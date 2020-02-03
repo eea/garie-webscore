@@ -3,6 +3,14 @@ const express = require('express')
 const nunjucks = require('nunjucks')
 const Influx = require('influx')
 
+const dev = (process.env.NODE_ENV || 'dev') === 'dev'
+const config = JSON.parse(
+  process.env.CONFIG ||
+  require('fs').readFileSync(`${__dirname}/examples/config.json`)
+)
+
+if(dev) console.debug('config =', config)
+
 const influx = new Influx.InfluxDB({
   host: process.env.INFLUX_HOST || 'influxdb',
   port: process.env.INFLUX_PORT || '8086',
