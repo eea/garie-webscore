@@ -11,10 +11,10 @@
     </tr>
   </thead>
   <tbody>
-  {% for url, value in data %}
+  {% for row in data %}
     <tr>
-      <td>{{ url }}</td>
-      <td>{{ value }}</td>
+      <td>{{ row.url }}</td>
+      <td>{{ row.links_integrity }}</td>
     </tr>
   {% endfor %}
   </tbody>

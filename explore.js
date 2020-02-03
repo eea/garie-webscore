@@ -27,6 +27,16 @@ async function query() {
   return data
 }
 
+async function getData() {
+  const result = await query()
+  const rv = []
+  for(const url of Object.keys(result)) {
+    if(config.urls.indexOf(url) < 0) continue
+    rv.push({url, links_integrity: result[url]})
+  }
+  return rv
+}
+
 const app = express()
 const port = process.env.PORT || '3000'
 
@@ -38,7 +48,7 @@ nunjucks.configure(`${__dirname}/templates`, {
 
 app.get('/', async (req, res, next) => {
   try {
-    const data = await query()
+    const data = await getData()
     res.render('index.html', {data})
   } catch(e) {
     next(e)
