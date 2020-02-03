@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express')
+const nunjucks = require('nunjucks')
 const Influx = require('influx')
 
 const influx = new Influx.InfluxDB({
@@ -21,14 +22,18 @@ async function query() {
 const app = express()
 const port = process.env.PORT || '3000'
 
-app.get('/data', async (req, res) => {
+nunjucks.configure(`${__dirname}/templates`, {
+  autoescape: true,
+  express: app,
+  watch: true
+})
+
+app.get('/', async (req, res, next) => {
   try {
     const data = await query()
-    res.json(data)
+    res.render('index.html', {data})
   } catch(e) {
-    console.error(e)
-    res.status(500)
-    res.send("Internal error")
+    next(e)
   }
 })
 

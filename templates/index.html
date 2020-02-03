@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf8">
+<title>Garie WebScore</title>
+<body>
+
+<table>
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>Links integrity</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for url, value in data %}
+    <tr>
+      <td>{{ url }}</td>
+      <td>{{ value }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
