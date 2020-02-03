@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const nunjucks = require('nunjucks')
 const queries = require('./queries')
+const metrics = require('./metrics')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 const config = JSON.parse(
@@ -23,7 +24,7 @@ nunjucks.configure(`${__dirname}/templates`, {
 app.get('/', async (req, res, next) => {
   try {
     const data = await queries.getData(config)
-    res.render('index.html', {data})
+    res.render('index.html', { data, metrics })
   } catch(e) {
     next(e)
   }

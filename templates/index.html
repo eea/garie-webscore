@@ -8,13 +8,18 @@
     <tr>
       <th>URL</th>
       <th>Links integrity</th>
+      {% for metric in metrics %}
+        <th>{{ metric.name }}</th>
+      {% endfor %}
     </tr>
   </thead>
   <tbody>
   {% for row in data %}
     <tr>
       <td>{{ row.url }}</td>
-      <td>{{ row.links_integrity }}</td>
+      {% for metric in metrics %}
+        <td>{{ row[metric.name] }}</td>
+      {% endfor %}
     </tr>
   {% endfor %}
   </tbody>

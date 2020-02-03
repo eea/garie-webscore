@@ -2,27 +2,36 @@ const Influx = require('influx')
 
 const influx = new Influx.InfluxDB({
   host: process.env.INFLUX_HOST || 'influxdb',
-  port: process.env.INFLUX_PORT || '8086',
-  database: 'linksintegrity'
+  port: process.env.INFLUX_PORT || '8086'
 })
 
-async function query() {
-  const result = await influx.query(`SELECT mean("value") AS "value" FROM "linksintegrity" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`)
+const metrics = require('./metrics')
+
+async function query(metric) {
+  const {name, query, database} = metric
+  const result = await influx.query(query, {database})
   const data = {}
   for(const row of result) {
-    const {url, value} = row
-    data[url] = value
+    data[row.url] = row[name]
   }
   return data
 }
 
 async function getData(config) {
-  const result = await query()
-  const rv = []
-  for(const url of Object.keys(result)) {
-    if(config.urls.indexOf(url) < 0) continue
-    rv.push({url, links_integrity: result[url]})
+  const metricResults = {}
+  for(const metric of metrics) {
+    metricResults[metric.name] = await query(metric)
   }
+
+  const rv = []
+  for(const url of config.urls) {
+    const row = {url}
+    for(const metric of metrics) {
+      row[metric.name] = metricResults[metric.name][url]
+    }
+    rv.push(row)
+  }
+
   return rv
 }
 
