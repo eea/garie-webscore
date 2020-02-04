@@ -11,14 +11,18 @@
     <thead class="thead-dark">
       <tr>
         <th scope="col">Metric</th>
-        <th scope="col">Score</th>
+        <th scope="col" class="text-center">Score</th>
       </tr>
     </thead>
     <tbody>
     {% for metric in metrics %}
       <tr>
-        <th scope="row">{{ metric.name }}</th>
-        <td>{{ data[metric.name] }}</td>
+        <th scope="row">
+          {{ metric.name }}
+        </th>
+        <td class="{{ metricStyle(metric, data[metric.name]) }} text-center">
+          {{ data[metric.name] }}
+        </td>
       </tr>
     {% endfor %}
     </tbody>

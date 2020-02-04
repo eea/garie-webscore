@@ -15,10 +15,34 @@ if(dev) console.debug('config =', config)
 const app = express()
 const port = process.env.PORT || '3000'
 
-nunjucks.configure(`${__dirname}/templates`, {
+const nunjucksEnv = nunjucks.configure(`${__dirname}/templates`, {
   autoescape: true,
   express: app,
   watch: true
+})
+
+function thresholdColor(thresholds, value) {
+  if (typeof value === 'number' && !isNaN(value)) {
+    const [red, yellow] = thresholds
+    if (value < red)
+      return "table-danger"
+    else if (value < yellow)
+      return "table-warning"
+    else
+      return "table-success"
+  } else {
+    return "table-secondary"
+  }
+}
+
+nunjucksEnv.addGlobal('metricStyle', function(metric, value) {
+  return thresholdColor(metric.thresholds, value)
+})
+
+nunjucksEnv.addGlobal('scoreStyle', function(value) {
+  const max = metrics.length * 100
+  const [red, yellow] = config.scoreThresholds
+  return thresholdColor([max * red, max * yellow], value)
 })
 
 function wrap(fn) {

@@ -9,14 +9,22 @@
     <thead class="thead-dark">
       <tr>
         <th scope="col">URL</th>
-        <th scope="col">Score</th>
+        <th scope="col" class="text-center">Score</th>
       </tr>
     </thead>
     <tbody>
     {% for row in data %}
       <tr>
-        <th scope="row"><a href="{{ row.url }}">{{ row.url }}</a></td>
-        <td><a href="/site/{{ row.url }}">{{ row.score }}</a></td>
+        <th scope="row">
+          <a href="{{ row.url }}">
+            {{ row.url }}
+          </a>
+        </td>
+        <td class="{{ scoreStyle(row.score) }} text-center">
+          <a href="/site/{{ row.url }}">
+            {{ row.score }}
+          </a>
+        </td>
       </tr>
     {% endfor %}
     </tbody>
