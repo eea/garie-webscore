@@ -55,6 +55,8 @@ nunjucksEnv.addGlobal('scoreStyle', function(value) {
   return thresholdColor([max * red, max * yellow], value)
 })
 
+nunjucksEnv.addGlobal('reportUrl', reports.reportUrl)
+
 function wrap(fn) {
   return async (req, res, next) => {
     try {

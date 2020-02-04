@@ -15,6 +15,38 @@ async function findReportPath(report, slug) {
   return name && `${parent}/${name}`
 }
 
+function reportFilename(metric) {
+  switch (metric.database) {
+    case "lighthouse":
+      return "lighthouse.html"
+
+    case "linksintegrity":
+      return "linksintegrity.txt"
+
+    case "privacyscore":
+      return "privacyscore.html"
+
+    case "securityheaders":
+      return "securityheaders.html"
+
+    case "ssllabs":
+      return "ssllabs.txt"
+
+    case "webbkoll":
+      return "webbkoll.html"
+
+    default:
+      return null
+  }
+}
+
+function reportUrl(metric) {
+  const filename = reportFilename(metric)
+  if (!filename) return null
+  return `${metric.database}-results/${filename}`
+}
+
 module.exports = {
-  findReportPath
+  findReportPath,
+  reportUrl
 }

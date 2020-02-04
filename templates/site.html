@@ -20,8 +20,16 @@
         <th scope="row">
           {{ metric.name }}
         </th>
-        <td class="{{ metricStyle(metric, data[metric.name]) }} text-center">
-          {{ data[metric.name] }}
+        {% set value = data[metric.name] %}
+        <td class="{{ metricStyle(metric, value) }} text-center">
+          {% set report = reportUrl(metric) %}
+          {% if report %}
+            <a href="/site/{{ urlSlug(data.url) }}/reports/{{ report }}">
+              {{ value }}
+            </a>
+          {% else %}
+            {{ value }}
+          {% endif %}
         </td>
       </tr>
     {% endfor %}
