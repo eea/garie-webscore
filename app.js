@@ -21,13 +21,19 @@ nunjucks.configure(`${__dirname}/templates`, {
   watch: true
 })
 
-app.get('/', async (req, res, next) => {
-  try {
-    const data = await queries.getData(config)
-    res.render('index.html', { data, metrics })
-  } catch(e) {
-    next(e)
+function wrap(fn) {
+  return async (req, res, next) => {
+    try {
+      await fn(req, res, next)
+    } catch(e) {
+      next(e)
+    }
   }
-})
+}
+
+app.get('/', wrap(async (req, res) => {
+  const data = await queries.getData(config)
+  res.render('index.html', { data, metrics })
+}))
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
