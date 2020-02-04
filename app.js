@@ -36,4 +36,14 @@ app.get('/', wrap(async (req, res) => {
   res.render('index.html', { data, metrics })
 }))
 
+app.get(/^\/site\/(.*)$/, wrap(async (req, res) => {
+  const url = req.params[0]
+  if (config.urls.indexOf(url) < 0) {
+    res.sendStatus(404)
+    return
+  }
+  const data = (await queries.getData(config)).find((row) => row.url === url)
+  res.render('site.html', { url, data, metrics })
+}))
+
 app.listen(port, () => console.log(`Listening on port ${port}`))

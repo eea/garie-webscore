@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ url }} &ndash; {{ super() }}{% endblock %}
+
+{% block content %}
+<h1>{{ url }}</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for metric in metrics %}
+    <tr>
+      <th>{{ metric.name }}</th>
+      <td>{{ data[metric.name] }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

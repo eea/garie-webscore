@@ -1,27 +1,20 @@
-<!doctype html>
-<meta charset="utf8">
-<title>Garie WebScore</title>
-<body>
+{% extends "base.html" %}
 
+{% block content %}
 <table>
   <thead>
     <tr>
       <th>URL</th>
       <th>Score</th>
-      {% for metric in metrics %}
-        <th>{{ metric.name }}</th>
-      {% endfor %}
     </tr>
   </thead>
   <tbody>
   {% for row in data %}
     <tr>
       <td>{{ row.url }}</td>
-      <td>{{ row.score }}</td>
-      {% for metric in metrics %}
-        <td>{{ row[metric.name] }}</td>
-      {% endfor %}
+      <td><a href="/site/{{ row.url }}">{{ row.score }}</a></td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
+{% endblock %}
