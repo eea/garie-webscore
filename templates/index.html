@@ -11,6 +11,9 @@
         <th scope="col">#</th>
         <th scope="col">URL</th>
         <th scope="col" class="text-center">Score</th>
+        {% for metric in importantMetrics %}
+          <th scope="col" class="text-center">{{ metric.name }}</th>
+        {% endfor %}
       </tr>
     </thead>
     <tbody>
@@ -29,6 +32,11 @@
             {{ row.score }}
           </a>
         </td>
+        {% for metric in importantMetrics %}
+          <td class="{{ metricStyle(metric, row[metric.name]) }} text-center">
+            {{ row[metric.name] }}
+          </td>
+        {% endfor %}
       </tr>
     {% endfor %}
     </tbody>

@@ -1,6 +1,7 @@
 const metrics = [
   {
     name: "Performance",
+    important: true,
     database: "lighthouse",
     query: `SELECT mean("value") AS "value" FROM "performance-score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
     thresholds: [50, 90]
@@ -37,12 +38,14 @@ const metrics = [
   },
   {
     name: "Encryption (TLS)",
+    important: true,
     database: "ssllabs",
     query: `SELECT mean("value") AS "value" FROM "ssl_score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
     thresholds: [1, 90]
   },
   {
     name: "Securityheaders.com",
+    important: true,
     database: "securityheaders",
     query: `SELECT mean("value") AS "value" FROM "header_score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
     thresholds: [20, 90]
@@ -55,6 +58,7 @@ const metrics = [
   },
   {
     name: "Uptime(30days)",
+    important: true,
     database: "uptimerobot",
     query: `SELECT mean("value") AS "value" FROM "uptime_score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
     thresholds: [95, 99]
@@ -103,12 +107,14 @@ const metrics = [
   },
   {
     name: "Privacyscore",
+    important: true,
     database: "privacyscore",
     query: `SELECT mean("value") AS "value" FROM "privacyscore" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
     thresholds: [50, 90]
   },
   {
     name: "Webbkoll",
+    important: true,
     database: "webbkoll",
     query: `SELECT mean("value") AS "value" FROM "webbkoll" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
     thresholds: [50, 90]

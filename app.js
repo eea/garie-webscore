@@ -58,7 +58,8 @@ function wrap(fn) {
 app.get('/', wrap(async (req, res) => {
   const data = await queries.getData(config)
   data.sort((a, b) => b.score - a.score)
-  res.render('index.html', { data, metrics })
+  const importantMetrics = metrics.filter((m) => m.important)
+  res.render('index.html', { data, importantMetrics })
 }))
 
 app.get(/^\/site\/(.*)$/, wrap(async (req, res) => {
