@@ -12,7 +12,7 @@ async function query(metric) {
   const result = await influx.query(query, {database})
   const data = {}
   for(const row of result) {
-    data[row.url] = row[name]
+    data[row.url] = row.value
   }
   return data
 }
