@@ -18,10 +18,9 @@ async function query(metric) {
 }
 
 async function getData(config) {
+  const results = await Promise.all(metrics.map((metric) => query(metric)))
   const metricResults = {}
-  for(const metric of metrics) {
-    metricResults[metric.name] = await query(metric)
-  }
+  metrics.forEach((metric, i) => metricResults[metric.name] = results[i])
 
   const rv = []
   for(const url of config.urls) {
