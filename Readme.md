@@ -35,5 +35,6 @@ docker run \
   --name webscore \
   -p 3000:3000 \
   -e INFLUX_HOST=10.50.4.103 \
+  -e REPORTS_PATH=/reports
   eea/garie-webscore
 ```

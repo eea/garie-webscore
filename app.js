@@ -3,6 +3,7 @@ const express = require('express')
 const nunjucks = require('nunjucks')
 const queries = require('./queries')
 const metrics = require('./metrics')
+const reports = require('./reports')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 const config = JSON.parse(
@@ -64,6 +65,12 @@ function wrap(fn) {
   }
 }
 
+const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/
+function isUpPath(path) {
+  // Check if path contains `..`, we don't want clients browsing our filesystem
+  return UP_PATH_REGEXP.test(path)
+}
+
 app.get('/', wrap(async (req, res) => {
   const data = await queries.getData(config)
   data.sort((a, b) => b.score - a.score)
@@ -83,6 +90,29 @@ app.get('/site/:slug', wrap(async (req, res) => {
     .find((row) => urlSlug(row.url) === slug)
 
   res.render('site.html', { data, metrics })
+}))
+
+app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {
+  const { slug, report } = req.params
+  const path = req.params[0] || 'index.html'
+
+  if (isUpPath(slug) || isUpPath(report)) {
+    res.sendStatus(403)
+    return
+  }
+
+  if (config.urls.map(urlSlug).indexOf(slug) < 0) {
+    res.sendStatus(404)
+    return
+  }
+
+  const root = await reports.findReportPath(report, slug)
+  if (!root) {
+    res.sendStatus(404)
+    return
+  }
+
+  res.sendFile(path, { root })
 }))
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
