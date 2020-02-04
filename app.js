@@ -35,6 +35,15 @@ function thresholdColor(thresholds, value) {
   }
 }
 
+function urlSlug(url) {
+  return url
+    .replace(/^http[s]?:\/\//, '')
+    .replace(/\/$/, '')
+    .replace(/[^a-zA-Z0-9.]+/g, '-')
+}
+
+nunjucksEnv.addGlobal('urlSlug', urlSlug)
+
 nunjucksEnv.addGlobal('metricStyle', function(metric, value) {
   return thresholdColor(metric.thresholds, value)
 })
@@ -62,14 +71,18 @@ app.get('/', wrap(async (req, res) => {
   res.render('index.html', { data, importantMetrics })
 }))
 
-app.get(/^\/site\/(.*)$/, wrap(async (req, res) => {
-  const url = req.params[0]
-  if (config.urls.indexOf(url) < 0) {
+app.get('/site/:slug', wrap(async (req, res) => {
+  const { slug } = req.params
+
+  if (config.urls.map(urlSlug).indexOf(slug) < 0) {
     res.sendStatus(404)
     return
   }
-  const data = (await queries.getData(config)).find((row) => row.url === url)
-  res.render('site.html', { url, data, metrics })
+
+  const data = (await queries.getData(config))
+    .find((row) => urlSlug(row.url) === slug)
+
+  res.render('site.html', { data, metrics })
 }))
 
 app.listen(port, () => console.log(`Listening on port ${port}`))

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}{{ url }} &ndash; {{ super() }}{% endblock %}
+{% block title %}{{ data.url }} &ndash; {{ super() }}{% endblock %}
 
 {% block content %}
 <div class="container">
 
-  <h1>{{ url }}</h1>
+  <h1>{{ data.url }}</h1>
 
   <table class="table table-striped table-sm">
     <thead class="thead-dark">
