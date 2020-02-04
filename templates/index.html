@@ -7,7 +7,7 @@
   <thead>
     <tr>
       <th>URL</th>
-      <th>Links integrity</th>
+      <th>Score</th>
       {% for metric in metrics %}
         <th>{{ metric.name }}</th>
       {% endfor %}
@@ -17,6 +17,7 @@
   {% for row in data %}
     <tr>
       <td>{{ row.url }}</td>
+      <td>{{ row.score }}</td>
       {% for metric in metrics %}
         <td>{{ row[metric.name] }}</td>
       {% endfor %}

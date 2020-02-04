@@ -24,10 +24,13 @@ async function getData(config) {
 
   const rv = []
   for(const url of config.urls) {
-    const row = {url}
+    const row = {url, score: 0}
     for(const metric of metrics) {
-      row[metric.name] = metricResults[metric.name][url]
+      const value = metricResults[metric.name][url]
+      row[metric.name] = value ? Math.round(value) : null
+      row.score += value || 0
     }
+    row.score = Math.round(row.score)
     rv.push(row)
   }
 
