@@ -1,21 +1,21 @@
-const fs = require('fs').promises
+const fs = require('fs')
 
-async function findReportPath(report, slug) {
+const findReportPath = async (report, slug) => {
   const reportsPath = process.env.REPORTS_PATH
   if (!reportsPath) throw new Error("Required env var REPORTS_PATH is not set")
   const parent = `${reportsPath}/${report}/${slug}`
   try {
-    if (!(await fs.lstat(parent)).isDirectory()) return null
+    if (!(await fs.promises.lstat(parent)).isDirectory()) return null
   } catch(e) {
     if(e.code === 'ENOENT') return null
     throw e
   }
-  const items = await fs.readdir(parent)
+  const items = await fs.promises.readdir(parent)
   const name = items.sort().reverse()[0]
   return name && `${parent}/${name}`
 }
 
-function reportFilename(metric) {
+const reportFilename = (metric) => {
   switch (metric.database) {
     case "lighthouse":
       return "lighthouse.html"
@@ -40,7 +40,7 @@ function reportFilename(metric) {
   }
 }
 
-function reportUrl(metric) {
+const reportUrl = (metric) => {
   const filename = reportFilename(metric)
   if (!filename) return null
   return `${metric.database}-results/${filename}`
@@ -48,5 +48,5 @@ function reportUrl(metric) {
 
 module.exports = {
   findReportPath,
-  reportUrl
+  reportUrl,
 }
