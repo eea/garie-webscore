@@ -76,7 +76,7 @@ const isUpPath = (path) => {
 }
 
 app.get('/', wrap(async (req, res) => {
-  const data = await queries.getData(config)
+  const data = await queries.getData()
   data.sort((a, b) => b.score - a.score)
   const importantMetrics = metrics.filter((m) => m.important)
   return res.render('index.html', { data, importantMetrics })
@@ -85,11 +85,11 @@ app.get('/', wrap(async (req, res) => {
 app.get('/site/:slug', wrap(async (req, res) => {
   const { slug } = req.params
 
-  if (config.urls.map(urlSlug).indexOf(slug) < 0)
-    return res.sendStatus(404)
-
-  const data = (await queries.getData(config))
+  const data = (await queries.getData())
     .find((row) => urlSlug(row.url) === slug)
+
+  if (! data)
+    return res.sendStatus(404)
 
   return res.render('site.html', { data, metrics })
 }))
@@ -100,9 +100,6 @@ app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {
 
   if (isUpPath(slug) || isUpPath(report))
     return res.sendStatus(403)
-
-  if (config.urls.map(urlSlug).indexOf(slug) < 0)
-    return res.sendStatus(404)
 
   const root = await reports.findReportPath(report, slug)
   if (!root)
