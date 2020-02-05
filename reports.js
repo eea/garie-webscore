@@ -15,35 +15,29 @@ const findReportPath = async (report, slug) => {
   return name && `${parent}/${name}`
 }
 
-const reportFilename = (metric) => {
+const reportUrl = (metric) => {
   switch (metric.database) {
     case "lighthouse":
-      return "lighthouse.html"
+      return "lighthouse-reports/lighthouse.html"
 
     case "linksintegrity":
-      return "linksintegrity.txt"
+      return "linksintegrity-results/linksintegrity.txt"
 
     case "privacyscore":
-      return "privacyscore.html"
+      return "privacyscore-results/privacyscore.html"
 
     case "securityheaders":
-      return "securityheaders.html"
+      return "securityheaders-results/securityheaders.html"
 
     case "ssllabs":
-      return "ssllabs.txt"
+      return "ssllabs-results/ssllabs.txt"
 
     case "webbkoll":
-      return "webbkoll.html"
+      return "webbkoll-results/webbkoll.html"
 
     default:
       return null
   }
-}
-
-const reportUrl = (metric) => {
-  const filename = reportFilename(metric)
-  if (!filename) return null
-  return `${metric.database}-results/${filename}`
 }
 
 module.exports = {
