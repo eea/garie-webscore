@@ -51,12 +51,6 @@ nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
 })
 
-nunjucksEnv.addGlobal('scoreStyle', (value) => {
-  const max = metrics.length * 100
-  const [red, yellow] = config.scoreThresholds
-  return thresholdColor([max * red, max * yellow], value)
-})
-
 nunjucksEnv.addGlobal('reportUrl', reports.reportUrl)
 
 const wrap = (fn) => {
