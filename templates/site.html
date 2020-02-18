@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}{{ data.url }} &ndash; {{ super() }}{% endblock %}
+{% block title %}{{ urlSlug(data.url) }} &ndash; {{ super() }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+h3 { margin-top: 1em }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
 
-  <h1><a href="/">Garie WebScore</a></h1>
-
-  <h2>Report for <a href="{{ data.url }}">{{ data.url }}</a></h2>
+  <h3>Report for <a href="{{ data.url }}">{{ urlSlug(data.url) }}</a></h3>
 
   <table class="table table-striped table-sm">
     <thead class="thead-dark">
