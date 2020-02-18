@@ -16,6 +16,14 @@ const query = async (metric) => {
   return data
 }
 
+const median = (values) => {
+  values.sort((a, b) => a - b)
+  if (!values.length > 0) return null
+  const half = Math.floor(values.length / 2)
+  if (values.length % 2) return values[half]
+  return Math.round((values[half - 1] + values[half]) / 2)
+}
+
 const getData = async () => {
   const results = await Promise.all(metrics.map((metric) => query(metric)))
   const metricResults = {}
@@ -26,17 +34,18 @@ const getData = async () => {
   for (const metric of metrics) {
     const results = metricResults[metric.name]
     for (const url of Object.keys(results)) {
-      const row = urlMap[url] || { url, score: 0 }
+      const row = urlMap[url] || { url, metrics: {}, score: 0 }
       urlMap[url] = row
       const value = results[url]
-      row[metric.name] = value ? Math.round(value) : null
-      row.score += value || 0
+      row.metrics[metric.name] = Math.round(value)
+      row.score += value
     }
   }
 
   const rv = Object.values(urlMap)
   for (const row of rv) {
     row.score = Math.round(row.score)
+    row.median = median(Object.values(row.metrics))
   }
 
   return rv

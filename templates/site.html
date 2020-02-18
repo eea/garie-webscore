@@ -20,7 +20,7 @@
         <th scope="row">
           {{ metric.name }}
         </th>
-        {% set value = data[metric.name] %}
+        {% set value = data.metrics[metric.name] %}
         <td class="{{ metricStyle(metric, value) }} text-center">
           {% set report = reportUrl(metric) %}
           {% if report %}

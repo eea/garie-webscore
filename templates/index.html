@@ -29,6 +29,10 @@ function sortNumbers(a, b) {
           data-field="total-score"
           data-sortable="true"
           data-sorter="sortNumbers">Total score</th>
+        <th scope="col" class="text-center"
+          data-field="median-score"
+          data-sortable="true"
+          data-sorter="sortNumbers">Median score</th>
         {% for metric in importantMetrics %}
           <th
             scope="col"
@@ -55,8 +59,11 @@ function sortNumbers(a, b) {
         <td class="text-center">
           {{ row.score }}
         </td>
+        <td class="text-center">
+          {{ row.median }}
+        </td>
         {% for metric in importantMetrics %}
-          {% set value = row[metric.name] %}
+          {% set value = row.metrics[metric.name] %}
           <td class="{{ metricStyle(metric, value) }} text-center">
             {{ value }}
           </td>
