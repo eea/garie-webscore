@@ -8,12 +8,6 @@ const metrics = require('./metrics')
 const reports = require('./reports')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
-const config = JSON.parse(
-  process.env.CONFIG ||
-  fs.readFileSync(`${__dirname}/examples/config.json`)
-)
-
-if(dev) console.debug('config =', config)
 
 const app = express()
 const port = process.env.PORT || '3000'
