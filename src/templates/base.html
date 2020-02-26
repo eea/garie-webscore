@@ -11,11 +11,22 @@
 <body>
 
 {% block navbar %}
-<nav class="navbar navbar-light bg-light">
+<nav class="navbar navbar-expand navbar-light bg-light">
   <a class="navbar-brand" href="/">Garie WebScore</a>
-  <a href="https://taskman.eionet.europa.eu/projects/infrastructure/wiki/Garie"
-    class="navbar-text">About</a>
+
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a href="https://taskman.eionet.europa.eu/projects/infrastructure/wiki/Garie"
+           class="nav-link">About</a>
+      </li>
+      <li class="nav-item">
+        <a href="/ondemand" class="nav-link">Scan on demand</a>
+      </li>
+    </ul>
+  </div>
 </nav>
+
 {% endblock %}
 
 {% block content %}

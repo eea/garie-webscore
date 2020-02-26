@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Scan on demand &ndash; {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h3>Scan on demand</h3>
+  <p>Enter a URL to scan. It might take a few minutes for all the results to be
+  ready.</p>
+
+  <form method="post">
+    <div class="form-group">
+      <label for="urlInput">Website URL</label>
+      <input class="form-control" name="url" id="urlInput">
+    </div>
+    <button type="submit" class="btn btn-primary">Scan</button>
+  </form>
+
+</div>
+
+{% endblock %}

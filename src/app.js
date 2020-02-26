@@ -2,10 +2,12 @@ require('dotenv').config()
 
 const fs = require('fs')
 const express = require('express')
+const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
 const queries = require('./queries')
 const metrics = require('./metrics')
 const reports = require('./reports')
+const ondemand = require('./ondemand')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 
@@ -17,6 +19,8 @@ const nunjucksEnv = nunjucks.configure(`${__dirname}/templates`, {
   express: app,
   watch: true,
 })
+
+app.use(bodyParser.urlencoded({ extended: false }));
 
 const thresholdColor = (thresholds, value) => {
   if (typeof value === 'number' && !isNaN(value)) {
@@ -94,6 +98,22 @@ app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {
     return res.sendStatus(404)
 
   return res.sendFile(path, { root })
+}))
+
+app.get('/ondemand', (req, res) => {
+  return res.render('ondemand.html')
+})
+
+app.post('/ondemand', wrap(async (req, res) => {
+  const job = await ondemand.launch(req.body.url)
+  return res.redirect(`/ondemand/${job.id}`)
+}))
+
+app.get('/ondemand/:id', wrap(async (req, res) => {
+  const job = await ondemand.poll(req.params.id)
+  if (! job)
+    return res.sendStatus(404)
+  return res.render('ondemand-results.html', { job })
 }))
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
