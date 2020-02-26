@@ -38,6 +38,8 @@ const metrics = [
   },
   {
     name: "Encryption (TLS)",
+    apiUrl: "http://garie-ssllabs:3000",
+    parseResult: (result) => result.ssl_score,
     important: true,
     database: "ssllabs",
     query: `SELECT mean("value") AS "value" FROM "ssl_score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,

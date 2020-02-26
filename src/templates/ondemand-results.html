@@ -17,9 +17,9 @@
     {% for scan in job.scans %}
       <tr>
         <th scope="row">
-          {{ scan.name }}
+          {{ scan.metric.name }}
         </th>
-        <th scope="row">
+        <td class="{{ metricStyle(scan.metric, scan.result) }} text-center">
           {% if scan.finished %}
             {% if scan.success %}
               {{ scan.result }}
@@ -29,7 +29,7 @@
           {% else %}
             waiting for results
           {% endif %}
-        </th>
+        </td>
       </tr>
     {% endfor %}
     </tbody>
