@@ -10,10 +10,16 @@ class Scan {
   }
 
   async launch() {
-    const res = await axios.post(`${this.metric.apiUrl}/scan`, {
-      url: this.url,
-    })
-    this.id = res.data.id
+    try {
+      const res = await axios.post(`${this.metric.apiUrl}/scan`, {
+        url: this.url,
+      })
+      this.id = res.data.id
+    } catch (err) {
+      console.error(err)
+      this.finished = true
+      this.success = false
+    }
   }
 
   async poll() {
