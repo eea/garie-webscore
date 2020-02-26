@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "app": "node app.js"
+    "app": "node src/app.js"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
