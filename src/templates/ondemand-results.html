@@ -4,7 +4,37 @@
 
 {% block content %}
 <div class="container">
-  <p>{{ job.id }}</p>
+  <h3>Results for {{ job.url }}</h3>
+
+  <table class="table table-striped table-sm">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Metric</th>
+        <th scope="col" class="text-center">Score</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for scan in job.scans %}
+      <tr>
+        <th scope="row">
+          {{ scan.name }}
+        </th>
+        <th scope="row">
+          {% if scan.finished %}
+            {% if scan.success %}
+              {{ scan.result }}
+            {% else %}
+              failed
+            {% endif %}
+          {% else %}
+            waiting for results
+          {% endif %}
+        </th>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
 </div>
 
 {% endblock %}
