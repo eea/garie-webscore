@@ -2,33 +2,53 @@ const axios = require('axios')
 
 const jobs = {}
 
-const scan_ssllabs = async (url) => {
-  const res = await axios.post('http://garie-ssllabs:3000/scan', { url })
-  const { id } = res.data
-  const parseResult = (result) => {
-    return result.ssl_score
+class Scan {
+  constructor(url) {
+    this.url = url
   }
-  const poll = async () => {
-    const res = await axios.get(`http://garie-ssllabs:3000/scan/${id}`)
+
+  async launch() {
+    const res = await axios.post(`${this.apiUrl}/scan`, {
+      url: this.url,
+    })
+    this.id = res.data.id
+  }
+
+  async poll() {
+    const res = await axios.get(`${this.apiUrl}/scan/${this.id}`)
     const { state, result } = res.data
     if (state === 'success') {
-      scan.finished = true
-      scan.success = true
-      scan.result = parseResult(result)
+      this.finished = true
+      this.success = true
+      this.result = this.parseResult(result)
     }
     if (state === 'error') {
-      scan.finished = true
-      scan.success = false
+      this.finished = true
+      this.success = false
     }
-    return scan
   }
-  const scan = { name: "ssllabs", poll }
-  return scan
 }
+
+class SslLabsScan extends Scan {
+  name = "Encryption (TLS)"
+  apiUrl = "http://garie-ssllabs:3000"
+
+  parseResult(result) {
+    return result.ssl_score
+  }
+}
+
+const scanners = [
+  SslLabsScan,
+]
 
 const launch = async (url) => {
   const job = { url, id: new Date().getTime(), scans: [] }
-  job.scans.push(await scan_ssllabs(url))
+  for (const scanner of scanners) {
+    const scan = new scanner(url)
+    await scan.launch()
+    job.scans.push(scan)
+  }
   jobs[job.id] = job
   return job
 }
