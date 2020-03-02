@@ -49,6 +49,11 @@ nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
 })
 
+nunjucksEnv.addGlobal('formatMetric', (value) => {
+  if (typeof(value) === 'number') return value
+  return "-"
+})
+
 nunjucksEnv.addGlobal('reportUrl', reports.reportUrl)
 
 const wrap = (fn) => {

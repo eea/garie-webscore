@@ -28,7 +28,7 @@ class Scan {
     if (state === 'success') {
       this.finished = true
       this.success = true
-      this.result = result
+      this.result = result || {}
     }
     if (state === 'error') {
       this.finished = true
@@ -42,7 +42,10 @@ class Scan {
       if (metric.database === this.api.database) {
         const row = { metric }
         if (this.success) {
-          row.value = Math.round(this.result[metric.measurement])
+          const value = this.result[metric.measurement]
+          if (typeof(value) === 'number') {
+            row.value = Math.round(value)
+          }
         }
         results.push(row)
       }

@@ -23,7 +23,7 @@
           <td class="{{ metricStyle(result.metric, result.value) }} text-center">
             {% if scan.finished %}
               {% if scan.success %}
-                {{ result.value }}
+                {{ formatMetric(result.value) }}
               {% else %}
                 failed
               {% endif %}

@@ -32,10 +32,10 @@ h3 { margin-top: 1em }
           {% set report = reportUrl(metric) %}
           {% if report %}
             <a href="/site/{{ urlSlug(data.url) }}/reports/{{ report }}">
-              {{ value }}
+              {{ formatMetric(value) }}
             </a>
           {% else %}
-            {{ value }}
+            {{ formatMetric(value) }}
           {% endif %}
         </td>
       </tr>

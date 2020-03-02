@@ -67,7 +67,7 @@ function sortNumbers(a, b) {
         {% for metric in importantMetrics %}
           {% set value = row.metrics[metric.name] %}
           <td class="{{ metricStyle(metric, value) }} text-center">
-            {{ value }}
+            {{ formatMetric(value) }}
           </td>
         {% endfor %}
       </tr>
