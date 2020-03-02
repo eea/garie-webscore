@@ -149,6 +149,10 @@ const onDemandApis = [
     database: "ssllabs",
     url: "http://garie-ssllabs:3000",
   },
+  {
+    database: "sonarqube",
+    url: "http://garie-sonarqube:3000",
+  },
 ]
 
 module.exports = {
