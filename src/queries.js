@@ -6,8 +6,9 @@ const influx = new Influx.InfluxDB({
   port: process.env.INFLUX_PORT || '8086'
 })
 
-const query = async (metric) => {
-  const {name, query, database} = metric
+const query = async (metricSpec) => {
+  const {name, measurement, select, database} = metricSpec
+  const query = `SELECT ${select} AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`
   const result = await influx.query(query, {database})
   const data = {}
   for (const row of result) {

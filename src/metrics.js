@@ -3,31 +3,36 @@ const metrics = [
     name: "Performance",
     important: true,
     database: "lighthouse",
-    query: `SELECT mean("value") AS "value" FROM "performance-score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "performance-score",
+    select: `mean("value")`,
     thresholds: [50, 90]
   },
   {
     name: "Progressive Web App",
     database: "lighthouse",
-    query: `SELECT mean("value") AS "value" FROM "pwa-score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "pwa-score",
+    select: `mean("value")`,
     thresholds: [50, 90]
   },
   {
     name: "Accessibility",
     database: "lighthouse",
-    query: `SELECT mean("value") AS "value" FROM "accessibility-score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "accessibility-score",
+    select: `mean("value")`,
     thresholds: [50, 90]
   },
   {
     name: "Best Practice",
     database: "lighthouse",
-    query: `SELECT mean("value") AS "value" FROM "best-practices-score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "best-practices-score",
+    select: `mean("value")`,
     thresholds: [50, 90]
   },
   {
     name: "Seo Score",
     database: "lighthouse",
-    query: `SELECT mean("value") AS "value" FROM "seo-score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "seo-score",
+    select: `mean("value")`,
     thresholds: [50, 90]
   },
   {
@@ -35,7 +40,8 @@ const metrics = [
     apiUrl: "http://garie-linksintegrity:3000",
     parseResult: (result) => result.linksintegrity,
     database: "linksintegrity",
-    query: `SELECT mean("value") AS "value" FROM "linksintegrity" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "linksintegrity",
+    select: `mean("value")`,
     thresholds: [95, 99]
   },
   {
@@ -44,83 +50,96 @@ const metrics = [
     parseResult: (result) => result.ssl_score,
     important: true,
     database: "ssllabs",
-    query: `SELECT mean("value") AS "value" FROM "ssl_score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "ssl_score",
+    select: `mean("value")`,
     thresholds: [1, 90]
   },
   {
     name: "Securityheaders.com",
     important: true,
     database: "securityheaders",
-    query: `SELECT mean("value") AS "value" FROM "header_score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "header_score",
+    select: `mean("value")`,
     thresholds: [20, 90]
   },
   {
     name: "Securityheaders(mozilla)",
     database: "securityheaders",
-    query: `SELECT mean("value") AS "value" FROM "mozilla_score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "mozilla_score",
+    select: `mean("value")`,
     thresholds: [25, 70]
   },
   {
     name: "Uptime(30days)",
     important: true,
     database: "uptimerobot",
-    query: `SELECT mean("value") AS "value" FROM "uptime_score" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "uptime_score",
+    select: `mean("value")`,
     thresholds: [95, 99]
   },
   {
     name: "Server errors(30)",
     database: "sentry-metrics",
-    query: `SELECT mean("value_30days") AS "value" FROM "ServerErrors/TotalVisits" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "ServerErrors/TotalVisits",
+    select: `mean("value_30days")`,
     thresholds: [95, 99]
   },
   {
     name: "JS errors(30)",
     database: "sentry-metrics",
-    query: `SELECT mean("value_30days") AS "value" FROM "JsEvents/TotalVisits" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "JsEvents/TotalVisits",
+    select: `mean("value_30days")`,
     thresholds: [95, 99]
   },
   {
     name: "Test coverage",
     database: "sonarqube",
-    query: `SELECT mean("value") AS "value" FROM "coverage_rating" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "coverage_rating",
+    select: `mean("value")`,
     thresholds: [30, 80]
   },
   {
     name: "Bugs",
     database: "sonarqube",
-    query: `SELECT mean("value") AS "value" FROM "security_rating" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "security_rating",
+    select: `mean("value")`,
     thresholds: [25, 75]
   },
   {
     name: "Vulnerabilities",
     database: "sonarqube",
-    query: `SELECT mean("value") AS "value" FROM "reliability_rating" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "reliability_rating",
+    select: `mean("value")`,
     thresholds: [25, 75]
   },
   {
     name: "Code smells",
     database: "sonarqube",
-    query: `SELECT mean("value") AS "value" FROM "sqale_rating" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "sqale_rating",
+    select: `mean("value")`,
     thresholds: [25, 75]
   },
   {
     name: "Duplication score",
     database: "sonarqube",
-    query: `SELECT mean("value") AS "value" FROM "non_duplication_rating" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "non_duplication_rating",
+    select: `mean("value")`,
     thresholds: [80, 95]
   },
   {
     name: "Privacyscore",
     important: true,
     database: "privacyscore",
-    query: `SELECT mean("value") AS "value" FROM "privacyscore" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "privacyscore",
+    select: `mean("value")`,
     thresholds: [50, 90]
   },
   {
     name: "Webbkoll",
     important: true,
     database: "webbkoll",
-    query: `SELECT mean("value") AS "value" FROM "webbkoll" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
+    measurement: "webbkoll",
+    select: `mean("value")`,
     thresholds: [50, 90]
   },
 ]
