@@ -28,7 +28,7 @@ class Scan {
     if (state === 'success') {
       this.finished = true
       this.success = true
-      this.result = this.metric.parseResult(result)
+      this.result = Math.round(this.metric.parseResult(result))
     }
     if (state === 'error') {
       this.finished = true
