@@ -37,7 +37,6 @@ const metrics = [
   },
   {
     name: "Links integrity",
-    apiUrl: "http://garie-linksintegrity:3000",
     database: "linksintegrity",
     measurement: "linksintegrity",
     select: `mean("value")`,
@@ -45,7 +44,6 @@ const metrics = [
   },
   {
     name: "Encryption (TLS)",
-    apiUrl: "http://garie-ssllabs:3000",
     important: true,
     database: "ssllabs",
     measurement: "ssl_score",
@@ -142,6 +140,18 @@ const metrics = [
   },
 ]
 
+const onDemandApis = [
+  {
+    database: "linksintegrity",
+    url: "http://garie-linksintegrity:3000",
+  },
+  {
+    database: "ssllabs",
+    url: "http://garie-ssllabs:3000",
+  },
+]
+
 module.exports = {
   metrics,
+  onDemandApis,
 }

@@ -1,17 +1,17 @@
 const axios = require('axios')
-const { metrics } = require('./metrics')
+const { metrics, onDemandApis } = require('./metrics')
 
 const jobs = {}
 
 class Scan {
-  constructor(metric, url) {
-    this.metric = metric
+  constructor(api, url) {
+    this.api = api
     this.url = url
   }
 
   async launch() {
     try {
-      const res = await axios.post(`${this.metric.apiUrl}/scan`, {
+      const res = await axios.post(`${this.api.url}/scan`, {
         url: this.url,
       })
       this.id = res.data.id
@@ -23,28 +23,40 @@ class Scan {
   }
 
   async poll() {
-    const res = await axios.get(`${this.metric.apiUrl}/scan/${this.id}`)
+    const res = await axios.get(`${this.api.url}/scan/${this.id}`)
     const { state, result } = res.data
     if (state === 'success') {
       this.finished = true
       this.success = true
-      this.result = Math.round(result[this.metric.measurement])
+      this.result = result
     }
     if (state === 'error') {
       this.finished = true
       this.success = false
     }
   }
+
+  getResults() {
+    const results = []
+    for (const metric of metrics) {
+      if (metric.database === this.api.database) {
+        const row = { metric }
+        if (this.success) {
+          row.value = Math.round(this.result[metric.measurement])
+        }
+        results.push(row)
+      }
+    }
+    return results
+  }
 }
 
 const launch = async (url) => {
   const job = { url, id: new Date().getTime(), scans: [] }
-  for (const metric of metrics) {
-    if (metric.apiUrl) {
-      const scan = new Scan(metric, url)
-      await scan.launch()
-      job.scans.push(scan)
-    }
+  for (const api of onDemandApis) {
+    const scan = new Scan(api, url)
+    await scan.launch()
+    job.scans.push(scan)
   }
   jobs[job.id] = job
   return job
