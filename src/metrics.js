@@ -38,7 +38,6 @@ const metrics = [
   {
     name: "Links integrity",
     apiUrl: "http://garie-linksintegrity:3000",
-    parseResult: (result) => result.linksintegrity,
     database: "linksintegrity",
     measurement: "linksintegrity",
     select: `mean("value")`,
@@ -47,7 +46,6 @@ const metrics = [
   {
     name: "Encryption (TLS)",
     apiUrl: "http://garie-ssllabs:3000",
-    parseResult: (result) => result.ssl_score,
     important: true,
     database: "ssllabs",
     measurement: "ssl_score",
