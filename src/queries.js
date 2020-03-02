@@ -1,5 +1,5 @@
 const Influx = require('influx')
-const metrics = require('./metrics')
+const { metrics } = require('./metrics')
 
 const influx = new Influx.InfluxDB({
   host: process.env.INFLUX_HOST || 'influxdb',

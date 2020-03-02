@@ -5,7 +5,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
 const queries = require('./queries')
-const metrics = require('./metrics')
+const { metrics } = require('./metrics')
 const reports = require('./reports')
 const ondemand = require('./ondemand')
 

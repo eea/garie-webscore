@@ -142,4 +142,6 @@ const metrics = [
   },
 ]
 
-module.exports = metrics
+module.exports = {
+  metrics,
+}

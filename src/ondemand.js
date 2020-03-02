@@ -1,5 +1,5 @@
 const axios = require('axios')
-const metrics = require('./metrics')
+const { metrics } = require('./metrics')
 
 const jobs = {}
 
