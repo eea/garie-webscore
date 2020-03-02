@@ -32,6 +32,8 @@ const metrics = [
   },
   {
     name: "Links integrity",
+    apiUrl: "http://garie-linksintegrity:3000",
+    parseResult: (result) => result.linksintegrity,
     database: "linksintegrity",
     query: `SELECT mean("value") AS "value" FROM "linksintegrity" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`,
     thresholds: [95, 99]
