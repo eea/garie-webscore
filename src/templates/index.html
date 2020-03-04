@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "./macros.html" import "metricDocs" %}
+{% from "./macros.html" import "metricDocs", "formatTrend" %}
 
 {% block head %}
 {{ super() }}
@@ -9,8 +9,12 @@
 
 {% block content %}
 <script>
+function getNumber(text) {
+  return +(text.match(/\d+/) || [0])[0]
+}
+
 function sortNumbers(a, b) {
-  return a - b;
+  return getNumber(a) - getNumber(b)
 }
 </script>
 <div class="container-fluid">
@@ -73,9 +77,10 @@ function sortNumbers(a, b) {
           </a>
         </td>
         {% for metric in importantMetrics %}
-          {% set value = row.metrics[metric.name] %}
-          <td class="{{ metricStyle(metric, value) }} text-center">
-            {{ formatMetric(value) }}
+          {% set result = row.metrics[metric.name] %}
+          <td class="{{ metricStyle(metric, result.value) }} text-center">
+            {{ formatMetric(result.value) }}
+            {{ formatTrend(result) }}
           </td>
         {% endfor %}
       </tr>

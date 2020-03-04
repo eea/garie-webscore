@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "./macros.html" import "metricDocs" %}
+{% from "./macros.html" import "metricDocs", "formatTrend" %}
 
 {% block title %}{{ urlSlug(data.url) }} &ndash; {{ super() }}{% endblock %}
 
@@ -29,15 +29,17 @@ h3 { margin-top: 1em }
           {{ metric.name }}
           {{ metricDocs(metric) }}
         </th>
-        {% set value = data.metrics[metric.name] %}
-        <td class="{{ metricStyle(metric, value) }} text-center">
+        {% set result = data.metrics[metric.name] %}
+        <td class="{{ metricStyle(metric, result.value) }} text-center">
           {% set report = reportUrl(metric) %}
           {% if report %}
             <a href="/site/{{ urlSlug(data.url) }}/reports/{{ report }}">
-              {{ formatMetric(value) }}
+              {{ formatMetric(result.value) }}
+              {{ formatTrend(result) }}
             </a>
           {% else %}
-            {{ formatMetric(value) }}
+            {{ formatMetric(result.value) }}
+            {{ formatTrend(result) }}
           {% endif %}
         </td>
       </tr>

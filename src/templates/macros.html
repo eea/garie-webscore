@@ -9,3 +9,13 @@
     </a>
   {%- endif %}
 {%- endmacro %}
+
+{% macro formatTrend(result) %}
+{% if result.maxTime %}
+  {% if result.value < result.max %}
+    <span class="arrow-down" data-toggle="tooltip" data-placement="right" title="{{ result.max }} on {{ result.maxTime }}">▼</span>
+  {% elif result.value > result.max %}
+    <span class="arrow-up" data-toggle="tooltip" data-placement="right" title="{{ result.max }} on {{ result.maxTime }}">▲</span>
+  {% endif %}
+{% endif %}
+{% endmacro %}
