@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "./macros.html" import "metricDocs" %}
 
 {% block title %}Results for scan on demand &ndash; {{ super() }}{% endblock %}
 
@@ -19,6 +20,7 @@
         <tr>
           <th scope="row">
             {{ result.metric.name }}
+            {{ metricDocs(result.metric) }}
           </th>
           <td class="{{ metricStyle(result.metric, result.value) }} text-center">
             {% if scan.finished %}

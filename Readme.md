@@ -38,3 +38,7 @@ docker run \
   -e REPORTS_PATH=/reports
   eea/garie-webscore
 ```
+
+
+## License
+Icons from https://icons.getbootstrap.com/, MIT license

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "./macros.html" import "metricDocs" %}
 
 {% block head %}
 {{ super() }}
@@ -42,7 +43,8 @@ function sortNumbers(a, b) {
             data-field="metric-{{ metric.name }}"
             data-sortable="true"
             data-sorter="sortNumbers">
-              {{- metric.name -}}
+              {{ metric.name }}
+              {{ metricDocs(metric) }}
           </th>
         {% endfor %}
       </tr>

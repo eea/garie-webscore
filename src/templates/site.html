@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "./macros.html" import "metricDocs" %}
 
 {% block title %}{{ urlSlug(data.url) }} &ndash; {{ super() }}{% endblock %}
 
@@ -26,6 +27,7 @@ h3 { margin-top: 1em }
       <tr>
         <th scope="row">
           {{ metric.name }}
+          {{ metricDocs(metric) }}
         </th>
         {% set value = data.metrics[metric.name] %}
         <td class="{{ metricStyle(metric, value) }} text-center">
