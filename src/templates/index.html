@@ -27,7 +27,7 @@ function sortNumbers(a, b) {
     <thead class="thead-dark">
       <tr>
         <th scope="col" data-field="rank">Rank</th>
-        <th scope="col" data-field="url">URL</th>
+        <th scope="col" data-field="url">Website</th>
         <th scope="col" class="text-center"
           data-field="total-score"
           data-sortable="true"
@@ -36,6 +36,7 @@ function sortNumbers(a, b) {
           data-field="median-score"
           data-sortable="true"
           data-sorter="sortNumbers">Median score</th>
+        <th scope="col">Full report</th>
         {% for metric in importantMetrics %}
           <th
             scope="col"
@@ -56,8 +57,8 @@ function sortNumbers(a, b) {
           {{ loop.index }}
         </th>
         <td scope="row">
-          <a href="/site/{{ urlSlug(row.url) }}">
-            {{ row.url }}
+          <a href="{{ row.url }}">
+            {{ urlSlug(row.url) }}
           </a>
         </td>
         <td class="text-center">
@@ -65,6 +66,11 @@ function sortNumbers(a, b) {
         </td>
         <td class="text-center">
           {{ row.median }}
+        </td>
+        <td class="text-center">
+          <a href="/site/{{ urlSlug(row.url) }}">
+            full report
+          </a>
         </td>
         {% for metric in importantMetrics %}
           {% set value = row.metrics[metric.name] %}
