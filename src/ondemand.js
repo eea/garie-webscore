@@ -1,6 +1,9 @@
 const axios = require('axios')
 const { metrics, onDemandApis } = require('./metrics')
 
+const JOB_POLL_INTERVAL = 3
+const JOB_LIFETIME = 24 * 3600
+
 const jobs = {}
 
 class Scan {
@@ -54,31 +57,77 @@ class Scan {
   }
 }
 
+const deltaSeconds = (t1, t0) => {
+  return (t1.getTime() - t0.getTime()) / 1000
+}
+
 const launch = async (url) => {
-  const job = { url, id: new Date().getTime(), scans: [] }
+  const job = {
+    url,
+    id: new Date().getTime(),
+    createTime: new Date(),
+    updateTime: new Date(),
+    scans: [],
+    done: false,
+  }
   for (const api of onDemandApis) {
     const scan = new Scan(api, url)
     await scan.launch()
     job.scans.push(scan)
   }
+  job.duration = () => {
+    return Math.round(deltaSeconds(job.updateTime, job.createTime))
+  }
   jobs[job.id] = job
   return job
 }
 
-const poll = async (jobId) => {
-  const job = jobs[jobId]
-  if (!job) return null
+const get = (jobId) => {
+  return jobs[jobId]
+}
 
+const poll = async (job) => {
+  if (job.done) return
+
+  let done = true
   for (const scan of job.scans) {
     if (!scan.finished) {
       await scan.poll()
     }
+    if (!scan.finished) done = false
   }
-
-  return job
+  job.done = done
+  job.updateTime = new Date()
 }
+
+let pollJobsRunning = false
+
+const pollJobs = async () => {
+  if (pollJobsRunning) return
+  try {
+    pollJobsRunning = true
+    for (const job of Object.values(jobs)) {
+      // Forget about old jobs
+      if (deltaSeconds(new Date(), job.createTime) > JOB_LIFETIME) {
+        delete jobs[job.id]
+      }
+
+      try {
+        await poll(job)
+      } catch(err) {
+        console.error(err)
+      }
+    }
+  } catch(err) {
+    console.error(err)
+  } finally {
+    pollJobsRunning = false
+  }
+}
+
+setInterval(pollJobs, JOB_POLL_INTERVAL * 1000)
 
 module.exports = {
   launch,
-  poll,
+  get,
 }
