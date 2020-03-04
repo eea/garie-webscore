@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "app": "node src/app.js"
+    "start": "node src/app.js"
   },
   "dependencies": {
     "axios": "^0.19.2",

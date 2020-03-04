@@ -6,4 +6,4 @@ RUN npm install
 COPY src ./
 
 ENV NODE_ENV=production
-CMD npm run app
+CMD npm start
