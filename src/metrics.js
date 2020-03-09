@@ -180,6 +180,10 @@ const onDemandApis = [
     database: "privacyscore",
     url: "http://garie-privacyscore:3000",
   },
+  {
+    database: "securityheaders",
+    url: "http://garie-securityheaders:3000",
+  },
 ]
 
 module.exports = {
