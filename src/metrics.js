@@ -184,6 +184,10 @@ const onDemandApis = [
     database: "securityheaders",
     url: "http://garie-securityheaders:3000",
   },
+  {
+    database: "sentry-metrics",
+    url: "http://garie-sentry-metrics:3000",
+  },
 ]
 
 module.exports = {
