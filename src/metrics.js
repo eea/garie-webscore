@@ -176,6 +176,10 @@ const onDemandApis = [
     database: "lighthouse",
     url: "http://garie-lighthouse:3000",
   },
+  {
+    database: "privacyscore",
+    url: "http://garie-privacyscore:3000",
+  },
 ]
 
 module.exports = {
