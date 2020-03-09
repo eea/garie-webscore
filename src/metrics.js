@@ -172,6 +172,10 @@ const onDemandApis = [
     database: "sonarqube",
     url: "http://garie-sonarqube:3000",
   },
+  {
+    database: "lighthouse",
+    url: "http://garie-lighthouse:3000",
+  },
 ]
 
 module.exports = {
