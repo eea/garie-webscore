@@ -118,7 +118,10 @@ app.get('/ondemand/:id', wrap(async (req, res) => {
   const job = await ondemand.get(req.params.id)
   if (! job)
     return res.sendStatus(404)
-  return res.render('ondemand-results.html', { job })
+  const template = req.query.contentonly
+    ? 'ondemand-results-content.html'
+    : 'ondemand-results.html'
+  return res.render(template, { job })
 }))
 
 app.listen(port, () => console.log(`Listening on port ${port}`))

@@ -1,51 +1,29 @@
 {% extends "base.html" %}
-{% from "./macros.html" import "metricDocs" %}
 
 {% block title %}Results for scan on demand &ndash; {{ super() }}{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h3>Results for {{ job.url }}</h3>
-
-  {% if not job.done %}
-    <p>Running for {{ job.duration() }}s ...</p>
-    <script>setTimeout(function() { window.location.href = window.location.href }, 3000)</script>
-  {% else %}
-    <p>Scan finished, took {{ job.duration() }}s</p>
-  {% endif %}
-
-  <table class="table table-striped table-sm">
-    <thead class="thead-dark">
-      <tr>
-        <th scope="col">Metric</th>
-        <th scope="col" class="text-center">Score</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for scan in job.scans %}
-      {% for result in scan.getResults() %}
-        <tr>
-          <th scope="row">
-            {{ result.metric.name }}
-            {{ metricDocs(result.metric) }}
-          </th>
-          <td class="{{ metricStyle(result.metric, result.value) }} text-center">
-            {% if scan.finished %}
-              {% if scan.success %}
-                {{ formatMetric(result.value) }}
-              {% else %}
-                failed
-              {% endif %}
-            {% else %}
-              waiting for {{ scan.api.database }}
-            {% endif %}
-          </td>
-        </tr>
-      {% endfor %}
-    {% endfor %}
-    </tbody>
-  </table>
-
+<div class="container" id="job-report">
+  {%- include "./ondemand-results-content.html" -%}
 </div>
+
+<script>
+function loadContent() {
+  fetch(window.location.href + '?contentonly=true')
+    .then(function(res) { return res.text(); })
+    .then(function(html) {
+      $('#job-report').html(html);
+      scheduleLoader();
+    });
+}
+
+function scheduleLoader() {
+  if (! $('#job-status').data('finished')) {
+    setTimeout(loadContent, 3000);
+  }
+}
+
+scheduleLoader()
+</script>
 
 {% endblock %}
