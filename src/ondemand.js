@@ -1,8 +1,9 @@
 const axios = require('axios')
 const { metrics, onDemandApis } = require('./metrics')
 
-const JOB_POLL_INTERVAL = 3
-const JOB_LIFETIME = 24 * 3600
+const JOB_POLL_INTERVAL = 3 // 3 seconds
+const JOB_LIFETIME = 24 * 3600 // 24 hours
+const JOB_TIMEOUT = 5 * 60 // 5 minutes
 
 const jobs = {}
 
@@ -18,6 +19,7 @@ class Scan {
         url: this.url,
       })
       this.id = res.data.id
+      this.jobUrl = `${this.api.url}/scan/${this.id}`
     } catch (err) {
       console.error(err)
       this.finished = true
@@ -25,8 +27,14 @@ class Scan {
     }
   }
 
+  timeout() {
+    console.error(`Scan timeout: ${this.jobUrl}`)
+    this.finished = true
+    this.success = false
+  }
+
   async poll() {
-    const res = await axios.get(`${this.api.url}/scan/${this.id}`)
+    const res = await axios.get(this.jobUrl)
     const { state, result } = res.data
     if (state === 'success') {
       this.finished = true
@@ -93,9 +101,15 @@ const poll = async (job) => {
   if (job.done) return
 
   let done = true
+  let timeout = deltaSeconds(new Date(), job.createTime) > JOB_TIMEOUT
   for (const scan of job.scans) {
     if (!scan.finished) {
-      await scan.poll()
+      if (timeout) {
+        scan.timeout()
+      }
+      else {
+        await scan.poll()
+      }
     }
     if (!scan.finished) done = false
   }
