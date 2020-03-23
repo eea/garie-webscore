@@ -188,6 +188,14 @@ const onDemandApis = [
     database: "sentry-metrics",
     url: "http://garie-sentry-metrics:3000",
   },
+  {
+    database: "uptimerobot",
+    url: "http://garie-uptimerobot:3000",
+  },
+  {
+    database: "webbkoll",
+    url: "http://garie-webbkoll:3000",
+  },
 ]
 
 module.exports = {
