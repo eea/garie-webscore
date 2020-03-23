@@ -17,7 +17,10 @@ const query = async (metricSpec) => {
   const [ metricsRows, maxRows ] = await Promise.all([
     influx.query(metricsQuery, { database }),
     influx.query(maxQuery, { database }),
-  ])
+  ]).catch((e) => {
+    console.error(e);
+    return [[], []];
+  })
 
   const maxValues = {}
   for (const row of maxRows) {
