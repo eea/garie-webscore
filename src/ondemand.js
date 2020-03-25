@@ -3,7 +3,7 @@ const { metrics, onDemandApis } = require('./metrics')
 
 const JOB_POLL_INTERVAL = 3 // 3 seconds
 const JOB_LIFETIME = 24 * 3600 // 24 hours
-const JOB_TIMEOUT = 5 * 60 // 5 minutes
+const JOB_TIMEOUT = +(process.env.ONDEMAND_JOB_TIMEOUT || 5 * 60) // 5 minutes
 
 const jobs = {}
 
