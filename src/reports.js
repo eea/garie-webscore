@@ -1,5 +1,7 @@
 const fs = require('fs')
 
+const SONARQUBE_URL = process.env.SONARQUBE_URL
+
 const findReportPath = async (report, slug) => {
   const reportsPath = process.env.REPORTS_PATH
   if (!reportsPath) throw new Error("Required env var REPORTS_PATH is not set")
@@ -15,29 +17,35 @@ const findReportPath = async (report, slug) => {
   return name && `${parent}/${name}`
 }
 
-const reportUrl = (metric) => {
+const reportUrl = (metric, slug) => {
+  const fileUrl = (fragment) => `/site/${slug}/reports/${fragment}`
   switch (metric.database) {
     case "lighthouse":
-      return "lighthouse-reports/lighthouse.html"
+      return fileUrl("lighthouse-reports/lighthouse.html")
 
     case "linksintegrity":
-      return "linksintegrity-results/linksintegrity.txt"
+      return fileUrl("linksintegrity-results/linksintegrity.txt")
 
     case "privacyscore":
-      return "privacyscore-results/privacyscore.html"
+      return fileUrl("privacyscore-results/privacyscore.html")
 
     case "securityheaders":
       if (metric.measurement === "mozilla_score") {
-        return "securityheaders-results/mozilla-observatory.txt"
+        return fileUrl("securityheaders-results/mozilla-observatory.txt")
       } else {
-        return "securityheaders-results/securityheaders.html"
+        return fileUrl("securityheaders-results/securityheaders.html")
       }
 
     case "ssllabs":
-      return "ssllabs-results/ssllabs.txt"
+      return fileUrl("ssllabs-results/ssllabs.txt")
 
     case "webbkoll":
-      return "webbkoll-results/webbkoll.html"
+      return fileUrl("webbkoll-results/webbkoll.html")
+
+    case "sonarqube":
+      if (SONARQUBE_URL) {
+        return `${SONARQUBE_URL}/projects?tags=${slug}`
+      }
 
     default:
       return null

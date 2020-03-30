@@ -31,9 +31,9 @@ h3 { margin-top: 1em }
         </th>
         {% set result = data.metrics[metric.name] %}
         <td class="{{ metricStyle(metric, result.value) }} text-center">
-          {% set report = reportUrl(metric) %}
+          {% set report = reportUrl(metric, urlSlug(data.url)) %}
           {% if report %}
-            <a href="/site/{{ urlSlug(data.url) }}/reports/{{ report }}">
+            <a href="{{ report }}">
               {{ formatMetric(result.value) }}
               {{ formatTrend(result) }}
             </a>
