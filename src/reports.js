@@ -27,7 +27,11 @@ const reportUrl = (metric) => {
       return "privacyscore-results/privacyscore.html"
 
     case "securityheaders":
-      return "securityheaders-results/securityheaders.html"
+      if (metric.measurement === "mozilla_score") {
+        return "securityheaders-results/mozilla-observatory.txt"
+      } else {
+        return "securityheaders-results/securityheaders.html"
+      }
 
     case "ssllabs":
       return "ssllabs-results/ssllabs.txt"
