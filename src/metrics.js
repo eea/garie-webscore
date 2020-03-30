@@ -110,7 +110,7 @@ const metrics = [
   {
     name: "Bugs",
     database: "sonarqube",
-    measurement: "security_rating",
+    measurement: "reliability_rating",
     field: "value",
     thresholds: [25, 75],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Bugs-JenkinsSonarqube"
@@ -118,7 +118,7 @@ const metrics = [
   {
     name: "Vulnerabilities",
     database: "sonarqube",
-    measurement: "reliability_rating",
+    measurement: "security_rating",
     field: "value",
     thresholds: [25, 75],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Vulnerabilities-JenkinsSonarqube"
