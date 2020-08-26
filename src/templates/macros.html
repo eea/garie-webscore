@@ -19,3 +19,9 @@
   {% endif %}
 {% endif %}
 {% endmacro %}
+
+{% macro formatSparkline(sparkline) %}
+  <span class="sparkline" data-toggle="tooltip" data-placement="right" title="{{ result.max }} on {{ result.maxTime }}">
+    {{ sparkline }}
+  </span>
+{% endmacro %}

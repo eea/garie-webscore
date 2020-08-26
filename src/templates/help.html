@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Quality metrics help &ndash; {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <p>EEA websites are audited daily and receive a score between 0 and 100 for each of the following metrics:
+    </p>
+    <ul>
+        <li>Performance - evaluated using Google Chrome Developer Tools</li>
+        <li>Progressive Web App - evaluated using Google Chrome Developer Tools</li>
+        <li>Accessibility - evaluated using Google Chrome Developer Tools (Audits)</li>
+        <li>Best Practice - evaluated using Google Chrome Developer Tools (Audits)</li>
+        <li>SEO Score - evaluated using Google Chrome Developer Tools (Audits)</li>
+        <li>Links Integrity -  the amount of broken links in websites is evaluated using linkchecker (https://github.com/linkchecker/linkchecker), which is run locally in a Docker container</li>
+        <li>Encryption (TLS) - certificates validity and configuration are evaluated using the tool at https://www.ssllabs.com/ssltest/ <li>SecurityHeaders.com - Checks for missing HTTP security headers in website responses using the tool at https://securityheaders.com/. This is somewhat outdated and mostly superseded by the next metric.</li>
+        <li>Securityheaders(mozilla) - also checks for missing HTTP security headers in website responses, but uses the tool at https://observatory.mozilla.org/</li>
+        <li>Uptime (30 days) - this metrics gives 100 if the site is never found down/unresponsive within the checks performed under the last 30d period.</li>
+        <li>Server Errors per visit - aggregation of the number of server-side errors/exception received in Sentry (sentry.eea.europa.eu) from the website, divided by the total number of website visits as logged by Matomo (https://matomo.org/)</li>
+        <li>JS Errors per visit - aggregation of the number of JS errors/exceptions received in Sentry(sentry.eea.europa.eu), divided by the number of website visits  as logged by Matomo (https://matomo.org/)</li>
+        <li>Test coverage - code quality metric that is computed based on the unit test coverage in Jenkins (ci.eionet.europa.eu)</li>
+        <li>Bugs - code quality metric that is computed based on the results of tests ran in Jenkins (ci.eionet.europa.eu) using the SonarQube plugin</li>
+        <li>Vulnerabilities - code quality metric that is computed based on the results of tests ran in Jenkins (ci.eionet.europa.eu) using the SonarQube plugin</li>
+        <li>Code smells - code quality metric is computed based on the results of tests ran in Jenkins (ci.eionet.europa.eu) using the SonarQube plugin</li>
+        <li>Duplication score - code quality metric is computed based on the results of tests ran in Jenkins (ci.eionet.europa.eu) using the SonarQube plugin</li>
+        <li>Privacy score - evaluated using https://privacyscore.org/</li>
+        <li>webbkoll.dataskydd.net - evaluated using Webbkoll (webbkoll.dataskydd.net), an online tool that simulates a normal browser visit and checks for potential privacy problems.</li>
+    </ul>
+    <p>For more info please visit <a href="https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics">the quality metrics wiki page</a>.</p>
+</div>
+{% endblock %}

@@ -4,10 +4,36 @@ const fs = require('fs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
+const sparkline = require('node-sparkline')
+const path = require('path')
+const { promisify } = require('util')
+
 const queries = require('./queries')
 const { metrics } = require('./metrics')
 const reports = require('./reports')
 const ondemand = require('./ondemand')
+
+
+const generateSparkline = (valuesList) => {
+  try {
+    console.log(valuesList)
+
+    const svg = sparkline({
+      values: valuesList,
+      width: 135,
+      height: 50,
+      stroke: '#000000',
+      strokeWidth: 1.25,
+      strokeOpacity: 1,
+    });
+
+    return svg
+  } catch (e) {
+    // return empty object
+    return {}
+    // console.error(e.toString())
+  }
+}
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 
@@ -21,6 +47,8 @@ const nunjucksEnv = nunjucks.configure(`${__dirname}/templates`, {
 })
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 const thresholdColor = (thresholds, value) => {
   if (typeof value === 'number' && !isNaN(value)) {
@@ -76,7 +104,8 @@ app.get('/', wrap(async (req, res) => {
   const data = await queries.getData()
   data.sort((a, b) => b.score - a.score)
   const importantMetrics = metrics.filter((m) => m.important)
-  return res.render('index.html', { data, importantMetrics })
+  // passing generateSparkline so it's used for the actual row data
+  return res.render('index.html', { data, importantMetrics, generateSparkline })
 }))
 
 app.get('/site/:slug', wrap(async (req, res) => {
@@ -123,5 +152,13 @@ app.get('/ondemand/:id', wrap(async (req, res) => {
     : 'ondemand-results.html'
   return res.render(template, { job })
 }))
+
+app.get('/help', (req, res) => {
+  return res.render('help.html')
+})
+
+app.get('/about', (req, res) => {
+  return res.render('about.html')
+})
 
 app.listen(port, () => console.log(`Listening on port ${port}`))

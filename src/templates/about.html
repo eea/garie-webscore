@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}About &ndash; {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <p>This site provides software quality checks and ratings for EEA websites. Hundreds of quality checks are performed daily and results can be visualized in a single unified dashboard.</p>
+
+    <p>The rating scale is from 0 (worst) to 100 (best).</p>
+
+    <p>The ratings evolution over time for each EEA site can also be visualized, with details for each check being available.</p>
+
+    <p>Checks and tests can be easily added by creating plugins (starting from an existing template); plugins can also collect results from other external systems.</p>
+
+    <p>For more info please visit <a href="https://taskman.eionet.europa.eu/projects/infrastructure/wiki/Garie">The Garie wiki page</a>.</p>
+</div>
+{% endblock %}

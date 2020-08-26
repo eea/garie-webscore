@@ -14,26 +14,39 @@ const query = async (metricSpec) => {
 
   const metricsQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
-  const [ metricsRows, maxRows ] = await Promise.all([
+  // last 30 days - should we add `LIMIT 30` ?
+  const timeSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(none) ORDER BY time ASC`
+
+  const [ metricsRows, maxRows, timesSeriesRows ] = await Promise.all([
     influx.query(metricsQuery, { database }),
     influx.query(maxQuery, { database }),
+    influx.query(timeSeriesQuery, { database }),
   ]).catch((e) => {
     console.error(e);
-    return [[], []];
+    return [[], [], []];
   })
 
   const maxValues = {}
   for (const row of maxRows) {
     maxValues[row.url] = {
       max: row.value,
-      maxTime: (row.time.toISOString() || "").substr(0,10),
+      maxTime: (row.time.toISOString() || "").substr(0, 10),
     }
+  }
+
+  const timeSeriesValues = new Object()
+  for (const row of timesSeriesRows) {
+    if (!timeSeriesValues[row.url]) {
+      timeSeriesValues[row.url] = []
+    }
+    timeSeriesValues[row.url].push(row.value)
   }
 
   const data = {}
   for (const { url, value } of metricsRows) {
     const { max, maxTime } = maxValues[url] || {}
-    data[url] = { value, max, maxTime }
+    const timeSeries = timeSeriesValues[url] || []
+    data[url] = { value, max, maxTime, timeSeries }
   }
 
   return data
@@ -64,7 +77,9 @@ const getData = async () => {
         value: Math.round(result.value),
         max: Math.round(result.max),
         maxTime: result.maxTime,
+        timeSeries: result.timeSeries
       }
+      //console.log(row.metrics[metric.name].timeSeries)
       row.score += result.value
     }
   }

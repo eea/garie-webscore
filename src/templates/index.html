@@ -1,10 +1,20 @@
 {% extends "base.html" %}
-{% from "./macros.html" import "metricDocs", "formatTrend" %}
+{% from "./macros.html" import "metricDocs", "formatTrend", "formatSparkline" %}
 
 {% block head %}
 {{ super() }}
 <link href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css" rel="stylesheet">
 <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+<style>
+  .sparkline canvas{
+    vertical-align: text-bottom;
+  }
+  .sparkline {
+    background: transparent;
+    height: 100px;
+    display: true;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -40,7 +50,6 @@ function sortNumbers(a, b) {
           data-field="median-score"
           data-sortable="true"
           data-sorter="sortNumbers">Median score</th>
-        <th scope="col">Full report</th>
         {% for metric in importantMetrics %}
           <th
             scope="col"
@@ -61,26 +70,28 @@ function sortNumbers(a, b) {
           {{ loop.index }}
         </th>
         <td scope="row">
-          <a href="{{ row.url }}">
-            {{ urlSlug(row.url) }}
-          </a>
+          {{ urlSlug(row.url) }}
+          <br/>
+          <a href="{{ row.url }}"
+             target="_blank" class="external">View site</a>
+             |
+          <a href="/site/{{ urlSlug(row.url) }}" class="external">View report</a>
         </td>
         <td class="text-center">
           {{ row.score }}
+          - <a href="/site/{{ urlSlug(row.url) }}">Full report</a>
         </td>
         <td class="text-center">
           {{ row.median }}
         </td>
-        <td class="text-center">
-          <a href="/site/{{ urlSlug(row.url) }}">
-            full report
-          </a>
-        </td>
         {% for metric in importantMetrics %}
           {% set result = row.metrics[metric.name] %}
+          {% set timeSeries = row.metrics[metric.name].timeSeries %}
           <td class="{{ metricStyle(metric, result.value) }} text-center">
             {{ formatMetric(result.value) }}
-            {{ formatTrend(result) }}
+            <br/>
+            <span class="sparkline" data-sparkline='{{ timeSeries }}'>
+            </span>
           </td>
         {% endfor %}
       </tr>
@@ -89,4 +100,41 @@ function sortNumbers(a, b) {
   </table>
 
 </div>
+{% endblock %}
+
+{% block finalscripts %}
+{{ super() }}
+
+<script src="/static/js/sparkline.js"></script>
+<script>
+$(document).ready(function(){
+  var sparklineSpans = document.getElementsByClassName("sparkline");
+  var i;
+
+  for (i = 0; i < sparklineSpans.length; i++) {
+    var attr = sparklineSpans[i].getAttribute('data-sparkline');
+    var valuesList;
+    if (attr === "") {
+      // do not display empty sparklines
+      continue;
+    } else {
+      values_list = attr.split(',').map(item => {
+        if (! item) return 0;
+        return parseInt(item);
+      });
+    }
+    var sparkline = new Sparkline(sparklineSpans[i], {
+        lineColor: "#666",
+        width: 100,
+        dotRadius: 3,
+        // using 0 breaks check in sparkline.js
+        minValue: 1,
+        maxValue: 100
+      }
+    );
+    sparkline.draw(values_list);
+  }
+
+});
+</script>
 {% endblock %}
