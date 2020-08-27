@@ -29,7 +29,13 @@
     results, can be found at the
     <a href="https://garie.eea.europa.eu/" target="_blank">Websites QA dashboard</a>.
   </p>
-
+  <p>
+  <label for="time-selection">Display metrics evolution:</label>
+  <select name="time-selection" id="time-selection">
+    <option value="7">7 days</option>
+    <option value="30" selected="selected">30 days</option>
+  </select>
+  </p>
   <table class="table table-striped table-sm">
     <thead class="thead-dark">
       <tr>
@@ -75,35 +81,55 @@
 {{ super() }}
 
 <script src="/static/js/sparkline.js"></script>
+
 <script>
-$(document).ready(function(){
-  var sparklineSpans = document.getElementsByClassName("sparkline");
-  var i;
+// Closure to allow parameters to document.ready functions
+function drawSparklines(numberOfDays) {
+  return function() {
+    var sparklineSpans = document.getElementsByClassName("sparkline");
 
-  for (i = 0; i < sparklineSpans.length; i++) {
-    var attr = sparklineSpans[i].getAttribute('data-sparkline');
-    var valuesList;
-    if (attr === "") {
-      // do not display empty sparklines
-      continue;
-    } else {
-      values_list = attr.split(',').map(item => {
-        if (! item) return 0;
-        return parseInt(item);
-      });
-    }
-    var sparkline = new Sparkline(sparklineSpans[i], {
-        lineColor: "#666",
-        width: 100,
-        dotRadius: 3,
-        // using 0 breaks check in sparkline.js
-        minValue: 1,
-        maxValue: 100
+    for (var i = 0; i < sparklineSpans.length; i++) {
+      var attr = sparklineSpans[i].getAttribute('data-sparkline');
+      var valuesList;
+      if (attr === "") {
+        // do not display empty sparklines
+        continue;
+      } else {
+        valuesList = attr.split(',').map(item => {
+          if (! item) return 0;
+          return parseInt(item);
+        });
       }
-    );
-    sparkline.draw(values_list);
+      var sparkline = new Sparkline(sparklineSpans[i], {
+          lineColor: "#666",
+          width: 100,
+          dotRadius: 3,
+          // using 0 breaks check in sparkline.js
+          minValue: 1,
+          maxValue: 100
+        }
+      );
+      // valuesList has the most recent date as its last element
+      var begin = valuesList.length - 1 - numberOfDays;
+      if (begin < 0) {
+        begin = 0;
+      }
+      valuesList = valuesList.slice(begin, valuesList.length - 1);
+      sparkline.draw(valuesList);
+    }
   }
+}
 
+// On document ready, display sparklines for selected time period
+$(document).ready(drawSparklines(parseInt($('#time-selection').val())));
+
+$(function(){ /* DOM ready */
+  $('#time-selection').change(function(){
+    // get number of selected days, then re-draw sparklines.
+    days = parseInt($(this).val());
+    drawSparklines(days)();
+  });
 });
+
 </script>
 {% endblock %}
