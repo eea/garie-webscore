@@ -12,7 +12,7 @@
   .sparkline {
     background: transparent;
     height: 100px;
-    display: true;
+    display: inline;
   }
 </style>
 {% endblock %}
@@ -123,6 +123,14 @@ function drawSparklines(numberOfDays) {
     for (var i = 0; i < sparklineSpans.length; i++) {
       var attr = sparklineSpans[i].getAttribute('data-sparkline');
       var valuesList;
+
+      if (numberOfDays === 0) {
+        sparklineSpans[i].style.display = 'none';
+        continue;
+      } else {
+        sparklineSpans[i].style.display = 'inline';
+      }
+
       if (attr === "") {
         // do not display empty sparklines
         continue;
