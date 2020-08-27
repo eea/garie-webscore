@@ -120,8 +120,6 @@ function drawSparklines(numberOfDays) {
   return function() {
     var sparklineSpans = document.getElementsByClassName("sparkline");
 
-    //TODO: treat the zero case separately - maybe hide the spans
-
     for (var i = 0; i < sparklineSpans.length; i++) {
       var attr = sparklineSpans[i].getAttribute('data-sparkline');
       var valuesList;
@@ -154,11 +152,12 @@ function drawSparklines(numberOfDays) {
   }
 }
 
-$(document).ready(drawSparklines(7));
+// On document ready, display sparklines for selected time period
+$(document).ready(drawSparklines(parseInt($('#time-selection').val())));
 
 $(function(){ /* DOM ready */
   $('#time-selection').change(function(){
-    // get number of selected days, then redraw sparklines.
+    // get number of selected days, then re-draw sparklines.
     days = parseInt($(this).val());
     drawSparklines(days)();
   });
