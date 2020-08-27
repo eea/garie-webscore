@@ -53,6 +53,7 @@ function sortNumbers(a, b) {
         <th scope="col" class="text-center"
           data-field="total-score"
           data-sortable="true"
+          data-sort-name="_total-score_data"
           data-sorter="sortNumbers">Total score</th>
         <th scope="col" class="text-center"
           data-field="median-score"
@@ -80,14 +81,12 @@ function sortNumbers(a, b) {
         <td scope="row">
           {{ urlSlug(row.url) }}
           <br/>
-          <a href="{{ row.url }}"
-             target="_blank" class="external">View site</a>
+          <a href="{{ row.url }}"  class="external" target="_blank">View site</a>
              |
-          <a href="/site/{{ urlSlug(row.url) }}" class="external">View report</a>
+          <a href="/site/{{ urlSlug(row.url) }}">View report</a>
         </td>
-        <td class="text-center">
-          {{ row.score }}
-          - <a href="/site/{{ urlSlug(row.url) }}">Full report</a>
+        <td class="text-center" data-score="{{ row.score }}">
+          <a href="/site/{{ urlSlug(row.url) }}">{{ row.score }}</a>
         </td>
         <td class="text-center">
           {{ row.median }}
