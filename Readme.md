@@ -1,5 +1,5 @@
 # garie-webscore
-Garie-WebScore report on the health of websites with data from InfluxDB.
+Garie-WebScore report website on the health of websites with data from InfluxDB.
 
 ## Development
 
