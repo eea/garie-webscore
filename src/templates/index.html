@@ -149,11 +149,11 @@ function drawSparklines(numberOfDays) {
         }
       );
       // valuesList has the most recent date as its last element
-      var begin = valuesList.length - 1 - numberOfDays;
+      var begin = valuesList.length - numberOfDays;
       if (begin < 0) {
         begin = 0;
       }
-      valuesList = valuesList.slice(begin, valuesList.length - 1);
+      valuesList = valuesList.slice(begin, valuesList.length);
       sparkline.draw(valuesList);
     }
   }
