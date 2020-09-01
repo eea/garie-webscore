@@ -14,6 +14,9 @@
     height: 100px;
     display: inline;
   }
+  #spinner-sparklines {
+    display: none;
+  }
 </style>
 {% endblock %}
 
@@ -37,14 +40,16 @@ function sortNumbers(a, b) {
   better. The scores are calculated daily using various scanning and monitoring
   tools. Click on a website for details.</p>
 
-  <p>
   <label for="time-selection">Display metrics evolution:</label>
   <select name="time-selection" id="time-selection">
     <option value="7">7 days</option>
     <option value="30" selected="selected">30 days</option>
     <option value="0">Do not display</option>
   </select>
-  </p>
+  <div class="spinner-border spinner-border-sm" role="status" id="spinner-sparklines">
+    <span class="sr-only">Loading...</span>
+  </div>
+
   <table
     class="table table-striped table-sm"
     data-toggle="table"
@@ -170,9 +175,19 @@ $(document).ready(drawSparklines(parseInt($('#time-selection').val())));
 
 $(function(){ /* DOM ready */
   $('#time-selection').change(function(){
-    // get number of selected days, then re-draw sparklines.
+    // Show spinner
+    spinner = document.getElementById("spinner-sparklines");
+    spinner.style.display = "inline-block";
+
+    // Get number of selected days
     days = parseInt($(this).val());
-    drawSparklines(days)();
+
+    // Hide spinner on drawSparklines() completion
+    setTimeout(function() {
+      drawSparklines(days)();
+      spinner = document.getElementById("spinner-sparklines");
+      spinner.style.display = "none";
+    });
   });
 });
 
