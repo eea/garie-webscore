@@ -20,7 +20,11 @@
 {% block content %}
 <script>
 function getNumber(text) {
-  return +(text.match(/\d+/) || [0])[0]
+  try {
+    return +(text.match(/\d+/) || [0])[0];
+  } catch (error) {
+    return 0;
+  }
 }
 
 function sortNumbers(a, b) {
@@ -58,6 +62,7 @@ function sortNumbers(a, b) {
         <th scope="col" class="text-center"
           data-field="median-score"
           data-sortable="true"
+          data-sort-name="_median-score_data"
           data-sorter="sortNumbers">Median score</th>
         {% for metric in importantMetrics %}
           <th
@@ -65,6 +70,7 @@ function sortNumbers(a, b) {
             class="text-center"
             data-field="metric-{{ metric.name }}"
             data-sortable="true"
+            data-sort-name="_metric-{{ metric.name }}_data"
             data-sorter="sortNumbers">
               {{ metric.name }}
               {{ metricDocs(metric) }}
@@ -97,7 +103,7 @@ function sortNumbers(a, b) {
           <td class="{{ metricStyle(metric, result.value) }} text-center">
             {{ formatMetric(result.value) }}
             <br/>
-            <span class="sparkline" data-sparkline='{{ timeSeries }}'>
+            <span class="sparkline" data-sparkline="{{ timeSeries }}" data-toggle="tooltip" data-placement="right">
             </span>
           </td>
         {% endfor %}
