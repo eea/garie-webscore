@@ -26,12 +26,19 @@ function getNumber(text) {
   try {
     return +(text.match(/\d+/) || [0])[0];
   } catch (error) {
+    // Simply return 0 if no number could be extracted.
     return 0;
   }
 }
 
 function sortNumbers(a, b) {
   return getNumber(a) - getNumber(b)
+}
+
+function sortScores(a, b) {
+  if (a.score < b.score) return -1;
+  if (a.score > b.score) return 1;
+  return 0;
 }
 </script>
 <div class="container-fluid">
@@ -63,7 +70,7 @@ function sortNumbers(a, b) {
           data-field="total-score"
           data-sortable="true"
           data-sort-name="_total-score_data"
-          data-sorter="sortNumbers">Total score</th>
+          data-sorter="sortScores">Total score</th>
         <th scope="col" class="text-center"
           data-field="median-score"
           data-sortable="true"
