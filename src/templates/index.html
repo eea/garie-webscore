@@ -59,6 +59,7 @@ function sortScores(a, b) {
 
   <table
     class="table table-striped table-sm"
+    id="data-table"
     data-toggle="table"
     data-sort-name="total-score"
     data-sort-order="desc">
@@ -181,7 +182,7 @@ function drawSparklines(numberOfDays) {
 $(document).ready(drawSparklines(parseInt($('#time-selection').val())));
 
 $(function(){ /* DOM ready */
-  $('#time-selection').change(function(){
+  $('#time-selection').change(function() {
     // Show spinner
     spinner = document.getElementById("spinner-sparklines");
     spinner.style.display = "inline-block";
@@ -195,6 +196,13 @@ $(function(){ /* DOM ready */
       spinner = document.getElementById("spinner-sparklines");
       spinner.style.display = "none";
     });
+  });
+
+  $('#data-table').on('post-body.bs.table', function() {
+    // When data is reordered, sparklines need to be redrawn
+    days = parseInt($('#time-selection').val());
+    // TODO: this is a bit time-consuming
+    drawSparklines(days)();
   });
 });
 
