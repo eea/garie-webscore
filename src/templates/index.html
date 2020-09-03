@@ -75,7 +75,7 @@ function sortScores(a, b) {
           data-field="median-score"
           data-sortable="true"
           data-sort-name="_median-score_data"
-          data-sorter="sortNumbers">Median score</th>
+          data-sorter="sortScores">Median score</th>
         {% for metric in importantMetrics %}
           <th
             scope="col"
@@ -83,7 +83,7 @@ function sortScores(a, b) {
             data-field="metric-{{ metric.name }}"
             data-sortable="true"
             data-sort-name="_metric-{{ metric.name }}_data"
-            data-sorter="sortNumbers">
+            data-sorter="sortScores">
               {{ metric.name }}
               {{ metricDocs(metric) }}
           </th>
@@ -106,13 +106,13 @@ function sortScores(a, b) {
         <td class="text-center" data-score="{{ row.score }}">
           <a href="/site/{{ urlSlug(row.url) }}">{{ row.score }}</a>
         </td>
-        <td class="text-center">
+        <td class="text-center" data-score="{{ row.median }}">
           {{ row.median }}
         </td>
         {% for metric in importantMetrics %}
           {% set result = row.metrics[metric.name] %}
           {% set timeSeries = row.metrics[metric.name].timeSeries %}
-          <td class="{{ metricStyle(metric, result.value) }} text-center">
+          <td class="{{ metricStyle(metric, result.value) }} text-center" data-score="{{ result.value }}">
             {{ formatMetric(result.value) }}
             <br/>
             <span class="sparkline" data-sparkline="{{ timeSeries }}" data-toggle="tooltip" data-placement="right">
