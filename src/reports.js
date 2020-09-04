@@ -47,6 +47,9 @@ const reportUrl = (metric, slug) => {
         return `${SONARQUBE_URL}/projects?tags=${slug}`
       }
 
+    case "browsertime":
+      return fileUrl("browsertime-results/browsertime.json")
+
     default:
       return null
   }

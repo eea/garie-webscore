@@ -157,6 +157,15 @@ const metrics = [
     thresholds: [50, 90],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#webbkolldataskyddnet"
   },
+  {
+    name: "Browsertime",
+    important: true,
+    database: "browsertime",
+    measurement: "timings.navigationTiming.domInteractive.median",
+    field: "value",
+    thresholds: [50, 90],
+    docs: ""
+  },
 ]
 
 const onDemandApis = [
@@ -195,6 +204,10 @@ const onDemandApis = [
   {
     database: "webbkoll",
     url: "http://garie-webbkoll:3000",
+  },
+    {
+    database: "browsertime",
+    url: "http://garie-browsertime:3000",
   },
 ]
 
