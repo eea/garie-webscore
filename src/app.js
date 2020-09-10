@@ -73,6 +73,12 @@ const urlSlug = (url) => {
 
 nunjucksEnv.addGlobal('urlSlug', urlSlug)
 
+const urlHostname = (url) => {
+  return (new URL(url)).hostname
+}
+
+nunjucksEnv.addGlobal('urlHostname', urlHostname)
+
 nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
 })
