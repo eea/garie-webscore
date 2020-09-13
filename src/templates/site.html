@@ -17,6 +17,9 @@
     height: 100px;
     display: inline;
   }
+  #spinner-sparklines {
+    display: none;
+  }
 </style>
 {% endblock %}
 
@@ -29,13 +32,16 @@
     results, can be found at the
     <a href="https://garie.eea.europa.eu/" target="_blank">Websites QA dashboard</a>.
   </p>
-  <p>
+
   <label for="time-selection">Display metrics evolution:</label>
   <select name="time-selection" id="time-selection">
     <option value="7">7 days</option>
     <option value="30" selected="selected">30 days</option>
   </select>
-  </p>
+  <div class="spinner-border spinner-border-sm" role="status" id="spinner-sparklines">
+    <span class="sr-only">Loading...</span>
+  </div>
+
   <table class="table table-striped table-sm">
     <thead class="thead-dark">
       <tr>
@@ -125,9 +131,17 @@ $(document).ready(drawSparklines(parseInt($('#time-selection').val())));
 
 $(function(){ /* DOM ready */
   $('#time-selection').change(function(){
+    // Show spinner
+    spinner = document.getElementById("spinner-sparklines");
+    spinner.style.display = "inline-block";
+
     // get number of selected days, then re-draw sparklines.
     days = parseInt($(this).val());
-    drawSparklines(days)();
+    setTimeout(function() {
+      drawSparklines(days)();
+      spinner = document.getElementById("spinner-sparklines");
+      spinner.style.display = "none";
+    });
   });
 });
 
