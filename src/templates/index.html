@@ -26,8 +26,8 @@ function getNumber(text) {
   try {
     return +(text.match(/\d+/) || [0])[0];
   } catch (error) {
-    // Simply return 0 if no number could be extracted.
-    return 0;
+    // Simply return -1 if no number could be extracted, to ensure empty cells come before 0 cells.
+    return -1;
   }
 }
 
