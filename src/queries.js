@@ -79,7 +79,6 @@ const getData = async () => {
         maxTime: result.maxTime,
         timeSeries: result.timeSeries
       }
-      //console.log(row.metrics[metric.name].timeSeries)
       row.score += result.value
     }
   }

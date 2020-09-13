@@ -16,7 +16,6 @@ const ondemand = require('./ondemand')
 
 const generateSparkline = (valuesList) => {
   try {
-    console.log(valuesList)
 
     const svg = sparkline({
       values: valuesList,
