@@ -11,7 +11,6 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "influx": "^5.5.1",
-    "node-sparkline": "^1.1.1",
     "nunjucks": "^3.2.0"
   }
 }

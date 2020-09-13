@@ -4,7 +4,6 @@ const fs = require('fs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
-const sparkline = require('node-sparkline')
 const path = require('path')
 const { promisify } = require('util')
 
@@ -12,27 +11,6 @@ const queries = require('./queries')
 const { metrics } = require('./metrics')
 const reports = require('./reports')
 const ondemand = require('./ondemand')
-
-
-const generateSparkline = (valuesList) => {
-  try {
-
-    const svg = sparkline({
-      values: valuesList,
-      width: 135,
-      height: 50,
-      stroke: '#000000',
-      strokeWidth: 1.25,
-      strokeOpacity: 1,
-    });
-
-    return svg
-  } catch (e) {
-    // return empty object
-    return {}
-    // console.error(e.toString())
-  }
-}
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 
@@ -109,8 +87,7 @@ app.get('/', wrap(async (req, res) => {
   const data = await queries.getData()
   data.sort((a, b) => b.score - a.score)
   const importantMetrics = metrics.filter((m) => m.important)
-  // passing generateSparkline so it's used for the actual row data
-  return res.render('index.html', { data, importantMetrics, generateSparkline })
+  return res.render('index.html', { data, importantMetrics })
 }))
 
 app.get('/site/:slug', wrap(async (req, res) => {
