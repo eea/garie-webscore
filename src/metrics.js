@@ -161,7 +161,7 @@ const metrics = [
     name: "Browsertime",
     important: true,
     database: "browsertime",
-    measurement: "timings.navigationTiming.domInteractive.median",
+    measurement: "browsertimeScore",
     field: "value",
     thresholds: [50, 90],
     docs: ""
