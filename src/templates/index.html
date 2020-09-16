@@ -62,21 +62,25 @@ function sortScores(a, b) {
     id="data-table"
     data-toggle="table"
     data-sort-name="total-score"
-    data-sort-order="desc">
+    data-sort-order="desc"
+    data-search="true"
+    data-search-align="left">
     <thead class="thead-dark">
       <tr>
         <th scope="col" data-field="rank">Rank</th>
-        <th scope="col" data-field="url">Website</th>
+        <th scope="col" data-field="url" data-searchable="true">Website</th>
         <th scope="col" class="text-center"
           data-field="total-score"
           data-sortable="true"
           data-sort-name="_total-score_data"
-          data-sorter="sortScores">Total score</th>
+          data-sorter="sortScores"
+          data-searchable="false">Total score</th>
         <th scope="col" class="text-center"
           data-field="median-score"
           data-sortable="true"
           data-sort-name="_median-score_data"
-          data-sorter="sortScores">Median score</th>
+          data-sorter="sortScores"
+          data-searchable="false">Median score</th>
         {% for metric in importantMetrics %}
           <th
             scope="col"
@@ -84,7 +88,8 @@ function sortScores(a, b) {
             data-field="metric-{{ metric.name }}"
             data-sortable="true"
             data-sort-name="_metric-{{ metric.name }}_data"
-            data-sorter="sortScores">
+            data-sorter="sortScores"
+            data-searchable="false">
               {{ metric.name }}
               {{ metricDocs(metric) }}
           </th>
