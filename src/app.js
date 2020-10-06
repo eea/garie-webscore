@@ -132,7 +132,7 @@ app.get('/ondemand/:id', wrap(async (req, res) => {
   const template = req.query.contentonly
     ? 'ondemand-results-content.html'
     : 'ondemand-results.html'
-  return res.render(template, { job })
+  return res.render(template, { job, metrics })
 }))
 
 app.get('/help', (req, res) => {

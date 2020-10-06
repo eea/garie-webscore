@@ -1,4 +1,4 @@
-{% from "./macros.html" import "metricDocs" %}
+{% from "./macros.html" import "metricButtons", "metricDocs" %}
 
 <h3>Results for {{ job.url }}</h3>
 
@@ -21,7 +21,7 @@
       <tr>
         <th scope="row">
           {{ result.metric.name }}
-          {{ metricDocs(result.metric) }}
+          {{ metricButtons(result.metric) }}
         </th>
         <td class="{{ metricStyle(result.metric, result.value) }} text-center">
           {% if scan.finished %}
@@ -39,3 +39,9 @@
   {% endfor %}
   </tbody>
 </table>
+
+<div id="metric-modals">
+  {% for metric in metrics %}
+    {{ metricDocs(metric) }}
+  {% endfor %}
+</div>
