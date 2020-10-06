@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "./macros.html" import "metricDocs", "formatTrend" %}
+{% from "./macros.html" import "metricButtons", "metricDocs", "formatTrend" %}
 
 {% block head %}
 {{ super() }}
@@ -16,6 +16,11 @@
   }
   #spinner-sparklines {
     display: none;
+  }
+  .info-button{
+    border: none;
+    background: none;
+    cursor: pointer;
   }
 </style>
 {% endblock %}
@@ -91,7 +96,7 @@ function sortScores(a, b) {
             data-sorter="sortScores"
             data-searchable="false">
               {{ metric.name }}
-              {{ metricDocs(metric) }}
+              {{ metricButtons(metric) }}
           </th>
         {% endfor %}
       </tr>
@@ -132,6 +137,12 @@ function sortScores(a, b) {
     {% endfor %}
     </tbody>
   </table>
+
+</div id="metrics-modals">
+  {% for metric in importantMetrics %}
+    {{ metricDocs(metric) }}
+  {% endfor %}
+<div>
 
 </div>
 {% endblock %}

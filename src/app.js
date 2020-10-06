@@ -136,7 +136,7 @@ app.get('/ondemand/:id', wrap(async (req, res) => {
 }))
 
 app.get('/help', (req, res) => {
-  return res.render('help.html')
+  return res.render('help.html', { metrics })
 })
 
 app.get('/about', (req, res) => {

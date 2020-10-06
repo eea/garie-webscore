@@ -2,11 +2,32 @@
 <svg class="bi bi-info" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm8-7a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/><path d="M10.93 8.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533l1.002-4.705z"/><circle cx="10" cy="6.5" r="1"/></svg>
 {%- endmacro %}
 
+{% macro metricButtons(metric) -%}
+  {%- if metric.docs %}
+    <button class="info-button" data-toggle="modal" data-target="#modal-{{ metric.measurement }}" id="button-{{ metric.measurement }}">{{ info() }}</button>
+  {%- endif %}
+{%- endmacro %}
+
 {% macro metricDocs(metric) -%}
   {%- if metric.docs %}
-    <a href="{{ metric.docs }}" target="_blank">
-      {{ info() }}
-    </a>
+    <div class="modal" id="modal-{{ metric.measurement}}" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ metric.name }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {{ metric.help | safe }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   {%- endif %}
 {%- endmacro %}
 
