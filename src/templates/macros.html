@@ -3,13 +3,13 @@
 {%- endmacro %}
 
 {% macro metricButtons(metric) -%}
-  {%- if metric.docs %}
+  {%- if metric.help %}
     <button class="info-button" data-toggle="modal" data-target="#modal-{{ metric.measurement }}" id="button-{{ metric.measurement }}">{{ info() }}</button>
   {%- endif %}
 {%- endmacro %}
 
 {% macro metricDocs(metric) -%}
-  {%- if metric.docs %}
+  {%- if metric.help %}
     <div class="modal" id="modal-{{ metric.measurement}}" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
