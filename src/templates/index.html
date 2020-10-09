@@ -71,6 +71,12 @@ function sortScores(a, b) {
           data-sort-name="_median-score_data"
           data-sorter="sortScores"
           data-searchable="false">Median score</th>
+        <th scope="col" class="text-center"
+          data-field="checks"
+          data-sortable="true"
+          data-sort-name="_checks_data"
+          data-sorter="sortScores"
+          data-searchable="false">Checks run</th>
         {% for metric in importantMetrics %}
           <th
             scope="col"
@@ -107,6 +113,9 @@ function sortScores(a, b) {
         </td>
         <td class="text-center" data-score="{{ row.median }}">
           {{ row.median }}
+        </td>
+        <td class="text-center" data-checks="{{ row.checks }}">
+          {{ row.checks }}
         </td>
         {% for metric in importantMetrics %}
           {% set result = row.metrics[metric.name] %}

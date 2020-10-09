@@ -70,7 +70,7 @@ const getData = async () => {
   for (const metric of metrics) {
     const results = metricResults[metric.name]
     for (const url of Object.keys(results)) {
-      const row = urlMap[url] || { url, metrics: {}, score: 0 }
+      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0 }
       urlMap[url] = row
       const result = results[url]
       row.metrics[metric.name] = {
@@ -80,6 +80,7 @@ const getData = async () => {
         timeSeries: result.timeSeries
       }
       row.score += result.value
+      row.checks += 1
     }
   }
 
