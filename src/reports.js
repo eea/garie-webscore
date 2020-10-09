@@ -48,7 +48,7 @@ const reportUrl = (metric, slug) => {
       }
 
     case "browsertime":
-      return fileUrl("browsertime-results/browsertime.json")
+      return fileUrl("browsertime-results/browsertime.html")
 
     default:
       return null
