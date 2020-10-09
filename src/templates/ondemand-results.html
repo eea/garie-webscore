@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
+{% block head %}
+{{ super() }}
+<style>
+  .info-button:hover {
+    color: darkblue;
+  }
+</style>
+{% endblock %}
+
 {% block title %}Results for scan on demand &ndash; {{ super() }}{% endblock %}
 
 {% block content %}
