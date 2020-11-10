@@ -100,7 +100,7 @@ function sortScores(a, b) {
           {{ loop.index }}
         </th>
         <td scope="row">
-          {% if not 'europa.eu' in urlHostname(row.url) %}
+          {% if ((not 'europa.eu' in urlHostname(row.url)) and (not 'copernicus' in urlHostname(row.url))) %}
             <span data-toggle="tooltip" title="Non-EEA site, included for reference">🌎</span>
           {% endif %}
           {{ urlSlug(row.url) }}
