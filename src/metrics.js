@@ -178,7 +178,7 @@ const metrics = [
   },
   {
     name: "Browsertime",
-    important: true,
+    important: false,
     database: "browsertime",
     measurement: "browsertimeScore",
     field: "value",
