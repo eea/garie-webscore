@@ -13,7 +13,7 @@ const findReportPath = async (report, slug) => {
     throw e
   }
   const items = await fs.promises.readdir(parent)
-  const filtered_items = items.filter(folder => !isNaN(Date.parse(folder)))
+  const filtered_items = items.filter(folder => !isNaN(Date.parse(folder.slice(0,10))))
   const name = filtered_items.sort().reverse()[0]
   return name && `${parent}/${name}`
 }
