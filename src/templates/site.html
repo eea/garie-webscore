@@ -114,7 +114,7 @@ function drawSparklines(numberOfDays) {
       if (begin < 0) {
         begin = 0;
       }
-      valuesList = valuesList.slice(begin, valuesList.length - 1);
+      valuesList = valuesList.slice(begin, valuesList.length);
       sparkline.draw(valuesList);
     }
   }
