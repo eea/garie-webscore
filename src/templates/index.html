@@ -45,6 +45,7 @@ function sortScores(a, b) {
     <span class="sr-only">Loading...</span>
   </div>
 
+  <div class="table-responsive">
   <table
     class="table table-striped table-sm"
     id="data-table"
@@ -87,8 +88,7 @@ function sortScores(a, b) {
             data-sort-name="_metric-{{ metric.name }}_data"
             data-sorter="sortScores"
             data-searchable="false">
-              {{ metric.name }}
-              {{ metricButtons(metric) }}
+              {{ metric.name }} {{ metricButtons(metric) }}
           </th>
         {% endfor %}
       </tr>
@@ -132,6 +132,7 @@ function sortScores(a, b) {
     {% endfor %}
     </tbody>
   </table>
+  </div>
 
 </div id="metrics-modals">
   {% for metric in importantMetrics %}
