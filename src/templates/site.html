@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "./macros.html" import "metricButtons", "metricDocs", "formatTrend" %}
+{% from "./macros.html" import "metricButtons", "metricDocs" %}
 
 {% block title %}{{ urlSlug(data.url) }} &ndash; {{ super() }}{% endblock %}
 
@@ -53,11 +53,9 @@
           {% if report %}
             <a href="{{ report }}">
               {{ formatMetric(result.value) }}
-              {{ formatTrend(result) }}
             </a>
           {% else %}
             {{ formatMetric(result.value) }}
-            {{ formatTrend(result) }}
           {% endif %}
         </td>
         <td class="{{ metricStyle(metric, result.value) }} text-center">
