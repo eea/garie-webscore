@@ -134,11 +134,11 @@ function sortScores(a, b) {
   </table>
   </div>
 
-</div id="metrics-modals">
+<div id="metrics-modals">
   {% for metric in importantMetrics %}
     {{ metricDocs(metric) }}
   {% endfor %}
-<div>
+</div>
 
 </div>
 {% endblock %}
@@ -218,6 +218,11 @@ $(function(){ /* DOM ready */
     days = parseInt($('#time-selection').val());
     // TODO: this is a bit time-consuming
     drawSparklines(days)();
+  });
+
+  $('.info-button').click(function(event) {
+    event.stopPropagation();
+    $($(this).attr('data-target')).modal('show');
   });
 });
 
