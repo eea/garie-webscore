@@ -27,6 +27,7 @@
   <select name="time-selection" id="time-selection">
     <option value="7">7 days</option>
     <option value="30" selected="selected">30 days</option>
+    <option value="365">365 days</option>
   </select>
   <div class="spinner-border spinner-border-sm" role="status" id="spinner-sparklines">
     <span class="sr-only">Loading...</span>
@@ -61,8 +62,9 @@
           {% endif %}
         </td>
         <td class="{{ metricStyle(metric, result.value) }} text-center">
-           {% set timeSeries = data.metrics[metric.name].timeSeries %}
-           <span class="sparkline" data-sparkline='{{ timeSeries }}'>
+           {% set monthSeries = data.metrics[metric.name].monthSeries %}
+           {% set yearSeries = data.metrics[metric.name].yearSeries %}
+           <span class="sparkline" data-sparkline-month='{{ monthSeries }}' data-sparkline-year='{{ yearSeries }}'>
            </span>
         </td>
       </tr>
@@ -91,7 +93,13 @@ function drawSparklines(numberOfDays) {
     var sparklineSpans = document.getElementsByClassName("sparkline");
 
     for (var i = 0; i < sparklineSpans.length; i++) {
-      var attr = sparklineSpans[i].getAttribute('data-sparkline');
+      var attr;
+      if (numberOfDays <= 30) {
+        attr = sparklineSpans[i].getAttribute('data-sparkline-month');
+      } else {
+        attr = sparklineSpans[i].getAttribute('data-sparkline-year');
+      }
+      
       var valuesList;
       if (attr === "") {
         // do not display empty sparklines

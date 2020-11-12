@@ -15,15 +15,18 @@ const query = async (metricSpec) => {
   const metricsQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
   // last 30 days - should we add `LIMIT 30` ?
-  const timeSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(none) ORDER BY time ASC`
+  const monthSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(none) ORDER BY time ASC`
+  // last 365 days
+  const yearSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 365d GROUP BY time(7d), "url" fill(none) ORDER BY time ASC`
 
-  const [ metricsRows, maxRows, timesSeriesRows ] = await Promise.all([
+  const [ metricsRows, maxRows, monthSeriesRows, yearSeriesRows ] = await Promise.all([
     influx.query(metricsQuery, { database }),
     influx.query(maxQuery, { database }),
-    influx.query(timeSeriesQuery, { database }),
+    influx.query(monthSeriesQuery, { database }),
+    influx.query(yearSeriesQuery, { database })
   ]).catch((e) => {
     console.error(e);
-    return [[], [], []];
+    return [[], [], [], []];
   })
 
   const maxValues = {}
@@ -34,19 +37,28 @@ const query = async (metricSpec) => {
     }
   }
 
-  const timeSeriesValues = new Object()
-  for (const row of timesSeriesRows) {
-    if (!timeSeriesValues[row.url]) {
-      timeSeriesValues[row.url] = []
+  const monthSeriesValues = new Object()
+  for (const row of monthSeriesRows) {
+    if (!monthSeriesValues[row.url]) {
+      monthSeriesValues[row.url] = []
     }
-    timeSeriesValues[row.url].push(row.value)
+    monthSeriesValues[row.url].push(row.value)
+  }
+
+  const yearSeriesValues = new Object()
+  for (const row of yearSeriesRows) {
+    if (!yearSeriesValues[row.url]) {
+      yearSeriesValues[row.url] = []
+    }
+    yearSeriesValues[row.url].push(row.value);
   }
 
   const data = {}
   for (const { url, value } of metricsRows) {
     const { max, maxTime } = maxValues[url] || {}
-    const timeSeries = timeSeriesValues[url] || []
-    data[url] = { value, max, maxTime, timeSeries }
+    const monthSeries = monthSeriesValues[url] || []
+    const yearSeries = yearSeriesValues[url] || []
+    data[url] = { value, max, maxTime, monthSeries, yearSeries }
   }
 
   return data
@@ -77,7 +89,8 @@ const getData = async () => {
         value: Math.round(result.value),
         max: Math.round(result.max),
         maxTime: result.maxTime,
-        timeSeries: result.timeSeries
+        monthSeries: result.monthSeries,
+        yearSeries: result.yearSeries
       }
       row.score += result.value
       row.checks += 1
