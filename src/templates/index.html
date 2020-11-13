@@ -104,11 +104,13 @@ function sortScores(a, b) {
           {% if ((not 'europa.eu' in url_host) and (not 'copernicus' in url_host) and (not 'eea-subscriptions' in url_host)) %}
             <span data-toggle="tooltip" title="Non-EEA site, included for reference">🌎</span>
           {% endif %}
-          {{ urlSlug(row.url) }}
+          <span class="website-url">{{ urlSlug(row.url) }}</span>
           <br/>
+          <span class='website-toolbar'>
           <a href="{{ row.url }}"  class="external" target="_blank">View site</a>
              |
           <a href="/site/{{ urlSlug(row.url) }}">View report</a>
+          </span>
         </td>
         <td class="text-center" data-score="{{ row.score }}">
           <a href="/site/{{ urlSlug(row.url) }}">{{ row.score }}</a>
