@@ -95,9 +95,8 @@ const getData = async () => {
       row.score += result.value
       row.checks += 1
     }
-    
   }
-  
+
   const rv = Object.values(urlMap)
   for (const row of rv) {
     row.score = Math.round(row.score)
