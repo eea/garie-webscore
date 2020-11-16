@@ -15,15 +15,18 @@ const query = async (metricSpec) => {
   const metricsQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
   // last 30 days - should we add `LIMIT 30` ?
-  const timeSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
+  const monthSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
+  // last 365 days
+  const yearSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 365d GROUP BY time(7d), "url" fill(-1) ORDER BY time ASC`
 
-  const [ metricsRows, maxRows, timesSeriesRows ] = await Promise.all([
+  const [ metricsRows, maxRows, monthSeriesRows, yearSeriesRows ] = await Promise.all([
     influx.query(metricsQuery, { database }),
     influx.query(maxQuery, { database }),
-    influx.query(timeSeriesQuery, { database }),
+    influx.query(monthSeriesQuery, { database }),
+    influx.query(yearSeriesQuery, { database })
   ]).catch((e) => {
     console.error(e);
-    return [[], [], []];
+    return [[], [], [], []];
   })
 
   const maxValues = {}
@@ -34,19 +37,28 @@ const query = async (metricSpec) => {
     }
   }
 
-  const timeSeriesValues = new Object()
-  for (const row of timesSeriesRows) {
-    if (!timeSeriesValues[row.url]) {
-      timeSeriesValues[row.url] = []
+  const monthSeriesValues = new Object()
+  for (const row of monthSeriesRows) {
+    if (!monthSeriesValues[row.url]) {
+      monthSeriesValues[row.url] = []
     }
-    timeSeriesValues[row.url].push(row.value)
+    monthSeriesValues[row.url].push(row.value)
+  }
+
+  const yearSeriesValues = new Object()
+  for (const row of yearSeriesRows) {
+    if (!yearSeriesValues[row.url]) {
+      yearSeriesValues[row.url] = []
+    }
+    yearSeriesValues[row.url].push(row.value);
   }
 
   const data = {}
   for (const { url, value } of metricsRows) {
     const { max, maxTime } = maxValues[url] || {}
-    const timeSeries = timeSeriesValues[url] || []
-    data[url] = { value, max, maxTime, timeSeries }
+    const monthSeries = monthSeriesValues[url] || []
+    const yearSeries = yearSeriesValues[url] || []
+    data[url] = { value, max, maxTime, monthSeries, yearSeries }
   }
 
   return data
@@ -60,6 +72,18 @@ const median = (values) => {
   return Math.round((values[half - 1] + values[half]) / 2)
 }
 
+const fillCheckList = (series, checkList) => {
+  for (let i = 0; i < series.length; i++) {
+    if (checkList.length <= i) {
+      checkList.push(0);
+    }
+    if (series[i] >= 0) {
+      checkList[i]++;
+    }
+  }
+  return checkList;
+}
+
 const getData = async () => {
   const results = await Promise.all(metrics.map((metric) => query(metric)))
   const metricResults = {}
@@ -70,28 +94,23 @@ const getData = async () => {
   for (const metric of metrics) {
     const results = metricResults[metric.name]
     for (const url of Object.keys(results)) {
-      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, checkList: [] }
+      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, checkListMonth: [], checkListYear: [] }
       urlMap[url] = row
       const result = results[url]
       row.metrics[metric.name] = {
         value: Math.round(result.value),
         max: Math.round(result.max),
         maxTime: result.maxTime,
-        timeSeries: result.timeSeries
+        monthSeries: result.monthSeries,
+        yearSeries: result.yearSeries
       }
 
-      for (let i = 0; i < result.timeSeries.length; i++) {
-        if (result.timeSeries[i] < 0) {
-          row.checkList[i] = 0;
-        } else {
-          if (row.checkList[i] === undefined) {
-            row.checkList[i] = 1;
-          } else {
-            row.checkList[i]++;
-          }
-        }
-      }
-      row.metrics[metric.name].timeSeries = result.timeSeries.filter(val => val >= 0);
+      row.checkListMonth = fillCheckList(result.monthSeries, row.checkListMonth);
+      row.checkListYear = fillCheckList(result.yearSeries, row.checkListYear);
+      
+      row.metrics[metric.name].monthSeries = result.monthSeries.filter(val => val >= 0);
+      row.metrics[metric.name].yearSeries = result.yearSeries.filter(val => val >= 0);
+
       row.score += result.value
       row.checks += 1
     }

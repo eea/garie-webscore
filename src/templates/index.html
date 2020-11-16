@@ -39,6 +39,7 @@ function sortScores(a, b) {
   <select name="time-selection" id="time-selection">
     <option value="7">7 days</option>
     <option value="30" selected="selected">30 days</option>
+    <option value="365">365 days</option>
     <option value="0">Do not display</option>
   </select>
   <div class="spinner-border spinner-border-sm" role="status" id="spinner-sparklines">
@@ -121,17 +122,17 @@ function sortScores(a, b) {
         <td class="text-center" data-score="{{ row.checks }}">
           {{ row.checks }}
           <br/>
-            {% set checkList = row.checkList %}
-            <span class="sparkline" data-sparkline="{{ checkList }}" data-toggle="tooltip" data-placement="right">
+            <span class="sparkline" data-sparkline-month="{{ row.checkListMonth }}" data-sparkline-year="{{ row.checkListYear }}" data-toggle="tooltip" data-placement="right">
           </span>
         </td>
         {% for metric in importantMetrics %}
           {% set result = row.metrics[metric.name] %}
-          {% set timeSeries = row.metrics[metric.name].timeSeries %}
+          {% set monthSeries = row.metrics[metric.name].monthSeries %}
+          {% set yearSeries = row.metrics[metric.name].yearSeries %}
           <td class="{{ metricStyle(metric, result.value) }} text-center" data-score="{{ result.value }}">
             {{ formatMetric(result.value) }}
             <br/>
-            <span class="sparkline" data-sparkline="{{ timeSeries }}" data-toggle="tooltip" data-placement="right">
+            <span class="sparkline" data-sparkline-month="{{ monthSeries }}"  data-sparkline-year="{{ yearSeries }}" data-toggle="tooltip" data-placement="right">
             </span>
           </td>
         {% endfor %}
@@ -161,7 +162,13 @@ function drawSparklines(numberOfDays) {
     var sparklineSpans = document.getElementsByClassName("sparkline");
 
     for (var i = 0; i < sparklineSpans.length; i++) {
-      var attr = sparklineSpans[i].getAttribute('data-sparkline');
+      var attr;
+      if (numberOfDays <= 30) {
+        attr = sparklineSpans[i].getAttribute('data-sparkline-month');
+      } else {
+        attr = sparklineSpans[i].getAttribute('data-sparkline-year');
+      }
+
       var valuesList;
 
       if (numberOfDays === 0) {
@@ -180,6 +187,7 @@ function drawSparklines(numberOfDays) {
           return parseInt(item);
         });
       }
+
       var sparkline = new Sparkline(sparklineSpans[i], {
           lineColor: "#666",
           width: 100,
