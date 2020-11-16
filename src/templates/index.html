@@ -120,6 +120,10 @@ function sortScores(a, b) {
         </td>
         <td class="text-center" data-score="{{ row.checks }}">
           {{ row.checks }}
+          <br/>
+            {% set checkList = row.checkList %}
+            <span class="sparkline" data-sparkline="{{ checkList }}" data-toggle="tooltip" data-placement="right">
+          </span>
         </td>
         {% for metric in importantMetrics %}
           {% set result = row.metrics[metric.name] %}

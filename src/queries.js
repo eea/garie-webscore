@@ -15,7 +15,7 @@ const query = async (metricSpec) => {
   const metricsQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
   // last 30 days - should we add `LIMIT 30` ?
-  const timeSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(none) ORDER BY time ASC`
+  const timeSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
 
   const [ metricsRows, maxRows, timesSeriesRows ] = await Promise.all([
     influx.query(metricsQuery, { database }),
@@ -70,7 +70,7 @@ const getData = async () => {
   for (const metric of metrics) {
     const results = metricResults[metric.name]
     for (const url of Object.keys(results)) {
-      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0 }
+      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, checkList: [] }
       urlMap[url] = row
       const result = results[url]
       row.metrics[metric.name] = {
@@ -79,11 +79,25 @@ const getData = async () => {
         maxTime: result.maxTime,
         timeSeries: result.timeSeries
       }
+
+      for (let i = 0; i < result.timeSeries.length; i++) {
+        if (result.timeSeries[i] < 0) {
+          row.checkList[i] = 0;
+        } else {
+          if (row.checkList[i] === undefined) {
+            row.checkList[i] = 1;
+          } else {
+            row.checkList[i]++;
+          }
+        }
+      }
+      row.metrics[metric.name].timeSeries = result.timeSeries.filter(val => val >= 0);
       row.score += result.value
       row.checks += 1
     }
+    
   }
-
+  
   const rv = Object.values(urlMap)
   for (const row of rv) {
     row.score = Math.round(row.score)
