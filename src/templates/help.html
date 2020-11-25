@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Quality metrics help &ndash; {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <p>EEA websites are audited daily and receive a score between 0 and 100 for each of the following metrics:
+    </p>
+    <ul>
+        {% for metric in metrics %}
+        <li>{{ metric.help | safe }}</li>
+        {% endfor %}
+    </ul>
+    <p>For more info please visit <a href="https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics" target="_blank">the quality metrics wiki page</a>.</p>
+</div>
+{% endblock %}

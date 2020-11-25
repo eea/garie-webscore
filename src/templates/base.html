@@ -7,6 +7,45 @@
 <style>
 .arrow-down { color: red }
 .arrow-up { color: green }
+.external::before {
+  content: "↗️";
+  display: inline;
+  margin-right: 3px;
+  font-size: 10px;
+}
+
+.sparkline canvas {
+  vertical-align: text-bottom;
+}
+.sparkline {
+  background: transparent;
+  height: 100px;
+  display: inline;
+}
+#spinner-sparklines {
+  display: none;
+}
+.info-button {
+  border: none;
+  background: none;
+  color: lightblue;
+  cursor: pointer;
+}
+.info-button:hover {
+  color: white;
+}
+.table-responsive{
+  position: absolute;
+  width: auto;
+  overflow: visible;
+}
+.website-url {
+  word-break: break-all;
+}
+.website-toolbar {
+  word-break: normal;
+  white-space: nowrap;
+}
 </style>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -16,16 +55,18 @@
 
 {% block navbar %}
 <nav class="navbar navbar-expand navbar-light bg-light">
-  <a class="navbar-brand" href="/">Garie WebScore</a>
+  <a class="navbar-brand" href="/"><img src="/static/images/logo_modified.png" alt="Garie WebScore" style="padding: 0px;" /></a>
 
   <div class="collapse navbar-collapse">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a href="https://taskman.eionet.europa.eu/projects/infrastructure/wiki/Garie"
-           class="nav-link">About</a>
+        <a href="/about" class="nav-link">About</a>
       </li>
       <li class="nav-item">
         <a href="/ondemand" class="nav-link">Scan on demand</a>
+      </li>
+      <li class="nav-item">
+        <a href="/help" class="nav-link">Help</a>
       </li>
     </ul>
   </div>

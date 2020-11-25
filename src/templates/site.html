@@ -1,25 +1,44 @@
 {% extends "base.html" %}
-{% from "./macros.html" import "metricDocs", "formatTrend" %}
+{% from "./macros.html" import "metricButtons", "metricDocs" %}
 
 {% block title %}{{ urlSlug(data.url) }} &ndash; {{ super() }}{% endblock %}
 
 {% block head %}
 {{ super() }}
 <style>
-h3 { margin-top: 1em }
+  h3 { margin-top: 1em }
+  .info-button:hover {
+    color: darkblue;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
 
-  <h3>Report for <a href="{{ data.url }}">{{ urlSlug(data.url) }}</a></h3>
+  <h3>Report for <a href="{{ data.url }}" target="_blank">{{ urlSlug(data.url) }}</a></h3>
+
+  <p>More detailed information for each metric, including logs with each day's
+    results, can be found at the
+    <a href="https://garie.eea.europa.eu/" target="_blank">Websites QA dashboard</a>.
+  </p>
+
+  <label for="time-selection">Display metrics evolution:</label>
+  <select name="time-selection" id="time-selection">
+    <option value="7">7 days</option>
+    <option value="30" selected="selected">30 days</option>
+    <option value="365">365 days</option>
+  </select>
+  <div class="spinner-border spinner-border-sm" role="status" id="spinner-sparklines">
+    <span class="sr-only">Loading...</span>
+  </div>
 
   <table class="table table-striped table-sm">
     <thead class="thead-dark">
       <tr>
         <th scope="col">Metric</th>
         <th scope="col" class="text-center">Score</th>
+        <th scope="col" class="text-center">Evolution</th>
       </tr>
     </thead>
     <tbody>
@@ -27,7 +46,7 @@ h3 { margin-top: 1em }
       <tr>
         <th scope="row">
           {{ metric.name }}
-          {{ metricDocs(metric) }}
+          {{ metricButtons(metric) }}
         </th>
         {% set result = data.metrics[metric.name] %}
         <td class="{{ metricStyle(metric, result.value) }} text-center">
@@ -35,12 +54,16 @@ h3 { margin-top: 1em }
           {% if report %}
             <a href="{{ report }}">
               {{ formatMetric(result.value) }}
-              {{ formatTrend(result) }}
             </a>
           {% else %}
             {{ formatMetric(result.value) }}
-            {{ formatTrend(result) }}
           {% endif %}
+        </td>
+        <td class="{{ metricStyle(metric, result.value) }} text-center">
+           {% set monthSeries = data.metrics[metric.name].monthSeries %}
+           {% set yearSeries = data.metrics[metric.name].yearSeries %}
+           <span class="sparkline" data-sparkline-month='{{ monthSeries }}' data-sparkline-year='{{ yearSeries }}'>
+           </span>
         </td>
       </tr>
     {% endfor %}
@@ -48,4 +71,81 @@ h3 { margin-top: 1em }
   </table>
 
 </div>
+
+<div id="metrics-modals">
+{% for metric in metrics %}
+  {{ metricDocs(metric) }}
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block finalscripts %}
+{{ super() }}
+
+<script src="/static/js/sparkline.js"></script>
+
+<script>
+// Closure to allow parameters to document.ready functions
+function drawSparklines(numberOfDays) {
+  return function() {
+    var sparklineSpans = document.getElementsByClassName("sparkline");
+
+    for (var i = 0; i < sparklineSpans.length; i++) {
+      var attr;
+      if (numberOfDays <= 30) {
+        attr = sparklineSpans[i].getAttribute('data-sparkline-month');
+      } else {
+        attr = sparklineSpans[i].getAttribute('data-sparkline-year');
+      }
+      
+      var valuesList;
+      if (attr === "") {
+        // do not display empty sparklines
+        continue;
+      } else {
+        valuesList = attr.split(',').map(item => {
+          if (! item) return 0;
+          return parseInt(item);
+        });
+      }
+      var sparkline = new Sparkline(sparklineSpans[i], {
+          lineColor: "#666",
+          width: 100,
+          dotRadius: 3,
+          // using 0 breaks check in sparkline.js
+          minValue: 1,
+          maxValue: 100
+        }
+      );
+      // valuesList has the most recent date as its last element
+      var begin = valuesList.length - 1 - numberOfDays;
+      if (begin < 0) {
+        begin = 0;
+      }
+      valuesList = valuesList.slice(begin, valuesList.length);
+      sparkline.draw(valuesList);
+    }
+  }
+}
+
+// On document ready, display sparklines for selected time period
+$(document).ready(drawSparklines(parseInt($('#time-selection').val())));
+
+$(function(){ /* DOM ready */
+  $('#time-selection').change(function(){
+    // Show spinner
+    spinner = document.getElementById("spinner-sparklines");
+    spinner.style.display = "inline-block";
+
+    // get number of selected days, then re-draw sparklines.
+    days = parseInt($(this).val());
+    setTimeout(function() {
+      drawSparklines(days)();
+      spinner = document.getElementById("spinner-sparklines");
+      spinner.style.display = "none";
+    });
+  });
+});
+
+</script>
 {% endblock %}

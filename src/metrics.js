@@ -6,7 +6,8 @@ const metrics = [
     measurement: "performance-score",
     field: "value",
     thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Performance"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Performance",
+    help: "Performance - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools"
   },
   {
     name: "Progressive Web App",
@@ -14,7 +15,8 @@ const metrics = [
     measurement: "pwa-score",
     field: "value",
     thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Progressive-Web-App"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Progressive-Web-App",
+    help: "Progressive Web App - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='blank'>Lighthouse</a> in Chrome Developer Tools"
   },
   {
     name: "Accessibility",
@@ -22,7 +24,8 @@ const metrics = [
     measurement: "accessibility-score",
     field: "value",
     thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Accessibility"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Accessibility",
+    help: "Accessibility - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools (Audits)"
   },
   {
     name: "Best Practice",
@@ -30,7 +33,8 @@ const metrics = [
     measurement: "best-practices-score",
     field: "value",
     thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Best-Practice"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Best-Practice",
+    help: "Best Practice - evaluated using evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools (Audits)"
   },
   {
     name: "Seo Score",
@@ -38,7 +42,8 @@ const metrics = [
     measurement: "seo-score",
     field: "value",
     thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Seo-Score"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Seo-Score",
+    help: "SEO Score - evaluated using evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools (Audits)"
   },
   {
     name: "Links integrity",
@@ -46,7 +51,8 @@ const metrics = [
     measurement: "linksintegrity",
     field: "value",
     thresholds: [95, 99],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Links-integrity"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Links-integrity",
+    help: "Links Integrity -  the amount of broken links in websites is evaluated using <a href='https://github.com/linkchecker/linkchecker' target='_blank'>linkchecker</a>, which is run locally in a Docker container"
   },
   {
     name: "Encryption (TLS)",
@@ -55,7 +61,8 @@ const metrics = [
     measurement: "ssl_score",
     field: "value",
     thresholds: [1, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Encryption-TLS"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Encryption-TLS",
+    help: "Encryption (TLS) - certificates validity and configuration are evaluated using the SSL test tool at <a href='https://www.ssllabs.com/ssltest/' target='_blank'>https://www.ssllabs.com/ssltest/</a>"
   },
   {
     name: "Securityheaders.com",
@@ -64,7 +71,8 @@ const metrics = [
     measurement: "header_score",
     field: "value",
     thresholds: [20, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Securityheaderscom"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Securityheaderscom",
+    help: "SecurityHeaders.com - Checks for missing HTTP security headers in website responses using the tool at <a href='https://securityheaders.com/' target='_blank'>https://securityheaders.com/</a>. This is somewhat outdated and mostly superseded by the Mozilla security headers metric."
   },
   {
     name: "Securityheaders(mozilla)",
@@ -72,7 +80,8 @@ const metrics = [
     measurement: "mozilla_score",
     field: "value",
     thresholds: [25, 70],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Securityheadersmozilla"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Securityheadersmozilla",
+    help: "Securityheaders(mozilla) - also checks for missing HTTP security headers in website responses, but uses the tool at <a href='https://observatory.mozilla.org/' target='_blank'>https://observatory.mozilla.org/</a>"
   },
   {
     name: "Uptime(30days)",
@@ -81,7 +90,8 @@ const metrics = [
     measurement: "uptime_score",
     field: "value",
     thresholds: [95, 99],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Uptime30days"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Uptime30days",
+    help: "Uptime (30 days) - this metrics gives 100 if the site is never found down/unresponsive within the checks performed under the last 30 days period."
   },
   {
     name: "Server errors(30)",
@@ -89,7 +99,8 @@ const metrics = [
     measurement: "ServerErrors/TotalVisits",
     field: "value_30days",
     thresholds: [95, 99],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Server-errorsvisit-by-Sentry"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Server-errorsvisit-by-Sentry",
+    help: "Server Errors per visit - aggregation of the number of server-side errors/exception received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a> from the website, divided by the total number of website visits as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
   },
   {
     name: "JS errors(30)",
@@ -97,7 +108,8 @@ const metrics = [
     measurement: "JsEvents/TotalVisits",
     field: "value_30days",
     thresholds: [95, 99],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#JS-errorsvisit-by-Sentry"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#JS-errorsvisit-by-Sentry",
+    help: "JS Errors per visit - aggregation of the number of JS errors/exceptions received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a>, divided by the number of website visits  as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
   },
   {
     name: "Test coverage",
@@ -105,7 +117,8 @@ const metrics = [
     measurement: "coverage_rating",
     field: "value",
     thresholds: [30, 80],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Test-coverage-JenkinsSonarqube"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Test-coverage-JenkinsSonarqube",
+    help: "Test coverage - code quality metric that is computed based on the unit test coverage in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a>."
   },
   {
     name: "Bugs",
@@ -113,7 +126,8 @@ const metrics = [
     measurement: "reliability_rating",
     field: "value",
     thresholds: [25, 75],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Bugs-JenkinsSonarqube"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Bugs-JenkinsSonarqube",
+    help: "Bugs - code quality metric that is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
   },
   {
     name: "Vulnerabilities",
@@ -121,7 +135,8 @@ const metrics = [
     measurement: "security_rating",
     field: "value",
     thresholds: [25, 75],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Vulnerabilities-JenkinsSonarqube"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Vulnerabilities-JenkinsSonarqube",
+    help: "Vulnerabilities - code quality metric that is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
   },
   {
     name: "Code smells",
@@ -129,7 +144,8 @@ const metrics = [
     measurement: "sqale_rating",
     field: "value",
     thresholds: [25, 75],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Code-smells-JenkinsSonarqube"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Code-smells-JenkinsSonarqube",
+    help: "Code smells - code quality metric is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
   },
   {
     name: "Duplication score",
@@ -137,7 +153,8 @@ const metrics = [
     measurement: "non_duplication_rating",
     field: "value",
     thresholds: [80, 95],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Duplication-score-JenkinsSonarqube"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Duplication-score-JenkinsSonarqube",
+    help: "Duplication score - code quality metric is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
   },
   {
     name: "Privacyscore",
@@ -146,7 +163,8 @@ const metrics = [
     measurement: "privacyscore",
     field: "value",
     thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Privacyscoreorg"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Privacyscoreorg",
+    help: "Privacy score - evaluated using <a href='https://privacyscore.org/' target='_blank'>https://privacyscore.org/</a>"
   },
   {
     name: "Webbkoll",
@@ -155,7 +173,18 @@ const metrics = [
     measurement: "webbkoll",
     field: "value",
     thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#webbkolldataskyddnet"
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#webbkolldataskyddnet",
+    help: "webbkoll.dataskydd.net - evaluated using <a href='webbkoll.dataskydd.net' target='_blank'>Webbkoll</a>, an online tool that simulates a normal browser visit and checks for potential privacy problems."
+  },
+  {
+    name: "Browsertime",
+    important: false,
+    database: "browsertime",
+    measurement: "browsertimeScore",
+    field: "value",
+    thresholds: [50, 90],
+    docs: "",
+    help: "Browsertime provides an alternative way of evaluating website performance."
   },
 ]
 
@@ -195,6 +224,10 @@ const onDemandApis = [
   {
     database: "webbkoll",
     url: "http://garie-webbkoll:3000",
+  },
+    {
+    database: "browsertime",
+    url: "http://garie-browsertime:3000",
   },
 ]
 

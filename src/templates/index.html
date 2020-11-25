@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "./macros.html" import "metricDocs", "formatTrend" %}
+{% from "./macros.html" import "metricButtons", "metricDocs" %}
 
 {% block head %}
 {{ super() }}
@@ -10,11 +10,23 @@
 {% block content %}
 <script>
 function getNumber(text) {
-  return +(text.match(/\d+/) || [0])[0]
+  try {
+    return +(text.match(/\d+/) || [0])[0];
+  } catch (error) {
+    // Simply return -1 if no number could be extracted, to ensure empty cells come before 0 cells.
+    return -1;
+  }
 }
 
 function sortNumbers(a, b) {
   return getNumber(a) - getNumber(b)
+}
+
+function sortScores(a, b) {
+  if ((typeof(a.score) === "string") && (typeof(b.score) === "string")) return 0;
+  if ((a.score < b.score) || (typeof(a.score) === "string")) return -1;
+  if ((a.score > b.score) || (typeof(b.score) === "string")) return 1;
+  return 0;
 }
 </script>
 <div class="container-fluid">
@@ -23,33 +35,61 @@ function sortNumbers(a, b) {
   better. The scores are calculated daily using various scanning and monitoring
   tools. Click on a website for details.</p>
 
+  <label for="time-selection">Display metrics evolution:</label>
+  <select name="time-selection" id="time-selection">
+    <option value="7">7 days</option>
+    <option value="30" selected="selected">30 days</option>
+    <option value="365">365 days</option>
+    <option value="0">Do not display</option>
+  </select>
+  <div class="spinner-border spinner-border-sm" role="status" id="spinner-sparklines">
+    <span class="sr-only">Loading...</span>
+  </div>
+
+  <div class="table-responsive">
   <table
     class="table table-striped table-sm"
+    id="data-table"
     data-toggle="table"
     data-sort-name="total-score"
-    data-sort-order="desc">
+    data-sort-order="desc"
+    data-search="true"
+    data-search-align="left"
+    data-show-search-clear-button="true"
+    data-show-button-icons="false"
+    data-show-button-text="true">
     <thead class="thead-dark">
       <tr>
         <th scope="col" data-field="rank">Rank</th>
-        <th scope="col" data-field="url">Website</th>
+        <th scope="col" data-field="url" data-searchable="true">Website</th>
         <th scope="col" class="text-center"
           data-field="total-score"
           data-sortable="true"
-          data-sorter="sortNumbers">Total score</th>
+          data-sort-name="_total-score_data"
+          data-sorter="sortScores"
+          data-searchable="false">Total score</th>
         <th scope="col" class="text-center"
           data-field="median-score"
           data-sortable="true"
-          data-sorter="sortNumbers">Median score</th>
-        <th scope="col">Full report</th>
+          data-sort-name="_median-score_data"
+          data-sorter="sortScores"
+          data-searchable="false">Median score</th>
+        <th scope="col" class="text-center"
+          data-field="checks-score"
+          data-sortable="true"
+          data-sort-name="_checks-score_data"
+          data-sorter="sortScores"
+          data-searchable="false">Checks run</th>
         {% for metric in importantMetrics %}
           <th
             scope="col"
             class="text-center"
             data-field="metric-{{ metric.name }}"
             data-sortable="true"
-            data-sorter="sortNumbers">
-              {{ metric.name }}
-              {{ metricDocs(metric) }}
+            data-sort-name="_metric-{{ metric.name }}_data"
+            data-sorter="sortScores"
+            data-searchable="false">
+              {{ metric.name }} {{ metricButtons(metric) }}
           </th>
         {% endfor %}
       </tr>
@@ -61,32 +101,145 @@ function sortNumbers(a, b) {
           {{ loop.index }}
         </th>
         <td scope="row">
-          <a href="{{ row.url }}">
-            {{ urlSlug(row.url) }}
-          </a>
+          {% set url_host = urlHostname(row.url) %}
+          {% if ((not 'europa.eu' in url_host) and (not 'copernicus' in url_host) and (not 'eea-subscriptions' in url_host)) %}
+            <span data-toggle="tooltip" title="Non-EEA site, included for reference">🌎</span>
+          {% endif %}
+          <span class="website-url">{{ urlSlug(row.url) }}</span>
+          <br/>
+          <span class='website-toolbar'>
+          <a href="{{ row.url }}"  class="external" target="_blank">View site</a>
+             |
+          <a href="/site/{{ urlSlug(row.url) }}">View report</a>
+          </span>
         </td>
-        <td class="text-center">
-          {{ row.score }}
+        <td class="text-center" data-score="{{ row.score }}">
+          <a href="/site/{{ urlSlug(row.url) }}">{{ row.score }}</a>
         </td>
-        <td class="text-center">
+        <td class="text-center" data-score="{{ row.median }}">
           {{ row.median }}
         </td>
-        <td class="text-center">
-          <a href="/site/{{ urlSlug(row.url) }}">
-            full report
-          </a>
+        <td class="text-center" data-score="{{ row.checks }}">
+          {{ row.checks }}
+          <br/>
+            <span class="sparkline" data-sparkline-month="{{ row.checkListMonth }}" data-sparkline-year="{{ row.checkListYear }}" data-toggle="tooltip" data-placement="right">
+          </span>
         </td>
         {% for metric in importantMetrics %}
           {% set result = row.metrics[metric.name] %}
-          <td class="{{ metricStyle(metric, result.value) }} text-center">
+          {% set monthSeries = row.metrics[metric.name].monthSeries %}
+          {% set yearSeries = row.metrics[metric.name].yearSeries %}
+          <td class="{{ metricStyle(metric, result.value) }} text-center" data-score="{{ result.value }}">
             {{ formatMetric(result.value) }}
-            {{ formatTrend(result) }}
+            <br/>
+            <span class="sparkline" data-sparkline-month="{{ monthSeries }}"  data-sparkline-year="{{ yearSeries }}" data-toggle="tooltip" data-placement="right">
+            </span>
           </td>
         {% endfor %}
       </tr>
     {% endfor %}
     </tbody>
   </table>
+  </div>
+
+<div id="metrics-modals">
+  {% for metric in importantMetrics %}
+    {{ metricDocs(metric) }}
+  {% endfor %}
+</div>
 
 </div>
+{% endblock %}
+
+{% block finalscripts %}
+{{ super() }}
+
+<script src="/static/js/sparkline.js"></script>
+<script>
+// Closure to allow parameters to document.ready functions
+function drawSparklines(numberOfDays) {
+  return function() {
+    var sparklineSpans = document.getElementsByClassName("sparkline");
+
+    for (var i = 0; i < sparklineSpans.length; i++) {
+      var attr;
+      if (numberOfDays <= 30) {
+        attr = sparklineSpans[i].getAttribute('data-sparkline-month');
+      } else {
+        attr = sparklineSpans[i].getAttribute('data-sparkline-year');
+      }
+
+      var valuesList;
+
+      if (numberOfDays === 0) {
+        sparklineSpans[i].style.display = 'none';
+        continue;
+      } else {
+        sparklineSpans[i].style.display = 'inline';
+      }
+
+      if (attr === "") {
+        // do not display empty sparklines
+        continue;
+      } else {
+        valuesList = attr.split(',').map(item => {
+          if (! item) return 0;
+          return parseInt(item);
+        });
+      }
+
+      var sparkline = new Sparkline(sparklineSpans[i], {
+          lineColor: "#666",
+          width: 100,
+          dotRadius: 3,
+          // using 0 breaks check in sparkline.js
+          minValue: 1,
+          maxValue: 100
+        }
+      );
+      // valuesList has the most recent date as its last element
+      var begin = valuesList.length - numberOfDays;
+      if (begin < 0) {
+        begin = 0;
+      }
+      valuesList = valuesList.slice(begin, valuesList.length);
+      sparkline.draw(valuesList);
+    }
+  }
+}
+
+// On document ready, display sparklines for selected time period
+$(document).ready(drawSparklines(parseInt($('#time-selection').val())));
+
+$(function(){ /* DOM ready */
+  $('#time-selection').change(function() {
+    // Show spinner
+    spinner = document.getElementById("spinner-sparklines");
+    spinner.style.display = "inline-block";
+
+    // Get number of selected days
+    days = parseInt($(this).val());
+
+    // Hide spinner on drawSparklines() completion
+    setTimeout(function() {
+      drawSparklines(days)();
+      spinner = document.getElementById("spinner-sparklines");
+      spinner.style.display = "none";
+    });
+  });
+
+  $('#data-table').on('post-body.bs.table', function() {
+    // When data is reordered, sparklines need to be redrawn
+    days = parseInt($('#time-selection').val());
+    // TODO: this is a bit time-consuming
+    drawSparklines(days)();
+  });
+
+  $('.info-button').click(function(event) {
+    event.stopPropagation();
+    $($(this).attr('data-target')).modal('show');
+  });
+});
+
+</script>
 {% endblock %}

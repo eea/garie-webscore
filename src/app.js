@@ -4,6 +4,9 @@ const fs = require('fs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
+const path = require('path')
+const { promisify } = require('util')
+
 const queries = require('./queries')
 const { metrics } = require('./metrics')
 const reports = require('./reports')
@@ -21,6 +24,8 @@ const nunjucksEnv = nunjucks.configure(`${__dirname}/templates`, {
 })
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 const thresholdColor = (thresholds, value) => {
   if (typeof value === 'number' && !isNaN(value)) {
@@ -44,6 +49,12 @@ const urlSlug = (url) => {
 }
 
 nunjucksEnv.addGlobal('urlSlug', urlSlug)
+
+const urlHostname = (url) => {
+  return (new URL(url)).hostname
+}
+
+nunjucksEnv.addGlobal('urlHostname', urlHostname)
 
 nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
@@ -121,7 +132,15 @@ app.get('/ondemand/:id', wrap(async (req, res) => {
   const template = req.query.contentonly
     ? 'ondemand-results-content.html'
     : 'ondemand-results.html'
-  return res.render(template, { job })
+  return res.render(template, { job, metrics })
 }))
+
+app.get('/help', (req, res) => {
+  return res.render('help.html', { metrics })
+})
+
+app.get('/about', (req, res) => {
+  return res.render('about.html')
+})
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
