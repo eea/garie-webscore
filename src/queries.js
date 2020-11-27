@@ -116,6 +116,11 @@ const getData = async () => {
     }
   }
 
+  for (let url in urlMap) {
+    urlMap[url].checkListMonth = urlMap[url].checkListMonth.map(x=>x*5);
+    urlMap[url].checkListYear = urlMap[url].checkListYear.map(x=>x*5);
+  }
+
   const rv = Object.values(urlMap)
   for (const row of rv) {
     row.score = Math.round(row.score)
