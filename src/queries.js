@@ -12,7 +12,7 @@ const influx = new Influx.InfluxDB({
 const query = async (metricSpec) => {
   const { name, measurement, field, database } = metricSpec
 
-  const metricsQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY time(1d), "url" fill(none) ORDER BY time DESC LIMIT 1`
+  const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
   // last 30 days - should we add `LIMIT 30` ?
   const monthSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
