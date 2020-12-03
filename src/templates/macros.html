@@ -4,14 +4,14 @@
 
 {% macro metricButtons(metric) -%}
   {%- if metric.help %}
-    {% set measurement = metric.measurement | replace("/", "") %}
+    {% set measurement = metric.measurement | replace("/", "-") %}
     <button class="info-button" data-toggle="modal" data-target="#modal-{{ measurement }}" id="button-{{ measurement }}">{{ info() }}</button>
   {%- endif %}
 {%- endmacro %}
 
 {% macro metricDocs(metric) -%}
   {%- if metric.help %}
-    {% set measurement = metric.measurement | replace("/", "") %}
+    {% set measurement = metric.measurement | replace("/", "-") %}
     <div class="modal" id="modal-{{ measurement}}" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
