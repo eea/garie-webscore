@@ -60,6 +60,8 @@ nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
 })
 
+nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
+
 nunjucksEnv.addGlobal('formatMetric', (value) => {
   if (typeof(value) === 'number') return value
   return "-"

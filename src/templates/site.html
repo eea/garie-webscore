@@ -67,6 +67,18 @@
         </td>
       </tr>
     {% endfor %}
+      <tr>
+        <th scope="row">
+          Checks Run
+        </th>
+        <td class="text-center {{ thresholdColor([0, 20], data.checks) }}" data-score="{{ data.checks }}">
+          {{ data.checks }}
+        </td>
+        <td class= "text-center {{ thresholdColor([0, 20], data.checks) }}">
+          <span class="sparkline" data-sparkline-month="{{ data.checkListMonth }}" data-sparkline-year="{{ data.checkListYear }}" data-toggle="tooltip" data-placement="right">
+        </span>
+        </td>
+      </tr>
     </tbody>
   </table>
 
