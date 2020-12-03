@@ -37,6 +37,7 @@
     <thead class="thead-dark">
       <tr>
         <th scope="col">Metric</th>
+        <th scope="col" class="text-center">Last Run</th>
         <th scope="col" class="text-center">Score</th>
         <th scope="col" class="text-center">Evolution</th>
       </tr>
@@ -48,6 +49,11 @@
           {{ metric.name }}
           {{ metricButtons(metric) }}
         </th>
+        {% set lastTime = data.metrics[metric.name].lastTime %}
+        {% set last = data.metrics[metric.name].last %}
+        <td class="text-center">
+          {{ lastTime }}
+        </td>
         {% set result = data.metrics[metric.name] %}
         <td class="{{ metricStyle(metric, result.value) }} text-center">
           {% set report = reportUrl(metric, urlSlug(data.url)) %}
