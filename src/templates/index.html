@@ -132,7 +132,7 @@ function sortScores(a, b) {
           {% if (timestamp - row.metrics[metric.name].lastTimeMs) > 26*60*60*1000 %}
             {% set days = (timestamp - row.metrics[metric.name].lastTimeMs) / (24*60*60*1000) %}
             <td class="{{ metricStyle(metric, result.value) }} text-center outdated" data-score="{{ result.value }}">
-              {{ formatMetric(result.value) }} ( {{ days | round(0,"ceil") }} days ago )
+              {{ formatMetric(result.value) }} ({{ days | round(0,"ceil") }} days ago)
               <br/>
               <span class="sparkline" data-sparkline-month="{{ monthSeries }}"  data-sparkline-year="{{ yearSeries }}" data-toggle="tooltip" data-placement="right">
               </span>
