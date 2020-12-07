@@ -36,6 +36,7 @@ const query = async (metricSpec) => {
     lastValues[row.url] = {
       last: row.value,
       lastTime: (row.time.toISOString() || "").substr(0, 16).replace("T", " "),
+      lastTimeMs: row.time.getTime(),
     }
   }
 
@@ -65,12 +66,12 @@ const query = async (metricSpec) => {
 
   const data = {}
   for (const { url, value, time } of metricsRows) {
-    const { last, lastTime } = lastValues[url] || {}
+    const { last, lastTime, lastTimeMs } = lastValues[url] || {}
     const { max, maxTime } = maxValues[url] || {}
     const monthSeries = monthSeriesValues[url] || []
     const yearSeries = yearSeriesValues[url] || []
 
-    data[url] = { value, last, lastTime, max, maxTime, monthSeries, yearSeries }
+    data[url] = { value, last, lastTime, lastTimeMs, max, maxTime, monthSeries, yearSeries }
   }
 
   return data
@@ -113,6 +114,7 @@ const getData = async () => {
         value: Math.round(result.value),
         last: Math.round(result.last),
         lastTime: result.lastTime,
+        lastTimeMs: result.lastTimeMs,
         max: Math.round(result.max),
         maxTime: result.maxTime,
         monthSeries: result.monthSeries,

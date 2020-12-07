@@ -89,7 +89,8 @@ app.get('/', wrap(async (req, res) => {
   const data = await queries.getData()
   data.sort((a, b) => b.score - a.score)
   const importantMetrics = metrics.filter((m) => m.important)
-  return res.render('index.html', { data, importantMetrics })
+  const timestamp = Date.now();
+  return res.render('index.html', { data, importantMetrics, timestamp })
 }))
 
 app.get('/site/:slug', wrap(async (req, res) => {
