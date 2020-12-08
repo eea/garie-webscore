@@ -3,6 +3,7 @@ const { metrics } = require('./metrics')
 
 // how much time to skip when looking for the historic max value of a metric
 const MAX_GRACE_PERIOD = "7d"
+let nrUrls = 0;
 
 const influx = new Influx.InfluxDB({
   host: process.env.INFLUX_HOST || 'influxdb',
@@ -129,6 +130,7 @@ const getData = async () => {
       row.checks += 1
     }
   }
+  nrUrls = Object.keys(urlMap).length;
 
   for (let url in urlMap) {
     urlMap[url].checkListMonth = urlMap[url].checkListMonth.map(x=>x*5);
@@ -144,6 +146,12 @@ const getData = async () => {
   return rv
 }
 
+const getNrUrls = () => {
+  return nrUrls;
+}
+
 module.exports = {
   getData,
+  influx,
+  getNrUrls,
 }

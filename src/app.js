@@ -6,11 +6,14 @@ const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
 const path = require('path')
 const { promisify } = require('util')
-
 const queries = require('./queries')
+const { influx, getNrUrls } = require('./queries')
 const { metrics } = require('./metrics')
 const reports = require('./reports')
 const ondemand = require('./ondemand')
+const { table } = require('console')
+const garie_plugin = require('garie-plugin')
+const { get } = require('./ondemand')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 
@@ -144,5 +147,17 @@ app.get('/help', (req, res) => {
 app.get('/about', (req, res) => {
   return res.render('about.html')
 })
+
+
+app.get('/status/:plugin_name', async(req, res)=> {
+
+  const plugin = await req.params.plugin_name;
+
+  if (!plugin) {
+    return res.sendStatus(404);
+  }
+  const nrUrls = getNrUrls();
+  return garie_plugin.utils.makeStatusTables(res, influx, nrUrls, plugin);
+});
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
