@@ -50,11 +50,10 @@
           {{ metricButtons(metric) }}
         </th>
         {% set lastTime = data.metrics[metric.name].lastTime %}
-        {% set last = data.metrics[metric.name].last %}
-        <td class="text-center">
+        {% set result = data.metrics[metric.name] %}
+        <td class="{{ metricStyle(metric, result.value) }} text-center">
           {{ lastTime }}
         </td>
-        {% set result = data.metrics[metric.name] %}
         <td class="{{ metricStyle(metric, result.value) }} text-center">
           {% set report = reportUrl(metric, urlSlug(data.url)) %}
           {% if (report and result.value is number) %}
