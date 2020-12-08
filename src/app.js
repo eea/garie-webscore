@@ -156,6 +156,9 @@ app.get('/status/:plugin_name', async(req, res)=> {
   if (!plugin) {
     return res.sendStatus(404);
   }
+  //necessary to get nrUrls
+  await queries.getData()
+
   const nrUrls = getNrUrls();
   return garie_plugin.utils.makeStatusTables(res, influx, nrUrls, plugin);
 });
