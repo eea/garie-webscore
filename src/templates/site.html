@@ -50,11 +50,24 @@
           {{ metricButtons(metric) }}
         </th>
         {% set lastTime = data.metrics[metric.name].lastTime %}
+        {% set lastTimeMs = data.metrics[metric.name].lastTimeMs %}
         {% set result = data.metrics[metric.name] %}
+        {% set outdated = 0 %}
+        {% if (timestamp - lastTimeMs) > 26*60*60*1000 %}
+          {% set outdated = 1 %}
+        {% endif %}
+        {% if outdated == 1 %}
+        <td class="{{ metricStyle(metric, result.value) }} outdated text-center">
+        {% else %}
         <td class="{{ metricStyle(metric, result.value) }} text-center">
+        {% endif %}
           {{ lastTime }}
         </td>
+        {% if outdated == 1 %}
+        <td class="{{ metricStyle(metric, result.value) }} outdated text-center">
+        {% else %}
         <td class="{{ metricStyle(metric, result.value) }} text-center">
+        {% endif %}
           {% set report = reportUrl(metric, urlSlug(data.url)) %}
           {% if (report and result.value is number) %}
             <a href="{{ report }}">
@@ -64,7 +77,11 @@
             {{ formatMetric(result.value) }}
           {% endif %}
         </td>
+        {% if outdated == 1 %}
+        <td class="{{ metricStyle(metric, result.value) }} outdated text-center">
+        {% else %}
         <td class="{{ metricStyle(metric, result.value) }} text-center">
+        {% endif %}
            {% set monthSeries = data.metrics[metric.name].monthSeries %}
            {% set yearSeries = data.metrics[metric.name].yearSeries %}
            <span class="sparkline" data-sparkline-month='{{ monthSeries }}' data-sparkline-year='{{ yearSeries }}'>
@@ -77,7 +94,7 @@
           Checks Run
         </th>
         <td class="text-center">
-          -
+          Not applicable
         </td>
         <td class="text-center {{ thresholdColor([0, 20], data.checks) }}" data-score="{{ data.checks }}">
           {{ data.checks }}

@@ -102,7 +102,8 @@ app.get('/site/:slug', wrap(async (req, res) => {
   if (! data)
     return res.sendStatus(404)
 
-  return res.render('site.html', { data, metrics })
+    const timestamp = Date.now();
+  return res.render('site.html', { data, metrics, timestamp })
 }))
 
 app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {
