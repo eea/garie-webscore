@@ -86,15 +86,17 @@ const metrics = [
   {
     name: "Uptime(30days)",
     important: true,
+    internal: true,
     database: "uptimerobot",
     measurement: "uptime_score",
     field: "value",
     thresholds: [95, 99],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Uptime30days",
-    help: "Uptime (30 days) - this metrics gives 100 if the site is never found down/unresponsive within the checks performed under the last 30 days period."
+    help: "Uptime (30 days) - this metrics gives 100 if the site is never found down/unresponsive within the checks performed under the last 30 days period. Uptime data gathered using <a href='https://uptimerobot.com/'>https://uptimerobot.com/</a>"
   },
   {
     name: "Server errors(30)",
+    internal: true,
     database: "sentry-metrics",
     measurement: "ServerErrors/TotalVisits",
     field: "value_30days",
@@ -104,6 +106,7 @@ const metrics = [
   },
   {
     name: "JS errors(30)",
+    internal: true,
     database: "sentry-metrics",
     measurement: "JsEvents/TotalVisits",
     field: "value_30days",
@@ -113,6 +116,7 @@ const metrics = [
   },
   {
     name: "Test coverage",
+    internal: true,
     database: "sonarqube",
     measurement: "coverage_rating",
     field: "value",
@@ -122,6 +126,7 @@ const metrics = [
   },
   {
     name: "Bugs",
+    internal: true,
     database: "sonarqube",
     measurement: "reliability_rating",
     field: "value",
@@ -131,6 +136,7 @@ const metrics = [
   },
   {
     name: "Vulnerabilities",
+    internal: true,
     database: "sonarqube",
     measurement: "security_rating",
     field: "value",
@@ -140,6 +146,7 @@ const metrics = [
   },
   {
     name: "Code smells",
+    internal: true,
     database: "sonarqube",
     measurement: "sqale_rating",
     field: "value",
@@ -149,6 +156,7 @@ const metrics = [
   },
   {
     name: "Duplication score",
+    internal: true,
     database: "sonarqube",
     measurement: "non_duplication_rating",
     field: "value",
@@ -159,6 +167,7 @@ const metrics = [
   {
     name: "Privacyscore",
     important: true,
+    internal: true,
     database: "privacyscore",
     measurement: "privacyscore",
     field: "value",
