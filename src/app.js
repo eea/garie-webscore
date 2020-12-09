@@ -59,6 +59,15 @@ const urlHostname = (url) => {
 
 nunjucksEnv.addGlobal('urlHostname', urlHostname)
 
+const isExternal = (url) => {
+  if (url.includes('europa.eu') || url.includes('copernicus') || url.includes('eea-subscriptions')) {
+    return false
+  }
+  return true
+}
+
+nunjucksEnv.addGlobal('isExternal', isExternal)
+
 nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
 })
