@@ -44,6 +44,17 @@
     </thead>
     <tbody>
     {% for metric in metrics %}
+      {% if (metric.internal and isExternal(data.url)) %}
+      <tr>
+        <th scope="row" class="disabled">
+          {{ metric.name }}
+          {{ metricButtons(metric) }}
+        </th>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      {% else %}
       <tr>
         <th scope="row">
           {{ metric.name }}
@@ -76,6 +87,7 @@
            </span>
         </td>
       </tr>
+      {% endif %}
     {% endfor %}
       <tr>
         <th scope="row">

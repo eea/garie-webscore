@@ -115,6 +115,11 @@ app.get('/site/:slug', wrap(async (req, res) => {
     return res.sendStatus(404)
 
   const timestamp = Date.now();
+  if (isExternal(slug)) {
+    metrics.sort(function(a, b) {
+      return (a.internal === b.internal)? 0 : a.internal? 1 : -1;
+    });
+  }
   return res.render('site.html', { data, metrics, timestamp })
 }))
 
