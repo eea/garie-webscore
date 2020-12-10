@@ -64,23 +64,25 @@
         {% set lastTimeMs = data.metrics[metric.name].lastTimeMs %}
         {% set result = data.metrics[metric.name] %}
         {% set resultClass = "" %}
+        {% set resultValue = result.value %}
         {% if (timestamp - lastTimeMs) > 26*60*60*1000 %}
           {% set resultClass = "outdated" %}
+          {% set resultValue = result.last %}
         {% endif %}
-        <td class="{{ metricStyle(metric, result.value) }} {{ resultClass }} text-center">
+        <td class="{{ metricStyle(metric, resultValue) }} {{ resultClass }} text-center">
           {{ lastTime }}
         </td>
-        <td class="{{ metricStyle(metric, result.value) }} {{ resultClass }} text-center">
+        <td class="{{ metricStyle(metric, resultValue) }} {{ resultClass }} text-center">
           {% set report = reportUrl(metric, urlSlug(data.url)) %}
-          {% if (report and result.value is number) %}
+          {% if (report and resultValue is number) %}
             <a href="{{ report }}">
-              {{ formatMetric(result.value) }}
+              {{ formatMetric(resultValue) }}
             </a>
           {% else %}
-            {{ formatMetric(result.value) }}
+            {{ formatMetric(resultValue) }}
           {% endif %}
         </td>
-        <td class="{{ metricStyle(metric, result.value) }} {{ resultClass }} text-center">
+        <td class="{{ metricStyle(metric, resultValue) }} {{ resultClass }} text-center">
            {% set monthSeries = data.metrics[metric.name].monthSeries %}
            {% set yearSeries = data.metrics[metric.name].yearSeries %}
            <span class="sparkline" data-sparkline-month='{{ monthSeries }}' data-sparkline-year='{{ yearSeries }}'>
