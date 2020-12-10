@@ -98,17 +98,20 @@ const isUpPath = (path) => {
 }
 
 app.get('/', wrap(async (req, res) => {
-  const data = await queries.getData()
+  let { yearData } = req.query;
+  yearData = yearData === 'true';
+  const data = await queries.getData(yearData)
   data.sort((a, b) => b.score - a.score)
   const importantMetrics = metrics.filter((m) => m.important)
   const timestamp = Date.now();
-  return res.render('index.html', { data, importantMetrics, timestamp })
+  return res.render('index.html', { data, importantMetrics, timestamp, yearData })
 }))
 
 app.get('/site/:slug', wrap(async (req, res) => {
   const { slug } = req.params
-
-  const data = (await queries.getData())
+  let { yearData } = req.query;
+  yearData = yearData === 'true';
+  const data = (await queries.getData(yearData))
     .find((row) => urlSlug(row.url) === slug)
 
   if (! data)
@@ -120,7 +123,7 @@ app.get('/site/:slug', wrap(async (req, res) => {
       return (a.internal === b.internal)? 0 : a.internal? 1 : -1;
     });
   }
-  return res.render('site.html', { data, metrics, timestamp })
+  return res.render('site.html', { data, metrics, timestamp, yearData })
 }))
 
 app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {

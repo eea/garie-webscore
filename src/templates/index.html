@@ -38,8 +38,13 @@ function sortScores(a, b) {
   <label for="time-selection">Display metrics evolution:</label>
   <select name="time-selection" id="time-selection">
     <option value="7">7 days</option>
-    <option value="30" selected="selected">30 days</option>
-    <option value="365">365 days</option>
+    {% if yearData == true %}
+      <option value="30">30 days</option>
+      <option value="365" selected="selected">365 days</option>
+    {% else %}
+      <option value="30" selected="selected">30 days</option>
+      <option value="365">365 days</option>
+    {% endif %}
     <option value="0">Do not display</option>
   </select>
   <div class="spinner-border spinner-border-sm" role="status" id="spinner-sparklines">
@@ -229,7 +234,12 @@ $(function(){ /* DOM ready */
 
     // Get number of selected days
     days = parseInt($(this).val());
-
+    if (days === 365) {
+      if (window.location.pathname + window.location.search !== '/?yearData=true') {
+        window.location.href = '/?yearData=true';
+        return;
+      }
+    }
     // Hide spinner on drawSparklines() completion
     setTimeout(function() {
       drawSparklines(days)();
