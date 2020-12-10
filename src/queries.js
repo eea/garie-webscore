@@ -131,10 +131,10 @@ const getData = async () => {
         yearSeries: result.yearSeries
       }
 
-      row.checkListMonth = fillCheckList(result.monthSeries, row.checkListMonth);
-      row.checkListYear = fillCheckList(result.yearSeries, row.checkListYear);
+      row.checkListMonth = fillCheckList(result.monthSeries, row.checkListMonth)
+      row.checkListYear = fillCheckList(result.yearSeries, row.checkListYear)
 
-      row.score += result.value
+      row.score += (result.value) ? result.value : 0
       row.checks += 1
     }
   }
