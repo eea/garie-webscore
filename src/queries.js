@@ -32,6 +32,14 @@ const query = async (metricSpec) => {
     return [[], [], [], [], []];
   })
 
+  const metricsValues = {}
+  for (const row of metricsRows) {
+    metricsValues[row.url] = {
+      time: row.time,
+      value: row.value
+    }
+  }
+
   const lastValues = {}
   for (const row of lastMetricsRows) {
     lastValues[row.url] = {
@@ -66,7 +74,8 @@ const query = async (metricSpec) => {
   }
 
   const data = {}
-  for (const { url, value, time } of metricsRows) {
+  for (const url of Object.keys(lastValues)) {
+    const { value } = metricsValues[url] || -1
     const { last, lastTime, lastTimeMs } = lastValues[url] || {}
     const { max, maxTime } = maxValues[url] || {}
     const monthSeries = monthSeriesValues[url] || []
@@ -124,7 +133,6 @@ const getData = async () => {
 
       row.checkListMonth = fillCheckList(result.monthSeries, row.checkListMonth);
       row.checkListYear = fillCheckList(result.yearSeries, row.checkListYear);
-      
       row.metrics[metric.name].monthSeries = result.monthSeries.filter(val => val >= 0);
       row.metrics[metric.name].yearSeries = result.yearSeries.filter(val => val >= 0);
 
