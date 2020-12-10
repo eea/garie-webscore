@@ -133,8 +133,6 @@ const getData = async () => {
 
       row.checkListMonth = fillCheckList(result.monthSeries, row.checkListMonth);
       row.checkListYear = fillCheckList(result.yearSeries, row.checkListYear);
-      row.metrics[metric.name].monthSeries = result.monthSeries.filter(val => val >= 0);
-      row.metrics[metric.name].yearSeries = result.yearSeries.filter(val => val >= 0);
 
       row.score += result.value
       row.checks += 1
