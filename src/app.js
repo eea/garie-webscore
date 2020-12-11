@@ -43,6 +43,23 @@ const thresholdColor = (thresholds, value) => {
     return "table-secondary"
   }
 }
+nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
+
+const checksStyle = (value) => {
+  //TODO: instead of 13, 18... use (max_number_of_checks - something)
+  if (typeof value === 'number' && !isNaN(value)) {
+    if (value < 13)
+      return "checks-low"
+    else if (value < 18)
+      return "checks-medium"
+    else
+      return "checks-best"
+  } else {
+    return ""
+  }
+}
+nunjucksEnv.addGlobal('checksStyle', checksStyle)
+
 
 const urlSlug = (url) => {
   return url
@@ -50,13 +67,11 @@ const urlSlug = (url) => {
     .replace(/\/$/, '')
     .replace(/[^a-zA-Z0-9.]+/g, '-')
 }
-
 nunjucksEnv.addGlobal('urlSlug', urlSlug)
 
 const urlHostname = (url) => {
   return (new URL(url)).hostname
 }
-
 nunjucksEnv.addGlobal('urlHostname', urlHostname)
 
 const isExternal = (url) => {
@@ -65,14 +80,11 @@ const isExternal = (url) => {
   }
   return true
 }
-
 nunjucksEnv.addGlobal('isExternal', isExternal)
 
 nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
 })
-
-nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
 
 nunjucksEnv.addGlobal('formatMetric', (metric, url, value) => {
   if (typeof(value) === 'number') return value

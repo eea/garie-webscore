@@ -119,7 +119,7 @@ function sortScores(a, b) {
         <td class="text-center" data-score="{{ row.median }}">
           {{ row.median }}
         </td>
-        <td class="text-center" data-score="{{ row.checks }}">
+        <td class="{{ checksStyle(row.checks) }} text-center" data-score="{{ row.checks }}">
           {{ row.checks }}
           <br/>
             <span class="sparkline" data-sparkline-month="{{ row.checkListMonth }}" data-sparkline-year="{{ row.checkListYear }}" data-toggle="tooltip" data-placement="right">
