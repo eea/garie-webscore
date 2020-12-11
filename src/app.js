@@ -88,7 +88,7 @@ nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
 
 nunjucksEnv.addGlobal('formatMetric', (metric, url, value) => {
   if (typeof(value) === 'number') return value
-  if ((metric.internal === true) && (isExternal(url))) return ""
+  if ((metric.internal === true) && (isExternal(url))) return "N/A"
   return "-"
 })
 
