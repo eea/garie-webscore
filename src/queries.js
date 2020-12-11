@@ -70,12 +70,12 @@ const query = async (metricSpec) => {
     if (!yearSeriesValues[row.url]) {
       yearSeriesValues[row.url] = []
     }
-    yearSeriesValues[row.url].push(row.value);
+    yearSeriesValues[row.url].push(row.value)
   }
 
   const data = {}
   for (const url of Object.keys(lastValues)) {
-    const { value } = metricsValues[url] || -1
+    const { value } = metricsValues[url] || { "value": null }
     const { last, lastTime, lastTimeMs } = lastValues[url] || {}
     const { max, maxTime } = maxValues[url] || {}
     const monthSeries = monthSeriesValues[url] || []
