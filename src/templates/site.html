@@ -65,8 +65,8 @@
         {% set result = data.metrics[metric.name] %}
         {% set resultClass = "" %}
         {% set resultValue = result.value %}
-        {% if (timestamp - lastTimeMs) > 26*60*60*1000 %}
-          {% set resultClass = "outdated" %}
+        {% if (timestamp - lastTimeMs) > 24*60*60*1000 %}
+          {% set resultClass = "text-danger outdated" %}
           {% set resultValue = result.last %}
         {% endif %}
         <td class="{{ metricStyle(metric, resultValue) }} {{ resultClass }} text-center">
