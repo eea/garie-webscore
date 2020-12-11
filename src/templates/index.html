@@ -38,13 +38,8 @@ function sortScores(a, b) {
   <label for="time-selection">Display metrics evolution:</label>
   <select name="time-selection" id="time-selection">
     <option value="7">7 days</option>
-    {% if yearData == true %}
-      <option value="30">30 days</option>
-      <option value="365" selected="selected">365 days</option>
-    {% else %}
-      <option value="30" selected="selected">30 days</option>
-      <option value="365">365 days</option>
-    {% endif %}
+    <option value="30" selected="selected">30 days</option>
+    <option value="365">365 days</option>
     <option value="0">Do not display</option>
   </select>
   <div class="spinner-border spinner-border-sm" role="status" id="spinner-sparklines">
@@ -127,26 +122,25 @@ function sortScores(a, b) {
         <td class="text-center" data-score="{{ row.checks }}">
           {{ row.checks }}
           <br/>
-            <span class="sparkline" data-sparkline-month="{{ row.checkListMonth }}" data-sparkline-year="{{ row.checkListYear }}" data-toggle="tooltip" data-placement="right">
+            <span class="sparkline" sparkline-url="{{ row.url }}" sparkline-fields="checkList" data-sparkline="{{ row.checkList }}" data-toggle="tooltip" data-placement="right">
           </span>
         </td>
         {% for metric in importantMetrics %}
           {% set result = row.metrics[metric.name] %}
-          {% set monthSeries = row.metrics[metric.name].monthSeries %}
-          {% set yearSeries = row.metrics[metric.name].yearSeries %}
+          {% set series = row.metrics[metric.name].series %}
           {% if (timestamp - row.metrics[metric.name].lastTimeMs) > 26*60*60*1000 %}
             {% set days = (timestamp - row.metrics[metric.name].lastTimeMs) / (24*60*60*1000) %}
             <td class="{{ metricStyle(metric, result.value) }} text-center outdated" data-score="{{ result.value }}">
               {{ formatMetric(result.value) }} ({{ days | round(0,"ceil") }} days ago)
               <br/>
-              <span class="sparkline" data-sparkline-month="{{ monthSeries }}"  data-sparkline-year="{{ yearSeries }}" data-toggle="tooltip" data-placement="right">
+              <span class="sparkline" sparkline-url="{{ row.url }}" sparkline-fields="metrics,{{ metric.name }},series" data-sparkline="{{ series }}" data-toggle="tooltip" data-placement="right">
               </span>
             </td>
           {% else %}
             <td class="{{ metricStyle(metric, result.value) }} text-center" data-score="{{ result.value }}">
               {{ formatMetric(result.value) }}
               <br/>
-              <span class="sparkline" data-sparkline-month="{{ monthSeries }}"  data-sparkline-year="{{ yearSeries }}" data-toggle="tooltip" data-placement="right">
+              <span class="sparkline" sparkline-url="{{ row.url }}" sparkline-fields="metrics,{{ metric.name }},series" data-sparkline="{{ series }}" data-toggle="tooltip" data-placement="right">
               </span>
             </td>
           {% endif %}
@@ -174,16 +168,11 @@ function sortScores(a, b) {
 // Closure to allow parameters to document.ready functions
 function drawSparklines(numberOfDays) {
   return function() {
-    var sparklineSpans = document.getElementsByClassName("sparkline");
+
+    const sparklineSpans = document.getElementsByClassName("sparkline");
 
     for (var i = 0; i < sparklineSpans.length; i++) {
-      var attr;
-      if (numberOfDays <= 30) {
-        attr = sparklineSpans[i].getAttribute('data-sparkline-month');
-      } else {
-        attr = sparklineSpans[i].getAttribute('data-sparkline-year');
-      }
-
+      const attr = sparklineSpans[i].getAttribute("data-sparkline");
       var valuesList;
 
       if (numberOfDays === 0) {
@@ -226,26 +215,79 @@ function drawSparklines(numberOfDays) {
 // On document ready, display sparklines for selected time period
 $(document).ready(drawSparklines(parseInt($('#time-selection').val())));
 
+function updateDataSparkline(rows) {
+
+  const sparklineSpans = document.getElementsByClassName("sparkline");
+  const urlMap = {};
+  for (let i = 0; i < rows.length; i++) {
+    urlMap[rows[i].url] = rows[i];
+  }
+
+  for (var i = 0; i < sparklineSpans.length; i++) {
+    const url = sparklineSpans[i].getAttribute("sparkline-url");
+    const fields = sparklineSpans[i].getAttribute("sparkline-fields").split(',');
+    
+    let data = urlMap[url];
+    for (let field of fields) {
+      data = data[field] || {};
+    }
+
+    if (data === {}) {
+      data = "";
+    }
+    sparklineSpans[i].setAttribute("data-sparkline", data);
+  }
+}
+
+function drawSparklinesSetup(series) {
+  updateDataSparkline(series);
+  drawSparklines(days)();
+  spinner = document.getElementById("spinner-sparklines");
+  spinner.style.display = "none";
+}
+
 $(function(){ /* DOM ready */
+
+  const seriesCache = {};
+
   $('#time-selection').change(function() {
     // Show spinner
     spinner = document.getElementById("spinner-sparklines");
     spinner.style.display = "inline-block";
 
     // Get number of selected days
+    let kind = "";
     days = parseInt($(this).val());
+   
+
     if (days === 365) {
-      if (window.location.pathname + window.location.search !== '/?yearData=true') {
-        window.location.href = '/?yearData=true';
-        return;
+      kind = "year"
+    } else {
+      kind = "month"
+    }
+
+    if (seriesCache[kind] !== undefined) {
+      setTimeout( () => {
+        drawSparklinesSetup(seriesCache[kind]);
+      });  
+    } 
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/");
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    var params = `kind=${kind}`;
+
+    xhr.onreadystatechange = function() {
+      if(xhr.readyState == 4 && xhr.status == 200) {
+        seriesCache[kind] = JSON.parse(xhr.response).data;
+        drawSparklinesSetup(seriesCache[kind]);   
       }
     }
-    // Hide spinner on drawSparklines() completion
-    setTimeout(function() {
-      drawSparklines(days)();
-      spinner = document.getElementById("spinner-sparklines");
-      spinner.style.display = "none";
-    });
+    xhr.send(params);
+    
+    
+   
+    
   });
 
   $('#data-table').on('post-body.bs.table', function() {

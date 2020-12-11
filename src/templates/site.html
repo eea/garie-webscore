@@ -86,9 +86,8 @@
           {% endif %}
         </td>
         <td class="{{ metricStyle(metric, result.value) }} {{ resultClass }} text-center">
-           {% set monthSeries = data.metrics[metric.name].monthSeries %}
-           {% set yearSeries = data.metrics[metric.name].yearSeries %}
-           <span class="sparkline" data-sparkline-month='{{ monthSeries }}' data-sparkline-year='{{ yearSeries }}'>
+           {% set series = data.metrics[metric.name].series %}
+           <span class="sparkline" sparkline-url="{{ data.url }}" sparkline-fields="metrics,{{ metric.name }},series" data-sparkline='{{ series }}'>
            </span>
         </td>
       </tr>
@@ -105,7 +104,7 @@
           {{ data.checks }}
         </td>
         <td class= "text-center {{ thresholdColor([0, 20], data.checks) }}">
-          <span class="sparkline" data-sparkline-month="{{ data.checkListMonth }}" data-sparkline-year="{{ data.checkListYear }}" data-toggle="tooltip" data-placement="right">
+          <span class="sparkline" sparkline-url="{{ row.url }}" sparkline-fields="checkList" data-sparkline="{{ data.checkList }}" data-toggle="tooltip" data-placement="right">
         </span>
         </td>
       </tr>
@@ -133,12 +132,7 @@ function drawSparklines(numberOfDays) {
     var sparklineSpans = document.getElementsByClassName("sparkline");
 
     for (var i = 0; i < sparklineSpans.length; i++) {
-      var attr;
-      if (numberOfDays <= 30) {
-        attr = sparklineSpans[i].getAttribute('data-sparkline-month');
-      } else {
-        attr = sparklineSpans[i].getAttribute('data-sparkline-year');
-      }
+      const attr = sparklineSpans[i].getAttribute('data-sparkline');
       
       var valuesList;
       if (attr === "") {
@@ -173,25 +167,73 @@ function drawSparklines(numberOfDays) {
 // On document ready, display sparklines for selected time period
 $(document).ready(drawSparklines(parseInt($('#time-selection').val())));
 
+function updateDataSparkline(data) {
+
+  const sparklineSpans = document.getElementsByClassName("sparkline");
+
+  for (var i = 0; i < sparklineSpans.length; i++) {
+    const url = sparklineSpans[i].getAttribute("sparkline-url");
+    const fields = sparklineSpans[i].getAttribute("sparkline-fields").split(',');
+    
+
+    let series = data;
+    for (let field of fields) {
+      series = series[field] || {};
+    }
+
+    if (series === {}) {
+      series = "";
+    }
+    sparklineSpans[i].setAttribute("data-sparkline", series);
+  }
+}
+
+function drawSparklinesSetup(series) {
+  updateDataSparkline(series);
+  drawSparklines(days)();
+  spinner = document.getElementById("spinner-sparklines");
+  spinner.style.display = "none";
+}
+
 $(function(){ /* DOM ready */
+
+  const seriesCache = {};
+
   $('#time-selection').change(function(){
     // Show spinner
     spinner = document.getElementById("spinner-sparklines");
     spinner.style.display = "inline-block";
 
     // get number of selected days, then re-draw sparklines.
+
+    let kind = "";
     days = parseInt($(this).val());
+    
     if (days === 365) {
-      if (window.location.href.indexOf('?yearData=true') < 0) {
-        window.location.href += '/?yearData=true';
-        return;
+      kind = "year"
+    } else {
+      kind = "month"
+    }
+
+    if (seriesCache[kind] !== undefined) {
+      setTimeout( () => {
+        drawSparklinesSetup(seriesCache[kind]);
+      });  
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", window.location.href);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    var params = `kind=${kind}`;
+
+    xhr.onreadystatechange = function() {
+      if(xhr.readyState == 4 && xhr.status == 200) {
+        seriesCache[kind] = JSON.parse(xhr.response).data;
+        drawSparklinesSetup(seriesCache[kind]);   
       }
     }
-    setTimeout(function() {
-      drawSparklines(days)();
-      spinner = document.getElementById("spinner-sparklines");
-      spinner.style.display = "none";
-    });
+    xhr.send(params);
+
   });
 });
 
