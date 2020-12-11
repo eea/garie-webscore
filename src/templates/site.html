@@ -76,10 +76,10 @@
           {% set report = reportUrl(metric, urlSlug(data.url)) %}
           {% if (report and resultValue is number) %}
             <a href="{{ report }}">
-              {{ formatMetric(resultValue) }}
+              {{ formatMetric(metric, data.url, resultValue) }}
             </a>
           {% else %}
-            {{ formatMetric(resultValue) }}
+            {{ formatMetric(metric, data.url, resultValue) }}
           {% endif %}
         </td>
         <td class="{{ metricStyle(metric, resultValue) }} {{ resultClass }} text-center">

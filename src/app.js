@@ -74,8 +74,9 @@ nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
 
 nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
 
-nunjucksEnv.addGlobal('formatMetric', (value) => {
+nunjucksEnv.addGlobal('formatMetric', (metric, url, value) => {
   if (typeof(value) === 'number') return value
+  if ((metric.internal === true) && (isExternal(url))) return ""
   return "-"
 })
 

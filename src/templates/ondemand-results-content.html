@@ -26,7 +26,7 @@
         <td class="{{ metricStyle(result.metric, result.value) }} text-center">
           {% if scan.finished %}
             {% if scan.success %}
-              {{ formatMetric(result.value) }}
+              {{ formatMetric(result.metric, job.url, result.value) }}
             {% else %}
               failed
             {% endif %}
