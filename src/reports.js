@@ -27,9 +27,6 @@ const reportUrl = (metric, slug) => {
     case "linksintegrity":
       return fileUrl("linksintegrity-results/linksintegrity.txt")
 
-    case "privacyscore":
-      return fileUrl("privacyscore-results/privacyscore.html")
-
     case "securityheaders":
       if (metric.measurement === "mozilla_score") {
         return fileUrl("securityheaders-results/mozilla-observatory.txt")
