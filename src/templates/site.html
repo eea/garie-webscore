@@ -73,7 +73,7 @@
           {{ lastTime }}
         </td>
         <td class="{{ metricStyle(metric, resultValue) }} {{ resultClass }} text-center">
-          {% set report = reportUrl(metric, urlSlug(data.url)) %}
+          {% set report = reportUrl(metric, pathNameFromUrl(data.url)) %}
           {% if (report and resultValue is number) %}
             <a href="{{ report }}">
               {{ formatMetric(metric, data.url, resultValue) }}

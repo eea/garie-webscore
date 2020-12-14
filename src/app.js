@@ -69,6 +69,10 @@ const urlSlug = (url) => {
 }
 nunjucksEnv.addGlobal('urlSlug', urlSlug)
 
+
+nunjucksEnv.addGlobal('pathNameFromUrl', garie_plugin.utils.helpers.pathNameFromUrl);
+
+
 const urlHostname = (url) => {
   return (new URL(url)).hostname
 }
