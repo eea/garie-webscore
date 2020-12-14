@@ -1,12 +1,12 @@
 {
   "name": "garie-webscore",
-  "version": "0.2.3",
+  "version": "0.3.3",
   "description": "Dashboard for Garie plugins",
   "scripts": {
     "start": "node src/app.js"
   },
   "dependencies": {
-    "garie-plugin": "https://github.com/eea/garie-plugin#master",
+    "garie-plugin": "https://github.com/eea/garie-plugin#0.0.25",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
