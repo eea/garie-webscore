@@ -116,6 +116,7 @@ const metrics = [
   },
   {
     name: "Test coverage",
+    important: true,
     internal: true,
     database: "sonarqube",
     measurement: "coverage_rating",
