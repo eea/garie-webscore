@@ -117,7 +117,7 @@ const getData = async () => {
   for (const metric of metrics) {
     const results = metricResults[metric.name]
     for (const url of Object.keys(results)) {
-      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, checkListMonth: [], checkListYear: [] }
+      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, currentChecks: 0, checkListMonth: [], checkListYear: [] }
       urlMap[url] = row
       const result = results[url]
       row.metrics[metric.name] = {
@@ -134,10 +134,21 @@ const getData = async () => {
       row.checkListMonth = fillCheckList(result.monthSeries, row.checkListMonth)
       row.checkListYear = fillCheckList(result.yearSeries, row.checkListYear)
 
+      if (result.value) {
+        row.currentChecks += 1
+      }
       row.score += (result.value) ? result.value : 0
       row.checks += 1
     }
   }
+
+  // Eliminate URLs with no current checks
+  for (const url of Object.keys(urlMap)) {
+    if (urlMap[url].currentChecks === 0) {
+      delete urlMap[url]
+    }
+  }
+
   nrUrls = Object.keys(urlMap).length;
 
   for (let url in urlMap) {
