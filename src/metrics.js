@@ -96,6 +96,7 @@ const metrics = [
   },
   {
     name: "Server errors(30)",
+    important: true,
     internal: true,
     database: "sentry-metrics",
     measurement: "ServerErrors/TotalVisits",

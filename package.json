@@ -1,6 +1,6 @@
 {
   "name": "garie-webscore",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Dashboard for Garie plugins",
   "scripts": {
     "start": "node src/app.js"
