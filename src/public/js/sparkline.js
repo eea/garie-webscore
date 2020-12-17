@@ -92,13 +92,13 @@
         points = points || [];
         this.points = points;
 
-        this.canvas.width = this.options.width * this.ratio;
-        this.canvas.height = this.element.offsetHeight * this.ratio;
-        this.canvas.style.width = this.options.width + 'px';
-        this.canvas.style.height = this.element.offsetHeight + 'px';
+        this.canvas.width = this.options.width;// * this.ratio;
+        this.canvas.height = this.element.offsetHeight;// * this.ratio;
+        //this.canvas.style.width = this.options.width + 'px';
+        //this.canvas.style.height = this.element.offsetHeight + 'px';
 
-        var offsetX = this.options.dotRadius*this.ratio;
-        var offsetY = this.options.dotRadius*this.ratio;
+        var offsetX = this.options.dotRadius;//*this.ratio;
+        var offsetY = this.options.dotRadius;//*this.ratio;
         var width = this.canvas.width - offsetX*2;
         var height = this.canvas.height - offsetY*2;
 
@@ -111,12 +111,12 @@
         var y = getY.bind(points, minValue, maxValue, offsetY, height);
         var delta = width / (points.length - 1);
 
-        var dot = drawDot.bind(this.context, this.options.dotRadius*this.ratio);
+        var dot = drawDot.bind(this.context, this.options.dotRadius);//*this.ratio);
 
 
         this.context.beginPath();
         this.context.strokeStyle = this.options.lineColor;
-        this.context.lineWidth = this.options.lineWidth*this.ratio;
+        this.context.lineWidth = this.options.lineWidth;//*this.ratio;
 
         this.context.moveTo(x, y(0));
         for(var i=1; i<points.length; i++){

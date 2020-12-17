@@ -123,7 +123,7 @@ function sortScores(a, b) {
           {{ row.checks }}
           <br/>
             <span class="sparkline" data-sparkline-month="{{ row.checkListMonth }}" data-sparkline-year="{{ row.checkListYear }}" data-toggle="tooltip" data-placement="right">
-          </span>
+            </span>
         </td>
         {% for metric in importantMetrics %}
           {% set result = row.metrics[metric.name] %}
@@ -242,7 +242,9 @@ $(function(){ /* DOM ready */
     // When data is reordered, sparklines need to be redrawn
     days = parseInt($('#time-selection').val());
     // TODO: this is a bit time-consuming
+    console.time('drawSparklines');
     drawSparklines(days)();
+    console.timeEnd('drawSparklines');
   });
 
   $('.info-button').click(function(event) {
