@@ -62,7 +62,7 @@ const query = async (metricSpec) => {
     if (!monthSeriesValues[row.url]) {
       monthSeriesValues[row.url] = []
     }
-    monthSeriesValues[row.url].push(row.value)
+    monthSeriesValues[row.url].push(Math.round(row.value))
   }
 
   const yearSeriesValues = new Object()
@@ -70,7 +70,7 @@ const query = async (metricSpec) => {
     if (!yearSeriesValues[row.url]) {
       yearSeriesValues[row.url] = []
     }
-    yearSeriesValues[row.url].push(row.value)
+    yearSeriesValues[row.url].push(Math.round(row.value))
   }
 
   const data = {}
