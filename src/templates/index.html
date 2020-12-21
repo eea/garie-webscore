@@ -242,9 +242,7 @@ $(function(){ /* DOM ready */
     // When data is reordered, sparklines need to be redrawn
     days = parseInt($('#time-selection').val());
     // TODO: this is a bit time-consuming
-    console.time('drawSparklines');
     drawSparklines(days)();
-    console.timeEnd('drawSparklines');
   });
 
   $('.info-button').click(function(event) {
