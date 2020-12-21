@@ -5,11 +5,9 @@ const SONARQUBE_URL = process.env.SONARQUBE_URL
 const findReportPath = async (report, slug, onDemand) => {
   const reportsPath = process.env.REPORTS_PATH
   if (!reportsPath) throw new Error("Required env var REPORTS_PATH is not set")
-  if (onDemand === true) {
-    const parent = `${reportsPath}/on-demand/${report}/${slug}`
-  } else {
-    const parent = `${reportsPath}/${report}/${slug}`
-  }
+
+  const onDemandPart = (onDemand === true) ? "/on-demand" : ""
+  const parent = `${reportsPath}${onDemandPart}/${report}/${slug}`
   try {
     if (!(await fs.promises.lstat(parent)).isDirectory()) return null
   } catch(e) {
@@ -23,11 +21,9 @@ const findReportPath = async (report, slug, onDemand) => {
 }
 
 const reportUrl = (metric, slug, onDemand) => {
-  if (onDemand === true) {
-    const fileUrl = (fragment) => `/site/${slug}/reports/on-demand/${fragment}`
-  } else {
-    const fileUrl = (fragment) => `/site/${slug}/reports/${fragment}`
-  }
+    const onDemandPart = (onDemand === true) ? "/on-demand" : ""
+    const fileUrl = (fragment) => `/site/${slug}/reports${onDemandPart}/${fragment}`
+
   switch (metric.database) {
     case "lighthouse":
       return fileUrl("lighthouse-reports/lighthouse.html")
