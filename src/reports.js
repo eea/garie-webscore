@@ -8,6 +8,7 @@ const findReportPath = async (report, slug, onDemand) => {
 
   const onDemandPart = (onDemand === true) ? "/on-demand" : ""
   const parent = `${reportsPath}${onDemandPart}${report}/${slug}`
+  console.log(`findReportPath - Trying to get ${parent}`)
   try {
     if (!(await fs.promises.lstat(parent)).isDirectory()) return null
   } catch(e) {

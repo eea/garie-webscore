@@ -147,7 +147,7 @@ app.get('/site/:slug/reports/on-demand/:report/*', wrap(async (req, res) => {
   if (isUpPath(slug) || isUpPath(report))
     return res.sendStatus(403)
 
-  const root = await reports.findReportPath(report, slug, false)
+  const root = await reports.findReportPath(report, slug, true)
   if (!root)
     return res.sendStatus(404)
 
