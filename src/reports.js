@@ -5,11 +5,9 @@ const SONARQUBE_URL = process.env.SONARQUBE_URL
 const findReportPath = async (report, slug, onDemand) => {
   const reportsPath = process.env.REPORTS_PATH
   if (!reportsPath) throw new Error("Required env var REPORTS_PATH is not set")
-  if (onDemand === true) {
-    const parent = `${reportsPath}/on-demand/${report}/${slug}`
-  } else {
-    const parent = `${reportsPath}/${report}/${slug}`
-  }
+
+  const onDemandPart = (onDemand === true) ? "/on-demand" : ""
+  const parent = `${reportsPath}${onDemandPart}${report}/${slug}`
   try {
     if (!(await fs.promises.lstat(parent)).isDirectory()) return null
   } catch(e) {
