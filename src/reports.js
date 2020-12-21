@@ -7,7 +7,7 @@ const findReportPath = async (report, slug, onDemand) => {
   if (!reportsPath) throw new Error("Required env var REPORTS_PATH is not set")
 
   const onDemandPart = (onDemand === true) ? "/on-demand" : ""
-  const parent = `${reportsPath}${onDemandPart}${report}/${slug}`
+  const parent = `${reportsPath}${onDemandPart}/${report}/${slug}`
   console.log(`findReportPath - Trying to get ${parent}`)
   try {
     if (!(await fs.promises.lstat(parent)).isDirectory()) return null
