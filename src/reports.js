@@ -23,11 +23,9 @@ const findReportPath = async (report, slug, onDemand) => {
 }
 
 const reportUrl = (metric, slug, onDemand) => {
-  if (onDemand === true) {
-    const fileUrl = (fragment) => `/site/${slug}/reports/on-demand/${fragment}`
-  } else {
-    const fileUrl = (fragment) => `/site/${slug}/reports/${fragment}`
-  }
+    const onDemandPart = (onDemand === true) ? "/on-demand" : ""
+    const fileUrl = (fragment) => `/site/${slug}/reports${onDemandPart}/${fragment}`
+
   switch (metric.database) {
     case "lighthouse":
       return fileUrl("lighthouse-reports/lighthouse.html")
