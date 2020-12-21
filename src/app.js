@@ -140,6 +140,20 @@ app.get('/site/:slug', wrap(async (req, res) => {
   return res.render('site.html', { data, metrics, timestamp })
 }))
 
+app.get('/site/:slug/reports/on-demand/:report/*', wrap(async (req, res) => {
+  const { slug, report } = req.params
+  const path = req.params[0] || 'index.html'
+
+  if (isUpPath(slug) || isUpPath(report))
+    return res.sendStatus(403)
+
+  const root = await reports.findReportPath(report, slug, false)
+  if (!root)
+    return res.sendStatus(404)
+
+  return res.sendFile(path, { root })
+}))
+
 app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {
   const { slug, report } = req.params
   const path = req.params[0] || 'index.html'
@@ -147,7 +161,7 @@ app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {
   if (isUpPath(slug) || isUpPath(report))
     return res.sendStatus(403)
 
-  const root = await reports.findReportPath(report, slug)
+  const root = await reports.findReportPath(report, slug, false)
   if (!root)
     return res.sendStatus(404)
 
