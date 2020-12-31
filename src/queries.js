@@ -33,6 +33,14 @@ const query = async (metricSpec, kind) => {
     return [[], [], [], [], []];
   })
 
+  const metricsValues = {}
+  for (const row of metricsRows) {
+    metricsValues[row.url] = {
+      time: row.time,
+      value: row.value
+    }
+  }
+
   const lastValues = {}
   for (const row of lastMetricsRows) {
     lastValues[row.url] = {
@@ -53,7 +61,8 @@ const query = async (metricSpec, kind) => {
   
 
   const data = {}
-  for (const { url, value, time } of metricsRows) {
+  for (const url of Object.keys(lastValues)) {
+    const { value } = metricsValues[url] || { "value": null }
     const { last, lastTime, lastTimeMs } = lastValues[url] || {}
     const series = seriesValues[url] || []
 
@@ -96,7 +105,7 @@ const getData = async (kind) => {
   for (const metric of metrics) {
     const results = metricResults[metric.name]
     for (const url of Object.keys(results)) {
-      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, checkList: [] }
+      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, currentChecks: 0, checkList: [] }
       urlMap[url] = row
       const result = results[url]
       row.metrics[metric.name] = {
@@ -110,13 +119,22 @@ const getData = async (kind) => {
       }
 
       row.checkList = fillCheckList(result.series, row.checkList);
-      
-      row.metrics[metric.name].series = result.series.filter(val => val >= 0);
 
-      row.score += result.value
+      if (result.value) {
+        row.currentChecks += 1
+      }
+      row.score += (result.value) ? result.value : 0
       row.checks += 1
     }
   }
+
+  // Eliminate URLs with no current checks
+  for (const url of Object.keys(urlMap)) {
+    if (urlMap[url].currentChecks === 0) {
+      delete urlMap[url]
+    }
+  }
+
   nrUrls = Object.keys(urlMap).length;
 
   for (let url in urlMap) {

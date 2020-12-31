@@ -69,20 +69,22 @@
         {% set lastTimeMs = data.metrics[metric.name].lastTimeMs %}
         {% set result = data.metrics[metric.name] %}
         {% set resultClass = "" %}
-        {% if (timestamp - lastTimeMs) > 26*60*60*1000 %}
-          {% set resultClass = "outdated" %}
+        {% set resultValue = result.value %}
+        {% if (timestamp - lastTimeMs) > 24*60*60*1000 %}
+          {% set resultClass = "text-danger outdated" %}
+          {% set resultValue = result.last %}
         {% endif %}
-        <td class="{{ metricStyle(metric, result.value) }} {{ resultClass }} text-center">
+        <td class="{{ metricStyle(metric, resultValue) }} {{ resultClass }} text-center">
           {{ lastTime }}
         </td>
-        <td class="{{ metricStyle(metric, result.value) }} {{ resultClass }} text-center">
-          {% set report = reportUrl(metric, urlSlug(data.url)) %}
-          {% if (report and result.value is number) %}
+        <td class="{{ metricStyle(metric, resultValue) }} {{ resultClass }} text-center">
+          {% set report = reportUrl(metric, pathNameFromUrl(data.url), false) %}
+          {% if (report and resultValue is number) %}
             <a href="{{ report }}">
-              {{ formatMetric(result.value) }}
+              {{ formatMetric(metric, data.url, resultValue) }}
             </a>
           {% else %}
-            {{ formatMetric(result.value) }}
+            {{ formatMetric(metric, data.url, resultValue) }}
           {% endif %}
         </td>
         <td class="{{ metricStyle(metric, result.value) }} {{ resultClass }} text-center">
@@ -98,7 +100,6 @@
           Checks Run
         </th>
         <td class="text-center">
-          Not applicable
         </td>
         <td class="text-center {{ thresholdColor([0, 20], data.checks) }}" data-score="{{ data.checks }}">
           {{ data.checks }}

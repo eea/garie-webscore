@@ -43,6 +43,23 @@ const thresholdColor = (thresholds, value) => {
     return "table-secondary"
   }
 }
+nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
+
+const checksStyle = (value) => {
+  //TODO: instead of 13, 18... use (max_number_of_checks - something)
+  if (typeof value === 'number' && !isNaN(value)) {
+    if (value < 13)
+      return "checks-low"
+    else if (value < 18)
+      return "checks-medium"
+    else
+      return "checks-best"
+  } else {
+    return ""
+  }
+}
+nunjucksEnv.addGlobal('checksStyle', checksStyle)
+
 
 const urlSlug = (url) => {
   return url
@@ -50,13 +67,15 @@ const urlSlug = (url) => {
     .replace(/\/$/, '')
     .replace(/[^a-zA-Z0-9.]+/g, '-')
 }
-
 nunjucksEnv.addGlobal('urlSlug', urlSlug)
+
+
+nunjucksEnv.addGlobal('pathNameFromUrl', garie_plugin.utils.helpers.pathNameFromUrl);
+
 
 const urlHostname = (url) => {
   return (new URL(url)).hostname
 }
-
 nunjucksEnv.addGlobal('urlHostname', urlHostname)
 
 const isExternal = (url) => {
@@ -65,17 +84,15 @@ const isExternal = (url) => {
   }
   return true
 }
-
 nunjucksEnv.addGlobal('isExternal', isExternal)
 
 nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
 })
 
-nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
-
-nunjucksEnv.addGlobal('formatMetric', (value) => {
+nunjucksEnv.addGlobal('formatMetric', (metric, url, value) => {
   if (typeof(value) === 'number') return value
+  if ((metric.internal === true) && (isExternal(url))) return "N/A"
   return "-"
 })
 
@@ -147,6 +164,20 @@ app.post('/site/:slug', wrap(async(req,res) => {
 
 }));
 
+app.get('/site/:slug/reports/on-demand/:report/*', wrap(async (req, res) => {
+  const { slug, report } = req.params
+  const path = req.params[0] || 'index.html'
+
+  if (isUpPath(slug) || isUpPath(report))
+    return res.sendStatus(403)
+
+  const root = await reports.findReportPath(report, slug, true)
+  if (!root)
+    return res.sendStatus(404)
+
+  return res.sendFile(path, { root })
+}))
+
 app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {
   const { slug, report } = req.params
   const path = req.params[0] || 'index.html'
@@ -154,7 +185,7 @@ app.get('/site/:slug/reports/:report/*', wrap(async (req, res) => {
   if (isUpPath(slug) || isUpPath(report))
     return res.sendStatus(403)
 
-  const root = await reports.findReportPath(report, slug)
+  const root = await reports.findReportPath(report, slug, false)
   if (!root)
     return res.sendStatus(404)
 
@@ -198,6 +229,11 @@ app.get('/status/:plugin_name', async(req, res)=> {
   }
   
   return garie_plugin.utils.makeStatusTables(res, influx, plugin);
+});
+
+app.get('/status', (req, res) => {
+  
+  return res.render('status.html', { metrics });
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`))

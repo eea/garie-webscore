@@ -26,7 +26,10 @@
         <td class="{{ metricStyle(result.metric, result.value) }} text-center">
           {% if scan.finished %}
             {% if scan.success %}
-              {{ formatMetric(result.value) }}
+              {% set report = reportUrl(result.metric, pathNameFromUrl(job.url), true) %}
+              <a href="{{ report }}">
+                {{ formatMetric(result.metric, job.url, result.value) }}
+              </a>
             {% else %}
               failed
             {% endif %}

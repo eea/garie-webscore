@@ -96,6 +96,7 @@ const metrics = [
   },
   {
     name: "Server errors(30)",
+    important: true,
     internal: true,
     database: "sentry-metrics",
     measurement: "ServerErrors/TotalVisits",
@@ -116,6 +117,7 @@ const metrics = [
   },
   {
     name: "Test coverage",
+    important: true,
     internal: true,
     database: "sonarqube",
     measurement: "coverage_rating",
@@ -165,17 +167,6 @@ const metrics = [
     help: "Duplication score - code quality metric is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
   },
   {
-    name: "Privacyscore",
-    important: true,
-    internal: true,
-    database: "privacyscore",
-    measurement: "privacyscore",
-    field: "value",
-    thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Privacyscoreorg",
-    help: "Privacy score - evaluated using <a href='https://privacyscore.org/' target='_blank'>https://privacyscore.org/</a>"
-  },
-  {
     name: "Webbkoll",
     important: true,
     database: "webbkoll",
@@ -213,10 +204,6 @@ const onDemandApis = [
   {
     database: "lighthouse",
     url: "http://garie-lighthouse:3000",
-  },
-  {
-    database: "privacyscore",
-    url: "http://garie-privacyscore:3000",
   },
   {
     database: "securityheaders",
