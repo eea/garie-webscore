@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}  Click on one of the following plugins to see their status: &ndash; {{ super() }}{% endblock %}
+
+
+{% block head %}
+{{ super() }}
+<style>
+    .status {
+        padding-left: 250px;
+    }
+
+    .status-title{
+        padding-left: 230px;
+    }
+
+    .status-item {
+        color: rgba(0,0,0,.5);
+        font-size: medium;
+    }
+    a:hover {
+        color: black;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<br>
+<br>
+<h2 class="status-title">
+    Click on one of the following plugins to see their status:
+</h2>
+<br>
+{% for metric in metrics %}
+    <ul class="status">
+        <li>
+            <a href="/status/{{metric.database}}" class="status-item">{{ metric.name }}</a>
+        </li>
+    </ul>
+{% endfor %}
+{% endblock %}
+
+
+{% block finalscripts %}
+{{ super() }}
+
+{% endblock %}

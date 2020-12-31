@@ -207,4 +207,9 @@ app.get('/status/:plugin_name', async(req, res)=> {
   return garie_plugin.utils.makeStatusTables(res, influx, plugin);
 });
 
+app.get('/status', (req, res) => {
+  
+  return res.render('status.html', { metrics });
+});
+
 app.listen(port, () => console.log(`Listening on port ${port}`))
