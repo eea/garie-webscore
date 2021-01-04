@@ -6,12 +6,13 @@
     "start": "node src/app.js"
   },
   "dependencies": {
-    "garie-plugin": "https://github.com/eea/garie-plugin#master",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "garie-plugin": "https://github.com/eea/garie-plugin#master",
     "influx": "^5.5.1",
+    "memory-cache": "^0.2.0",
     "nunjucks": "^3.2.0"
   }
 }
