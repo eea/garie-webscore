@@ -186,6 +186,16 @@ const metrics = [
     docs: "",
     help: "Browsertime provides an alternative way of evaluating website performance."
   },
+  {
+    name: "code-age",
+    important: true,
+    database: "code-age",
+    measurement: "code-age",
+    field: "value",
+    thresholds: [100, 0],
+    docs: "",
+    help: "Code age measures how old the average line of code of the url is."
+  },
 ]
 
 const onDemandApis = [
