@@ -231,9 +231,13 @@ const onDemandApis = [
     database: "webbkoll",
     url: "http://garie-webbkoll:3000",
   },
-    {
+  {
     database: "browsertime",
     url: "http://garie-browsertime:3000",
+  },
+  {
+    database:"code-age",
+    url: "http://garie-code-age:3000",
   },
 ]
 
