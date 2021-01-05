@@ -16,7 +16,6 @@ const garie_plugin = require('garie-plugin')
 const { get } = require('./ondemand')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
-
 const app = express()
 const port = process.env.PORT || '3000'
 
@@ -207,9 +206,11 @@ app.get('/status/:plugin_name', async(req, res)=> {
   return garie_plugin.utils.makeStatusTables(res, influx, plugin);
 });
 
-app.get('/status', (req, res) => {
-  
-  return res.render('status.html', { metrics });
+
+
+app.get('/status', async (req, res) => {
+  const summaryStatus = await garie_plugin.utils.getSummaryStatus(influx, metrics);
+  return res.render('status.html', { metrics, summaryStatus });
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
