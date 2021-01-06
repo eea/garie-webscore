@@ -2,7 +2,9 @@ const Influx = require('influx')
 const { metrics } = require('./metrics')
 
 // how much time to skip when looking for the historic max value of a metric
-const MAX_GRACE_PERIOD = "7d"
+const MONTH = "month";
+const YEAR = "year";
+
 let nrUrls = 0;
 
 const influx = new Influx.InfluxDB({
@@ -10,23 +12,22 @@ const influx = new Influx.InfluxDB({
   port: process.env.INFLUX_PORT || '8086'
 })
 
-const query = async (metricSpec) => {
+const query = async (metricSpec, kind) => {
   const { name, measurement, field, database } = metricSpec
 
   const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const lastMetricQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
-  const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
-  // last 30 days - should we add `LIMIT 30` ?
-  const monthSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
-  // last 365 days
-  const yearSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 365d GROUP BY time(7d), "url" fill(-1) ORDER BY time ASC`
 
-  const [ metricsRows, lastMetricsRows, maxRows, monthSeriesRows, yearSeriesRows ] = await Promise.all([
+  let query = "";
+  if (kind === MONTH) {
+    query = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
+  } else if (kind === YEAR) {
+    query = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 365d GROUP BY time(7d), "url" fill(-1) ORDER BY time ASC`
+  }
+  const [ metricsRows, lastMetricsRows, seriesRows ] = await Promise.all([
     influx.query(metricsQuery, { database }),
     influx.query(lastMetricQuery, { database }),
-    influx.query(maxQuery, { database }),
-    influx.query(monthSeriesQuery, { database }),
-    influx.query(yearSeriesQuery, { database })
+    influx.query(query, { database })
   ]).catch((e) => {
     console.error(e);
     return [[], [], [], [], []];
@@ -49,41 +50,25 @@ const query = async (metricSpec) => {
     }
   }
 
-  const maxValues = {}
-  for (const row of maxRows) {
-    maxValues[row.url] = {
-      max: row.value,
-      maxTime: (row.time.toISOString() || "").substr(0, 10),
+  const seriesValues = new Object();
+  
+  for (const row of seriesRows) {
+    if (!seriesValues[row.url]) {
+      seriesValues[row.url] = []
     }
+    seriesValues[row.url].push(row.value)
   }
-
-  const monthSeriesValues = new Object()
-  for (const row of monthSeriesRows) {
-    if (!monthSeriesValues[row.url]) {
-      monthSeriesValues[row.url] = []
-    }
-    monthSeriesValues[row.url].push(Math.round(row.value))
-  }
-
-  const yearSeriesValues = new Object()
-  for (const row of yearSeriesRows) {
-    if (!yearSeriesValues[row.url]) {
-      yearSeriesValues[row.url] = []
-    }
-    yearSeriesValues[row.url].push(Math.round(row.value))
-  }
+  
 
   const data = {}
   for (const url of Object.keys(lastValues)) {
     const { value } = metricsValues[url] || { "value": null }
     const { last, lastTime, lastTimeMs } = lastValues[url] || {}
-    const { max, maxTime } = maxValues[url] || {}
-    const monthSeries = monthSeriesValues[url] || []
-    const yearSeries = yearSeriesValues[url] || []
+    const series = seriesValues[url] || []
 
-    data[url] = { value, last, lastTime, lastTimeMs, max, maxTime, monthSeries, yearSeries }
+    data[url] = { value, last, lastTime, lastTimeMs, series }
+   
   }
-
   return data
 }
 
@@ -104,11 +89,14 @@ const fillCheckList = (series, checkList) => {
       checkList[i]++;
     }
   }
+
+
   return checkList;
 }
 
-const getData = async () => {
-  const results = await Promise.all(metrics.map((metric) => query(metric)))
+
+const getData = async (kind) => {
+  const results = await Promise.all(metrics.map((metric) => query(metric, kind)))
   const metricResults = {}
   metrics.forEach((metric, i) => metricResults[metric.name] = results[i])
 
@@ -117,7 +105,7 @@ const getData = async () => {
   for (const metric of metrics) {
     const results = metricResults[metric.name]
     for (const url of Object.keys(results)) {
-      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, currentChecks: 0, checkListMonth: [], checkListYear: [] }
+      const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, currentChecks: 0, checkList: [] }
       urlMap[url] = row
       const result = results[url]
       row.metrics[metric.name] = {
@@ -127,12 +115,10 @@ const getData = async () => {
         lastTimeMs: result.lastTimeMs,
         max: Math.round(result.max),
         maxTime: result.maxTime,
-        monthSeries: result.monthSeries,
-        yearSeries: result.yearSeries
+        series: result.series,
       }
 
-      row.checkListMonth = fillCheckList(result.monthSeries, row.checkListMonth)
-      row.checkListYear = fillCheckList(result.yearSeries, row.checkListYear)
+      row.checkList = fillCheckList(result.series, row.checkList);
 
       if (result.value) {
         row.currentChecks += 1
@@ -152,8 +138,7 @@ const getData = async () => {
   nrUrls = Object.keys(urlMap).length;
 
   for (let url in urlMap) {
-    urlMap[url].checkListMonth = urlMap[url].checkListMonth.map(x=>x*5);
-    urlMap[url].checkListYear = urlMap[url].checkListYear.map(x=>x*5);
+    urlMap[url].checkList = urlMap[url].checkList.map(x=>x*5);
   }
 
   const rv = Object.values(urlMap)

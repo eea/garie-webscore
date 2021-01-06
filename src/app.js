@@ -115,17 +115,27 @@ const isUpPath = (path) => {
 }
 
 app.get('/', wrap(async (req, res) => {
-  const data = await queries.getData()
+  const data = await queries.getData("month")
   data.sort((a, b) => b.score - a.score)
   const importantMetrics = metrics.filter((m) => m.important)
   const timestamp = Date.now();
   return res.render('index.html', { data, importantMetrics, timestamp })
-}))
+}));
+
+
+app.post('/', wrap(async (req, res) => {
+  const { kind } = req.body;
+
+  const data = await queries.getData(kind);
+  data.sort((a, b) => b.score - a.score)
+  return res.send({data});
+
+}));
+
 
 app.get('/site/:slug', wrap(async (req, res) => {
   const { slug } = req.params
-
-  const data = (await queries.getData())
+  const data = (await queries.getData("month"))
     .find((row) => urlSlug(row.url) === slug)
 
   if (! data)
@@ -138,7 +148,21 @@ app.get('/site/:slug', wrap(async (req, res) => {
     });
   }
   return res.render('site.html', { data, metrics, timestamp })
-}))
+}));
+
+
+app.post('/site/:slug', wrap(async(req,res) => {
+  const { kind } = req.body;
+  const { slug } = req.params;
+  const data = (await queries.getData(kind))
+    .find((row) => urlSlug(row.url) === slug)
+  
+  if (! data)
+    return res.sendStatus(404)
+
+  return res.send({ data })
+
+}));
 
 app.get('/site/:slug/reports/on-demand/:report/*', wrap(async (req, res) => {
   const { slug, report } = req.params
