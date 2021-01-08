@@ -30,6 +30,9 @@
     .customCell {
         height: 50px;
     }
+    .dataCell {
+        text-align: center;
+    }
 </style>
 {% endblock %}
 
@@ -53,6 +56,7 @@
         <tr>
           <th scope="col" data-field="url">Plugin</th>
           <th scope="col" data-field="url">Status</th>
+          <th scope="col" data-field="url">Success / Total</th>
       </thead>
       <tbody>
         {% for metric in metrics %}
@@ -60,8 +64,11 @@
             <th scope="row">
                 <a href="/status/{{metric.database}}" class="status-item">{{ metric.name }}</a>
             </th>
-            <td>
+            <td class="dataCell">
                 {{ summaryStatus[metric.name] }}
+            </td>
+            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) }}">
+                {{ summaryStatus[metric.database].success  }} / {{ summaryStatus[metric.database].allUrls }}
             </td>
         </tr>
         {% endfor %}
