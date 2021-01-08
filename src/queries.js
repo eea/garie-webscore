@@ -1,5 +1,6 @@
 const Influx = require('influx')
 const { metrics } = require('./metrics')
+var cache = require('memory-cache');
 
 // how much time to skip when looking for the historic max value of a metric
 const MAX_GRACE_PERIOD = "7d"
@@ -12,25 +13,43 @@ const influx = new Influx.InfluxDB({
 
 const query = async (metricSpec) => {
   const { name, measurement, field, database } = metricSpec
-
-  const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
+  let metricsRows, lastMetricsRows, maxRows, monthSeriesRows, yearSeriesRows;
+  let cacheResult = cache.get(name);
+  const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const lastMetricQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
-  // last 30 days - should we add `LIMIT 30` ?
+    // last 30 days - should we add `LIMIT 30` ?
   const monthSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
-  // last 365 days
+    // last 365 days
   const yearSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 365d GROUP BY time(7d), "url" fill(-1) ORDER BY time ASC`
 
-  const [ metricsRows, lastMetricsRows, maxRows, monthSeriesRows, yearSeriesRows ] = await Promise.all([
-    influx.query(metricsQuery, { database }),
-    influx.query(lastMetricQuery, { database }),
-    influx.query(maxQuery, { database }),
-    influx.query(monthSeriesQuery, { database }),
-    influx.query(yearSeriesQuery, { database })
-  ]).catch((e) => {
-    console.error(e);
-    return [[], [], [], [], []];
-  })
+  if (cacheResult !== undefined && cacheResult !== null) {
+    metricsRows = cacheResult.metricsRows;
+    lastMetricsRows = cacheResult.lastMetricsRows;
+    maxRows = cacheResult.maxRows;
+    monthSeriesRows = cacheResult.monthSeriesRows;
+    yearSeriesRows = cacheResult.yearSeriesRows;
+
+  } else {
+    [ metricsRows, lastMetricsRows, maxRows, monthSeriesRows, yearSeriesRows ] = await Promise.all([
+      influx.query(metricsQuery, { database }),
+      influx.query(lastMetricQuery, { database }),
+      influx.query(maxQuery, { database }),
+      influx.query(monthSeriesQuery, { database }),
+      influx.query(yearSeriesQuery, { database })
+    ]).catch((e) => {
+      console.error(e);
+      return [[], [], [], [], []];
+    })
+
+    cache.put(name, {
+      metricsRows,
+      lastMetricsRows,
+      maxRows,
+      monthSeriesRows,
+      yearSeriesRows
+    }, 60000);
+  }
 
   const metricsValues = {}
   for (const row of metricsRows) {
