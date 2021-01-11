@@ -13,7 +13,6 @@ const influx = new Influx.InfluxDB({
 
 const query = async (metricSpec) => {
   const { name, measurement, field, database } = metricSpec
-  
   let metricsRows, lastMetricsRows, maxRows, monthSeriesRows, yearSeriesRows;
   let cacheResult = cache.get(name);
   const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
@@ -185,12 +184,7 @@ const getData = async () => {
   return rv
 }
 
-const getNrUrls = () => {
-  return nrUrls;
-}
-
 module.exports = {
   getData,
-  influx,
-  getNrUrls,
+  influx
 }
