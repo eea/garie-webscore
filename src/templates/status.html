@@ -25,7 +25,7 @@
     .customTable {
         position: absolute;
         left: 230px;
-        font-size: larger;
+        font-size: medium;
     }
     .customCell {
         height: 50px;
@@ -57,6 +57,7 @@
           <th scope="col" data-field="url">Plugin</th>
           <th scope="col" data-field="url">Status</th>
           <th scope="col" data-field="url">Success / Total</th>
+          <th scope="col" > Last Run </th>
       </thead>
       <tbody>
         {% for metric in metrics %}
@@ -64,11 +65,14 @@
             <th scope="row">
                 <a href="/status/{{metric.database}}" class="status-item">{{ metric.name }}</a>
             </th>
-            <td class="dataCell">
+            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) }}">
                 {{ summaryStatus[metric.name] }}
             </td>
             <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) }}">
                 {{ summaryStatus[metric.database].success  }} / {{ summaryStatus[metric.database].allUrls }}
+            </td>
+            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) }}">
+                {{ summaryStatus[metric.database].lastRun }}
             </td>
         </tr>
         {% endfor %}
