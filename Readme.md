@@ -39,6 +39,11 @@ docker run \
   eea/garie-webscore
 ```
 
+For development purposes, it can also be run directly on the dev machine, with the above env variables set, using:
+```shell
+npm install
+npm start
+```
 
 ## License
 Icons from https://icons.getbootstrap.com/, MIT license
