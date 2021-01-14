@@ -39,7 +39,7 @@ docker run \
   eea/garie-webscore
 ```
 
-For development purposes, it can also be run directly on the dev machine, with the above env variables set, using:
+For development purposes, it can also be git-cloned and run directly on the dev machine, with the above env variables set, using:
 ```shell
 npm install
 npm start
