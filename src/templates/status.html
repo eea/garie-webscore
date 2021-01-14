@@ -30,8 +30,11 @@
     .customCell {
         height: 50px;
     }
-    .dataCell {
+    .dataCell > td{
         text-align: center;
+    }
+    .greyedCell > td{
+        background-color: rgb(206, 206, 206);
     }
 </style>
 {% endblock %}
@@ -61,17 +64,17 @@
       </thead>
       <tbody>
         {% for metric in metrics %}
-        <tr class="customCell">
+        <tr class="customCell dataCell {{ 'greyedCell' if summaryStatus[metric.name] == 'No data yet' }}">
             <th scope="row">
                 <a href="/status/{{metric.database}}" class="status-item">{{ metric.name }}</a>
             </th>
-            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) }}">
+            <td class=" {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) if summaryStatus[metric.name] == 'FINISHED' }}">
                 {{ summaryStatus[metric.name] }}
             </td>
-            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) }}">
+            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) if summaryStatus[metric.name] == 'FINISHED' }}">
                 {{ summaryStatus[metric.database].success  }} / {{ summaryStatus[metric.database].allUrls }}
             </td>
-            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) }}">
+            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) if summaryStatus[metric.name] == 'FINISHED' }}">
                 {{ summaryStatus[metric.database].lastRun }}
             </td>
         </tr>
