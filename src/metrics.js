@@ -55,42 +55,6 @@ const metrics = [
     help: "Performance - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools"
   },
   {
-    name: "Progressive Web App (Fast Connection)",
-    database: "lighthouse",
-    measurement: "pwa-score_fast",
-    field: "value",
-    thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Progressive-Web-App",
-    help: "Progressive Web App - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='blank'>Lighthouse</a> in Chrome Developer Tools"
-  },
-  {
-    name: "Accessibility (Fast Connection)",
-    database: "lighthouse",
-    measurement: "accessibility-score_fast",
-    field: "value",
-    thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Accessibility",
-    help: "Accessibility - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools (Audits)"
-  },
-  {
-    name: "Best Practice (Fast Connection)",
-    database: "lighthouse",
-    measurement: "best-practices-score_fast",
-    field: "value",
-    thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Best-Practice",
-    help: "Best Practice - evaluated using evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools (Audits)"
-  },
-  {
-    name: "Seo Score (Fast Connection)",
-    database: "lighthouse",
-    measurement: "seo-score_fast",
-    field: "value",
-    thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Seo-Score",
-    help: "SEO Score - evaluated using evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools (Audits)"
-  },
-  {
     name: "Links integrity",
     database: "linksintegrity",
     measurement: "linksintegrity",
