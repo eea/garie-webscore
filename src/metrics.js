@@ -46,6 +46,15 @@ const metrics = [
     help: "SEO Score - evaluated using evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools (Audits)"
   },
   {
+    name: "Performance (Fast Connection)",
+    database: "lighthouse",
+    measurement: "performance-score_fast",
+    field: "value",
+    thresholds: [50, 90],
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Performance",
+    help: "Performance - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools"
+  },
+  {
     name: "Links integrity",
     database: "linksintegrity",
     measurement: "linksintegrity",
