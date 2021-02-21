@@ -18,6 +18,7 @@ const { get } = require('./ondemand')
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 const app = express()
 const port = process.env.PORT || '3000'
+const timezone = process.env.TZ;
 
 const nunjucksEnv = nunjucks.configure(`${__dirname}/templates`, {
   autoescape: true,
@@ -136,7 +137,7 @@ app.get('/site/:slug', wrap(async (req, res) => {
       return (a.internal === b.internal)? 0 : a.internal? 1 : -1;
     });
   }
-  return res.render('site.html', { data, metrics, timestamp })
+  return res.render('site.html', { data, metrics, timestamp, timezone })
 }))
 
 app.get('/site/:slug/reports/on-demand/:report/*', wrap(async (req, res) => {

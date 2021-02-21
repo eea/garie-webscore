@@ -4,7 +4,6 @@ var cache = require('memory-cache');
 
 // how much time to skip when looking for the historic max value of a metric
 const MAX_GRACE_PERIOD = "7d"
-let nrUrls = 0;
 
 const influx = new Influx.InfluxDB({
   host: process.env.INFLUX_HOST || 'influxdb',
@@ -63,7 +62,7 @@ const query = async (metricSpec) => {
   for (const row of lastMetricsRows) {
     lastValues[row.url] = {
       last: row.value,
-      lastTime: (row.time.toISOString() || "").substr(0, 16).replace("T", " "),
+      lastTime: row.time.toLocaleString('en-GB', { timeZone: `${process.env.TZ}` }),
       lastTimeMs: row.time.getTime(),
     }
   }
@@ -167,8 +166,6 @@ const getData = async () => {
       delete urlMap[url]
     }
   }
-
-  nrUrls = Object.keys(urlMap).length;
 
   for (let url in urlMap) {
     urlMap[url].checkListMonth = urlMap[url].checkListMonth.map(x=>x*5);
