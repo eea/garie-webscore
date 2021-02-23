@@ -56,7 +56,7 @@ const query = async (metricSpec) => {
   const { name, measurement, field, database } = metricSpec
   let metricsRows, lastMetricsRows, maxRows, monthSeriesRows, yearSeriesRows;
   let cacheResult = cache.get(name);
-  const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
+  const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const lastMetricQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
     // last 30 days - should we add `LIMIT 30` ?
@@ -131,8 +131,9 @@ const query = async (metricSpec) => {
     }
   }
 
+  
   const monthSeriesValues = merge_results(monthSeriesRows, 30);
-  const yearSeriesValues = merge_results(yearSeriesRows, 53);
+  const yearSeriesValues = merge_results(yearSeriesRows, 53); // query grouped by 7d, so 53 weeks of data
 
   const data = {}
   for (const url of Object.keys(lastValues)) {
