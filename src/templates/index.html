@@ -101,7 +101,7 @@ function sortScores(a, b) {
           {{ loop.index }}
         </th>
         <td scope="row">
-          {% set url_host = urlHostname(row.url) %}
+          {% set url_host = row.url %}
           {% if isExternal(url_host) %}
             <span data-toggle="tooltip" title="Non-EEA site, included for reference">🌎</span>
           {% endif %}
