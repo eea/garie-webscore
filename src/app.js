@@ -125,7 +125,7 @@ app.get('/subscriptions', wrap(async (req, res) => {
     row.url = urlSlug(row.url);
   }
 
-  const emails = get_all_emails();
+  const emails = await get_all_emails();
   return res.render('subscriptions.html', { data, emails });
 
 }));

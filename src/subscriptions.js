@@ -25,11 +25,7 @@ const urlSlug = (url) => {
 }
 
 async function update_email_for_url(url, email, active) {
-    let emails = await get_all_emails();
-    emails[url] = emails[url] || {};
-    active = parseInt(active);
-    emails[url][email] = active;
-    
+
     try{
         const point = {
             measurement: "application-emails",
