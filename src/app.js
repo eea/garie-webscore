@@ -1,19 +1,16 @@
 require('dotenv').config()
 
-const fs = require('fs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const nunjucks = require('nunjucks')
 const path = require('path')
-const { promisify } = require('util')
 const queries = require('./queries')
 const { influx } = require('./queries')
 const { metrics } = require('./metrics')
 const reports = require('./reports')
 const ondemand = require('./ondemand')
-const { table } = require('console')
 const garie_plugin = require('garie-plugin')
-const { get } = require('./ondemand')
+const { update_email_for_url, get_all_emails } = require('./subscriptions')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 const app = express()
@@ -121,6 +118,25 @@ app.get('/', wrap(async (req, res) => {
   return res.render('index.html', { data, importantMetrics, timestamp })
 }))
 
+app.get('/subscriptions', wrap(async (req, res) => {
+
+  const data = await queries.getData();
+  for (const row of data) {
+    row.url = urlSlug(row.url);
+  }
+
+  const emails = get_all_emails();
+  return res.render('subscriptions.html', { data, emails });
+
+}));
+
+app.post('/subscriptions/addEmail', wrap(async(req, res) => {
+  await update_email_for_url(req.body.url, req.body.email, req.body.active);
+  const emails = await get_all_emails();
+  return res.send(emails);
+}));
+
+
 app.get('/site/:slug', wrap(async (req, res) => {
   const { slug } = req.params
 
@@ -202,7 +218,6 @@ app.get('/status/:plugin_name', async(req, res)=> {
   if (!plugin) {
     return res.sendStatus(404);
   }
-  
   return garie_plugin.utils.makeStatusTables(res, influx, plugin);
 });
 

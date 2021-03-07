@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    th {
+        background-color: rgb(217, 224, 213);
+    }
+    table, td, th {  
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 50%;
+    }
+    
+    th, td {
+        padding: 15px;
+    }
+</style>
+</head>
+<body>
+    
+
+<h2> Greetings! </h2>
+<br>
+<br>
+<h3>{{ text }}</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th colspan="2"> Your application's score </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ app_info.url }}</td>
+            <td>{{ app_info.score }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+<br>
+
+<table>
+    <thead>
+        <tr>
+            <th colspan="2"> Current leaderboard </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in current_leaderboard %}
+        <tr>
+            <td>{{ app.url }}</td>
+            <td>{{ app.score }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p> If you want more info check http://webscore.garie.devel4cph.eea.europa.eu/ </p>
+
+
+</body>
+</html> 

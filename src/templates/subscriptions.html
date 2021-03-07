@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}  Subscriptions &ndash; {{ super() }}{% endblock %}
+
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    .add {
+        margin-left: 10px;
+    }
+    .remove {
+        margin-left: 20px;
+    }
+    .row {
+        display: flex;
+    }
+
+    .add{
+        background-color: rgb(159, 206, 161);
+    }
+
+    .remove {
+        background-color: rgb(206, 118, 118);
+    }
+
+    .app {
+        width: 40%;
+    }
+    .index {
+        text-align:center;
+    }
+    button {
+        position: relative;
+        top: 5px;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<br>
+<br>
+<h2 class="status-title">
+    Subscriptions:
+</h2>
+<div>
+<table class="table table-striped table-sm" >
+    <thead class="thead-dark">
+        <tr >
+            <th scope="col" class="index">No.</th>
+            <th scope="col">Application</th>
+            <th scope="col"> Saved Emails</th>
+            <th scope="col">Add Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            <td scope="row" class="index">
+                {{ loop.index }}
+            </td>
+            <td scope="row" class="app">
+                {{row.url}}
+            </td>
+            <td scope="row">
+                <ul id={{row.url}}>
+                    {% for email, value in emails[row.url] %}
+                        <li>
+                            {{ email }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td scope="row" class="row">
+                <input type="text" id="email-{{row.url}}" name="email">
+                <div>
+                    <button onclick="addEmail('{{row.url}}', this)" class="add"> <i class="fa fa-plus" aria-hidden="true"></i>  </button>
+                </div>
+                <div>
+                    <button onclick="removeEmail('{{row.url}}', this)" class="remove" > <i class="fa fa-trash"></i> </button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+</div>
+<br>
+
+{% endblock %}
+
+
+{% block finalscripts %}
+{{ super() }}
+
+<script>
+
+let emails = JSON.parse('{{ emails|dump|safe }}');
+
+function addEmail(url, elem) {
+    updateEmail(url, elem, 1);
+}
+
+function removeEmail(url, elem) {
+    updateEmail(url, elem, 0);
+}
+
+function deleteChildren(node) {
+    
+    while (node.firstChild) {
+        node.removeChild(node.lastChild);
+    }
+}
+
+function updateEmail(url, elem, active) {
+    const input = document.getElementById("email-"+url);
+    const email = input.value.trim();
+    if (email.length === 0 || !email.includes("@")) {
+        return;
+    }
+
+    if (parseInt(active) === 0) {
+        if ((emails[url] !== undefined) && (emails[url][email] !== 1)) {
+            const res = confirm('This email was not found in "Saved Emails". Still want to delete it?');
+            if (res === false) {
+                return;
+            }
+        }
+    } else {
+        if ((emails[url] !== undefined) && (emails[url][email] === 1)) {
+            alert ('The email is already subscribed.');
+            return;
+        }
+    }
+
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            try {
+                emails = JSON.parse(this.response);
+            } catch (err) {
+                console.log(`Could not parse response ${err}`);
+                alert('Operation not successful');
+                return;
+            }
+            
+            let emails_list = document.getElementById(url);
+            deleteChildren(emails_list);
+            
+            for (let email in emails[url]) {
+                if (emails[url][email] === 0) {
+                    continue;
+                }
+                const listElement = document.createElement("li");
+                listElement.innerText = email;
+                emails_list.appendChild(listElement);
+            }
+
+            if (parseInt(active) === 0) {
+                alert("Email successfully deleted");
+
+            } else {
+                alert("Email successfully added to database");
+            }
+            
+
+        }
+    };
+    xhttp.open("POST", "/subscriptions/addEmail", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send(`email=${email}&url=${url}&active=${active}`);
+
+}
+
+
+</script>
+
+{% endblock %}
