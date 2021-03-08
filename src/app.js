@@ -11,6 +11,8 @@ const reports = require('./reports')
 const ondemand = require('./ondemand')
 const garie_plugin = require('garie-plugin')
 const { update_email_for_url, get_all_emails } = require('./subscriptions')
+const passport = require('passport');
+const Strategy = require('passport-local').Strategy;
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 const app = express()
@@ -22,7 +24,11 @@ const nunjucksEnv = nunjucks.configure(`${__dirname}/templates`, {
   watch: true,
 })
 
+const USERNAME = process.env.USERNAME;
+const PASSWORD = process.env.PASSWORD;
+
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(require('express-session')({ secret: 'secret', resave: false, saveUninitialized: false }));
 
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
@@ -110,6 +116,32 @@ const isUpPath = (path) => {
   return UP_PATH_REGEXP.test(path)
 }
 
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.use(new Strategy(
+  function(username, password, done) {
+    if (username === USERNAME && password === PASSWORD) {
+      return done(null, {username: username});
+    }
+    done(null, false);
+  }
+));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+app.post('/login', passport.authenticate('local', {
+  failureRedirect: '/subscriptions',
+  successRedirect: '/subscriptions'
+}));
+
 app.get('/', wrap(async (req, res) => {
   const data = await queries.getData()
   data.sort((a, b) => b.score - a.score)
@@ -119,6 +151,10 @@ app.get('/', wrap(async (req, res) => {
 }))
 
 app.get('/subscriptions', wrap(async (req, res) => {
+
+  if (req.user === undefined) {
+    return res.render('login.html');
+  }
 
   const data = await queries.getData();
   for (const row of data) {

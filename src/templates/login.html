@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Login to see subscriptions &ndash; {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <form action="/login" method="post">
+        <div>
+            <label>Username:</label>
+            <input type="text" name="username"/><br/>
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" name="password"/>
+        </div>
+        <div>
+            <input type="submit" value="Submit"/>
+        </div>
+    </form>
+</div>
+{% endblock %}
