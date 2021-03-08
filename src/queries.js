@@ -1,6 +1,8 @@
 const Influx = require('influx')
 const { metrics } = require('./metrics')
 var cache = require('memory-cache');
+const { urlReplaceProtocol } = require('./utils')
+
 
 // how much time to skip when looking for the historic max value of a metric
 const MAX_GRACE_PERIOD = "7d"
@@ -17,7 +19,7 @@ const merge_results = (seriesRows, days) => {
   const seriesDuplicates = {};
 
   for (const row of seriesRows) {
-    const url = row.url.split('//')[1];
+    const url = urlReplaceProtocol(row.url);
     if (!seriesDuplicates[url]) {
       seriesDuplicates[url] = {};
     }
@@ -100,7 +102,7 @@ const query = async (metricSpec) => {
 
   const metricsValues = {}
   for (const row of metricsRows) {
-    metricsValues[row.url.split('//')[1]] = {
+    metricsValues[urlReplaceProtocol(row.url)] = {
       time: row.time,
       value: row.value
     }
@@ -112,7 +114,7 @@ const query = async (metricSpec) => {
 
   const lastValues = {}
   for (const row of lastMetricsRows) {
-    lastValues[row.url.split('//')[1]] = {
+    lastValues[urlReplaceProtocol(row.url)] = {
       last: row.value,
       lastTime: (row.time.toISOString() || "").substr(0, 16).replace("T", " "),
       lastTimeMs: row.time.getTime(),
@@ -125,7 +127,7 @@ const query = async (metricSpec) => {
 
   const maxValues = {}
   for (const row of maxRows) {
-    maxValues[row.url.split('//')[1]] = {
+    maxValues[urlReplaceProtocol(row.url)] = {
       max: row.value,
       maxTime: (row.time.toISOString() || "").substr(0, 10),
     }

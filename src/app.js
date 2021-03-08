@@ -14,6 +14,14 @@ const ondemand = require('./ondemand')
 const { table } = require('console')
 const garie_plugin = require('garie-plugin')
 const { get } = require('./ondemand')
+const {
+  urlSlug,
+  thresholdColor,
+  checksStyle,
+  isExternal,
+  urlHostname,
+  isUpPath
+} = require('./utils')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
 const app = express()
@@ -26,63 +34,13 @@ const nunjucksEnv = nunjucks.configure(`${__dirname}/templates`, {
 })
 
 app.use(bodyParser.urlencoded({ extended: false }));
-
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
-const thresholdColor = (thresholds, value) => {
-  if (typeof value === 'number' && !isNaN(value)) {
-    const [red, yellow] = thresholds
-    if (value < red)
-      return "table-danger"
-    else if (value < yellow)
-      return "table-warning"
-    else
-      return "table-success"
-  } else {
-    return "table-secondary"
-  }
-}
 nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
-
-const checksStyle = (value) => {
-  //TODO: instead of 13, 18... use (max_number_of_checks - something)
-  if (typeof value === 'number' && !isNaN(value)) {
-    if (value < 13)
-      return "checks-low"
-    else if (value < 18)
-      return "checks-medium"
-    else
-      return "checks-best"
-  } else {
-    return ""
-  }
-}
 nunjucksEnv.addGlobal('checksStyle', checksStyle)
-
-
-const urlSlug = (url) => {
-  return url
-    .replace(/^http[s]?:\/\//, '')
-    .replace(/\/$/, '')
-    .replace(/[^a-zA-Z0-9.]+/g, '-')
-}
 nunjucksEnv.addGlobal('urlSlug', urlSlug)
-
-
 nunjucksEnv.addGlobal('pathNameFromUrl', garie_plugin.utils.helpers.pathNameFromUrl);
-
-
-const urlHostname = (url) => {
-  return (new URL(url)).hostname
-}
 nunjucksEnv.addGlobal('urlHostname', urlHostname)
-
-const isExternal = (url) => {
-  if (url.includes('europa.eu') || url.includes('copernicus') || url.includes('eea-subscriptions')) {
-    return false
-  }
-  return true
-}
 nunjucksEnv.addGlobal('isExternal', isExternal)
 
 nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
@@ -105,12 +63,6 @@ const wrap = (fn) => {
       next(e)
     }
   }
-}
-
-const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/
-const isUpPath = (path) => {
-  // Check if path contains `..`, we don't want clients browsing our filesystem
-  return UP_PATH_REGEXP.test(path)
 }
 
 app.get('/', wrap(async (req, res) => {
