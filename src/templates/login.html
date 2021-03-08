@@ -3,16 +3,19 @@
 {% block title %}Login to see subscriptions &ndash; {{ super() }}{% endblock %}
 
 {% block content %}
+<br>
 <div class="container-fluid">
     <form action="/login" method="post">
         <div>
             <label>Username:</label>
             <input type="text" name="username"/><br/>
         </div>
+        <br>
         <div>
             <label>Password:</label>
             <input type="password" name="password"/>
         </div>
+        <br>
         <div>
             <input type="submit" value="Submit"/>
         </div>
