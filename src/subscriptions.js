@@ -12,10 +12,22 @@ const {
     send_email_bottom_five
 } = require('./email');
 
+const test = require('./test');
+
+const test_functions = Object.values(test);
+let test_idx = 0;
+const TEST_SUBSCRIPTION_EVENTS = process.env.TEST_SUBSCRIPTION_EVENTS || false;
+
 const DATABASE_NAME = 'leaderboard';
 const CONSISTENCY_LENGTH = 3;
 
-cron.schedule('0 7 * * 3', async()=> send_notification());
+const CRONJOB_INTERVAL = {
+    cronjob_syntax: '*/10 * * * *',
+    influx_syntax: '10m'
+}
+
+cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
+
 
 const urlSlug = (url) => {
     return url
@@ -173,7 +185,7 @@ async function update_influx(urls_array_sorted) {
 
 
 async function get_last_entries() {
-    const query =  'select * from "webscore-leaderboard" where time >= now() - 7d';
+    const query =  `select * from "webscore-leaderboard" where time >= now() - ${CRONJOB_INTERVAL.influx_syntax}`;
     let result = [];
     let last_urls_map = {};
     try {
@@ -215,7 +227,7 @@ function check_consistency_topk(k, url, scores_sorted, scores_sorted_map) {
             return false;
         }
         
-        const outside_topk = (scores_sorted_map[i][url] <= scores_sorted[i][k].score);
+        const outside_topk = (scores_sorted_map[i][url] < scores_sorted[i][k - 1].score);
         if ((last_outside_topk !== null) && (last_outside_topk !== outside_topk)) {
             return false;
         }
@@ -262,9 +274,9 @@ function check_consistency_median(url, scores_sorted, scores_sorted_map) {
     return true;
 }
 
-
 async function send_notification() {
     await init_leaderboard_influx();
+    const last_urls_map = await get_last_entries();
 
     const data = await queries.getData();
     for (const row of data) {
@@ -276,6 +288,18 @@ async function send_notification() {
       return;
     }
 
+    const urls_map = map_data(data);
+
+    //after querying influx for last week's results, update influx with current scores;
+    let current_urls_array_sorted = sort_data(urls_map, true);
+    await update_influx(current_urls_array_sorted);
+    current_urls_array_sorted = sort_data(urls_map, false);
+
+
+    if (Object.keys(last_urls_map).length === 0) {
+        console.log("No data found in webscore-leaderboard for last week");
+        return;
+    }
 
     let scores = [];
     scores.push({});
@@ -300,34 +324,27 @@ async function send_notification() {
         }
     }
 
-    
-    //scores_sorted[0] => one day ago; socres_sorted[1] -> two days ago ... etc
-    const scores_sorted = scores.map(map => sort_data(map));
-    //await update_influx(scores_sorted[5]);
-    const scores_sorted_map = get_mapped_scores(scores_sorted);
-
-    const last_urls_map = await get_last_entries();
-
-    //after querying influx for last week's results, update influx with current scores;
-    const urls_map = map_data(data);
-    let current_urls_array_sorted = sort_data(urls_map, true);
-    await update_influx(current_urls_array_sorted);
-    current_urls_array_sorted = sort_data(urls_map, false);
-    
-
-    if (Object.keys(last_urls_map).length === 0) {
-        console.log("No data found in webscore-leaderboard for last week");
-        return;
+    if (TEST_SUBSCRIPTION_EVENTS === "true") {
+        const test_function = test_functions[test_idx];
+        console.log("Now running test: ", test_function.name);
+        scores = test_function(scores);
+        test_idx = (test_idx + 1) % test_functions.length;
     }
+    
+    
+    //scores_sorted[0] => current score; socres_sorted[0] -> two days ago; socres_sorted[1] -> two days ago...
+    const scores_sorted = scores.map(map => sort_data(map));
+    const scores_sorted_map = get_mapped_scores(scores_sorted);
+    
+    
     const last_urls_array_sorted = sort_data(last_urls_map);
     const last_loserboard = last_urls_array_sorted.slice(last_urls_array_sorted.length - 5, last_urls_array_sorted.length);
-
+    current_urls_array_sorted = scores_sorted[0];
    
     const current_leaderboard = current_urls_array_sorted.slice(0, 5);
     const current_loserboard = current_urls_array_sorted.slice(current_urls_array_sorted.length - 5, current_urls_array_sorted.length);
 
-
-    //check 1st place:
+    //check 1st place, current day:
     if (current_urls_array_sorted[0].url !== last_urls_array_sorted[0].url) {
         send_email_first_place(current_urls_array_sorted[0], current_leaderboard, emails);
     }
@@ -358,7 +375,6 @@ async function send_notification() {
         if (is_consistent) {
             send_email_exited_top_five({url: elem, score: urls_map[elem].score}, current_leaderboard, emails);
         }
-        
     }
 
     //check for new consistent entries in bottom 5
@@ -396,7 +412,7 @@ async function send_notification() {
             }
         }
     }
-
+    
     for (let i = 0; i < below_median.length; i++) {
         const url = below_median[i].url;
         if (last_urls_map[url] === undefined) {

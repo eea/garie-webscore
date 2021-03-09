@@ -3,18 +3,19 @@ const nunjucks = require('nunjucks');
 
 
 const mail = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'mailtrap',
+    port: 25,
     auth: {
         //TODO: TO COMPLETE USER AND PASS
-        user: '',
-        pass: ''
+        user: 'mailtrap',
+        pass: 'mailtrap'
     }
 });
 
 
 
 function send_email_first_place(app_info, current_leaderboard, emails) {
-    const text = `Congratulations! Your application has now the highest score and reached first place with ${aoo_info.score} points!`;
+    const text = `Congratulations! Your application has now the highest score and reached first place with ${app_info.score} points!`;
     send_email(app_info, current_leaderboard, text, emails);
 }
 
@@ -53,14 +54,12 @@ function send_email(app_info, current_leaderboard, text, emails) {
         }
     }
 
-    console.log(email_list);
-
     try{
         const page = nunjucks.render('emailTemplate.html', {app_info, current_leaderboard, text})
         var mailOptions = {
             // TODO: TO COMPLETE MAIL
-            from: '',
-            to: email_list,
+            from: 'dana@gmail.com',
+            to: 'random@gmail.com',
             subject: 'Status of your application in webscore',
             html: page
         }
