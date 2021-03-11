@@ -3,7 +3,7 @@
 <head>
 <style>
     th {
-        background-color: rgb(217, 224, 213);
+        background-color: rgb(187, 188, 190);
     }
     table, td, th {  
         border: 1px solid #ddd;
@@ -31,11 +31,12 @@
 <table>
     <thead>
         <tr>
-            <th colspan="2"> Your application's score </th>
+            <th colspan="3"> Your application's rank and score </th>
         </tr>
     </thead>
     <tbody>
         <tr>
+            <td>{{ rank }}</td>
             <td>{{ app_info.url }}</td>
             <td>{{ app_info.score }}</td>
         </tr>
@@ -48,12 +49,13 @@
 <table>
     <thead>
         <tr>
-            <th colspan="2"> Current leaderboard </th>
+            <th colspan="3"> Current leaderboard </th>
         </tr>
     </thead>
     <tbody>
         {% for app in current_leaderboard %}
         <tr>
+            <td>{{ loop.index }}</td>
             <td>{{ app.url }}</td>
             <td>{{ app.score }}</td>
         </tr>

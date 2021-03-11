@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    th {
+        background-color: rgb(187, 188, 190);
+    }
+    table, td, th {  
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 50%;
+    }
+    
+    th, td {
+        padding: 15px;
+    }
+</style>
+</head>
+<body>
+    
+
+<h2> Greetings! </h2>
+<br>
+<br>
+<h3>You have been successfully subscribed to Webscore! See below stats from the most recent leaderboard</h3>
+
+{% if score != -1 %}
+    <table>
+        <thead>
+            <tr>
+                <th colspan="3"> Your application's rank and score </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% if rank != -1 %}
+                    <td>{{ rank }}</td>
+                {% else %}
+                    <td>-</td>
+                {% endif %}
+                <td>{{ url }}</td>
+                <td>{{ score }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    
+{% else %}
+    <h2> No stats saved yet for this application. </h2>
+{% endif %}
+
+<br>
+<br>
+
+{% if leaderboard.length != 0 %}
+
+    <table>
+        <thead>
+            <tr>
+                <th colspan="3"> Current leaderboard </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in leaderboard %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ app.url }}</td>
+                <td>{{ app.score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    <h2>No leaderboard to show yet. </h2>
+{% endif %}
+
+<p> If you want more info check http://webscore.garie.devel4cph.eea.europa.eu/ </p>
+
+
+</body>
+</html> 

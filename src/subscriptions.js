@@ -9,7 +9,8 @@ const {
     send_email_exited_top_five,
     send_email_above_median,
     send_email_below_median,
-    send_email_bottom_five
+    send_email_bottom_five,
+    send_email_subscription_started
 } = require('./email');
 
 const test = require('./test');
@@ -22,8 +23,8 @@ const DATABASE_NAME = 'leaderboard';
 const CONSISTENCY_LENGTH = 3;
 
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: '*/10 * * * *',
-    influx_syntax: '10m'
+    cronjob_syntax: '*/2 * * * *',
+    influx_syntax: '2m'
 }
 
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
@@ -51,6 +52,10 @@ async function update_email_for_url(url, email, active) {
 
         await influx.writePoints([point], {database: DATABASE_NAME});
         console.log(`Successfully saved email ${email} for the application ${url} as ${active}.`);
+        if (parseInt(active) === 1) {
+            const last_scores_saved = await get_last_entries();
+            send_email_subscription_started(url, email, last_scores_saved);
+        }
     } catch (err) {
         console.log(`Failed to save email ${email} for application ${url}.`);
         console.log(err);
@@ -274,6 +279,16 @@ function check_consistency_median(url, scores_sorted, scores_sorted_map) {
     return true;
 }
 
+function get_rank(current_urls_array_sorted, url) {
+    for (let i = 0; i < current_urls_array_sorted.length; i++) {
+        if (current_urls_array_sorted[i].url === url) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 async function send_notification() {
     await init_leaderboard_influx();
     const last_urls_map = await get_last_entries();
@@ -346,7 +361,7 @@ async function send_notification() {
 
     //check 1st place, current day:
     if (current_urls_array_sorted[0].url !== last_urls_array_sorted[0].url) {
-        send_email_first_place(current_urls_array_sorted[0], current_leaderboard, emails);
+        send_email_first_place(1, current_urls_array_sorted[0], current_leaderboard, emails);
     }
 
     //set with old top 5;
@@ -361,7 +376,8 @@ async function send_notification() {
         if (is_consistent) {
             if (!old_top5_set.has(current_urls_array_sorted[i].url)) {
                 if (i !== 0) {
-                    send_email_entered_top_five(current_urls_array_sorted[i], current_leaderboard, emails);
+                    const rank = i + 1;
+                    send_email_entered_top_five(rank, current_urls_array_sorted[i], current_leaderboard, emails);
                 }
             } else {
                 old_top5_set.delete(current_urls_array_sorted[i].url);
@@ -373,7 +389,8 @@ async function send_notification() {
     for (let elem of old_top5_set) {
         const is_consistent = check_consistency_topk(5, elem, scores_sorted, scores_sorted_map);
         if (is_consistent) {
-            send_email_exited_top_five({url: elem, score: urls_map[elem].score}, current_leaderboard, emails);
+            const rank = get_rank(current_urls_array_sorted, elem) + 1;
+            send_email_exited_top_five(rank, {url: elem, score: urls_map[elem].score}, current_leaderboard, emails);
         }
     }
 
@@ -388,7 +405,7 @@ async function send_notification() {
         const is_consistent = check_consistency_bottomk(5, current_urls_array_sorted[i].url, scores_sorted, scores_sorted_map);
         if (is_consistent) {
             if (!old_bottom5_set.has(current_urls_array_sorted[i].url)) {
-                send_email_bottom_five(current_urls_array_sorted[i], current_leaderboard, emails);
+                send_email_bottom_five(i + 1, current_urls_array_sorted[i], current_leaderboard, emails);
             }
         }
     }
@@ -408,7 +425,8 @@ async function send_notification() {
         if (last_urls_map[url].score < last_median_score) {
             const is_consistent = check_consistency_median(url, scores_sorted, scores_sorted_map);
             if (is_consistent === true) {
-                send_email_above_median(above_median[i], current_leaderboard, emails);
+                const rank = i + 5 + 1;
+                send_email_above_median(rank, above_median[i], current_leaderboard, emails);
             }
         }
     }
@@ -422,7 +440,8 @@ async function send_notification() {
         if (last_urls_map[url].score > last_median_score) {
             const is_consistent = check_consistency_median(below_median[i], scores_sorted, scores_sorted_map);
             if (is_consistent) {
-                send_email_below_median(below_median[i], current_leaderboard, emails);
+                const rank = i + (current_urls_array_sorted.length / 2) + 1;
+                send_email_below_median(rank, below_median[i], current_leaderboard, emails);
             }
         }
     }    
