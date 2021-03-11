@@ -1,6 +1,8 @@
 const Influx = require('influx')
 const { metrics } = require('./metrics')
 var cache = require('memory-cache');
+const { urlReplaceProtocol } = require('./utils')
+
 
 // how much time to skip when looking for the historic max value of a metric
 const MAX_GRACE_PERIOD = "7d"
@@ -11,6 +13,47 @@ const influx = new Influx.InfluxDB({
   port: process.env.INFLUX_PORT || '8086'
 })
 
+// merge the MEAN values from month and year queries to accept http and https link as the same key;
+const merge_results = (seriesRows, days) => {
+  const seriesValues = new Object()
+  const seriesDuplicates = {};
+
+  for (const row of seriesRows) {
+    const url = urlReplaceProtocol(row.url);
+    if (!seriesDuplicates[url]) {
+      seriesDuplicates[url] = {};
+    }
+    if (!seriesDuplicates[url][row.url]) {
+      seriesDuplicates[url][row.url] = [];
+    }
+
+    seriesDuplicates[url][row.url].push({ value: row.value, count: row.count });
+  }
+
+  for (const url in seriesDuplicates) {
+    const values = [];
+    for (let i = 0; i < days; i++) {
+      let value = 0;
+      let count = 0;
+      for (const unsplit_url in seriesDuplicates[url]) {
+        const elem = seriesDuplicates[url][unsplit_url][i];
+        if (elem.value !== -1) {
+          value += elem.value * elem.count;
+          count += elem.count;
+        }
+      }
+      if (count === 0)
+        values.push(-1);
+      else {
+        values.push(Math.round(value / count));
+      }
+    }
+
+    seriesValues[url] = values;
+  }
+  return seriesValues;
+}
+
 const query = async (metricSpec) => {
   const { name, measurement, field, database } = metricSpec
   let metricsRows, lastMetricsRows, maxRows, monthSeriesRows, yearSeriesRows;
@@ -19,9 +62,9 @@ const query = async (metricSpec) => {
   const lastMetricQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
     // last 30 days - should we add `LIMIT 30` ?
-  const monthSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
+  const monthSeriesQuery = `SELECT mean("${field}") AS "value", count("${field}") AS "count" FROM "${measurement}" WHERE time >= now() - 30d GROUP BY time(1d), "url" fill(-1) ORDER BY time ASC`
     // last 365 days
-  const yearSeriesQuery = `SELECT mean("${field}") AS "value" FROM "${measurement}" WHERE time >= now() - 365d GROUP BY time(7d), "url" fill(-1) ORDER BY time ASC`
+  const yearSeriesQuery = `SELECT mean("${field}") AS "value", count("${field}") AS "count" FROM "${measurement}" WHERE time >= now() - 365d GROUP BY time(7d), "url" fill(-1) ORDER BY time ASC`
 
   if (cacheResult !== undefined && cacheResult !== null) {
     metricsRows = cacheResult.metricsRows;
@@ -42,6 +85,7 @@ const query = async (metricSpec) => {
       return [[], [], [], [], []];
     })
 
+
     cache.put(name, {
       metricsRows,
       lastMetricsRows,
@@ -51,46 +95,47 @@ const query = async (metricSpec) => {
     }, 60000);
   }
 
+  // order asc metricRows to get the last value every time;
+  metricsRows.sort(function(a, b) {
+    return a.time - b.time;
+});
+
   const metricsValues = {}
   for (const row of metricsRows) {
-    metricsValues[row.url] = {
+    metricsValues[urlReplaceProtocol(row.url)] = {
       time: row.time,
       value: row.value
     }
   }
 
+  lastMetricsRows.sort(function(a, b) {
+    return a.time - b.time;
+  });
+
   const lastValues = {}
   for (const row of lastMetricsRows) {
-    lastValues[row.url] = {
+    lastValues[urlReplaceProtocol(row.url)] = {
       last: row.value,
       lastTime: (row.time.toISOString() || "").substr(0, 16).replace("T", " "),
       lastTimeMs: row.time.getTime(),
     }
   }
 
+  maxRows.sort(function(a, b) {
+    return a.time - b.time;
+  });
+
   const maxValues = {}
   for (const row of maxRows) {
-    maxValues[row.url] = {
+    maxValues[urlReplaceProtocol(row.url)] = {
       max: row.value,
       maxTime: (row.time.toISOString() || "").substr(0, 10),
     }
   }
 
-  const monthSeriesValues = new Object()
-  for (const row of monthSeriesRows) {
-    if (!monthSeriesValues[row.url]) {
-      monthSeriesValues[row.url] = []
-    }
-    monthSeriesValues[row.url].push(Math.round(row.value))
-  }
-
-  const yearSeriesValues = new Object()
-  for (const row of yearSeriesRows) {
-    if (!yearSeriesValues[row.url]) {
-      yearSeriesValues[row.url] = []
-    }
-    yearSeriesValues[row.url].push(Math.round(row.value))
-  }
+  
+  const monthSeriesValues = merge_results(monthSeriesRows, 30);
+  const yearSeriesValues = merge_results(yearSeriesRows, 53); // query grouped by 7d, so 53 weeks of data
 
   const data = {}
   for (const url of Object.keys(lastValues)) {

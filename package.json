@@ -6,12 +6,12 @@
     "start": "node src/app.js"
   },
   "dependencies": {
+    "garie-plugin": "https://github.com/eea/garie-plugin#0.0.33",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "garie-plugin": "https://github.com/eea/garie-plugin#master",
     "influx": "^5.5.1",
     "luxon": "^1.26.0",
     "memory-cache": "^0.2.0",
