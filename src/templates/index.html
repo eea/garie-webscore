@@ -101,14 +101,14 @@ function sortScores(a, b) {
           {{ loop.index }}
         </th>
         <td scope="row">
-          {% set url_host = urlHostname(row.url) %}
+          {% set url_host = row.url %}
           {% if isExternal(url_host) %}
             <span data-toggle="tooltip" title="Non-EEA site, included for reference">🌎</span>
           {% endif %}
           <span class="website-url">{{ urlSlug(row.url) }}</span>
           <br/>
           <span class='website-toolbar'>
-          <a href="{{ row.url }}"  class="external" target="_blank">View site</a>
+          <a href="http://{{ row.url }}"  class="external" target="_blank">View site</a>
              |
           <a href="/site/{{ urlSlug(row.url) }}">View report</a>
           </span>
