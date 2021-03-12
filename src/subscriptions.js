@@ -23,8 +23,8 @@ const DATABASE_NAME = 'leaderboard';
 const CONSISTENCY_LENGTH = 3;
 
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: '*/2 * * * *',
-    influx_syntax: '2m'
+    cronjob_syntax: '*/10 * * * *',
+    influx_syntax: '10m'
 }
 
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
