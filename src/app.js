@@ -69,12 +69,6 @@ const wrap = (fn) => {
   }
 }
 
-const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/
-const isUpPath = (path) => {
-  // Check if path contains `..`, we don't want clients browsing our filesystem
-  return UP_PATH_REGEXP.test(path)
-}
-
 passport.serializeUser(function(user, done) {
   done(null, user);
 });

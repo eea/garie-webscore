@@ -22,6 +22,8 @@ services:
             - 2000:80
     influxdb:
         image: 'influxdb:latest'
+        volumes:
+            - /var/lib/influxdb:/var/lib/influxdb
         ports:
             - 8086:8086
         environment:

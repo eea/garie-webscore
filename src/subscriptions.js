@@ -13,6 +13,10 @@ const {
     send_email_subscription_started
 } = require('./email');
 
+const {
+    urlSlug
+} = require('./utils');
+
 const test = require('./test');
 
 const test_functions = Object.values(test);
@@ -28,14 +32,6 @@ const CRONJOB_INTERVAL = {
 }
 
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
-
-
-const urlSlug = (url) => {
-    return url
-      .replace(/^http[s]?:\/\//, '')
-      .replace(/\/$/, '')
-      .replace(/[^a-zA-Z0-9.]+/g, '-')
-}
 
 async function update_email_for_url(url, email, active) {
 
@@ -331,9 +327,9 @@ async function send_notification() {
         for (const metric in row.metrics) {
             const month_values = row.metrics[metric].monthSeries;
             for (let i = 1; i <= CONSISTENCY_LENGTH; i++) {
-                if (month_values[14 - i] !== -1) {
+                if (month_values[30 - i] !== -1) {
                     scores[i][row.url] = scores[i][row.url] || {score: 0};
-                    scores[i][row.url].score += parseInt(month_values[14 - i] || 0);
+                    scores[i][row.url].score += parseInt(month_values[30 - i] || 0);
                 }
             }
         }
