@@ -108,10 +108,19 @@ function send_email(rank, app_info, current_leaderboard, text, emails) {
 }
 
 function send_email_subscription_started(url, email, last_scores_saved) {
-    const score = last_scores_saved[url].score || -1;
-    const last_leaderboard = sort_data(last_scores_saved);
-    const leaderboard = last_leaderboard.slice(0, 5) || [];
     let rank = -1;
+    let score = -1;
+    let leaderboard = [];
+    let last_leaderboard = [];
+
+    if (last_scores_saved.length !== 0) {
+        const url_score = last_scores_saved[url] || {score: -1};
+        score = url_score.score;
+
+        last_leaderboard = sort_data(last_scores_saved);
+        leaderboard = last_leaderboard.slice(0,5);
+    }
+
     for (let i = 0; i < last_leaderboard.length; i++) {
         if ((last_leaderboard[i] !== undefined) && (last_leaderboard[i].url === url)) {
             rank = i + 1;

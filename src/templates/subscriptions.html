@@ -68,9 +68,11 @@
             <td scope="row">
                 <ul id={{row.url}}>
                     {% for email, value in emails[row.url] %}
-                        <li>
-                            {{ email }}
-                        </li>
+                        {% if value == 1 %}
+                            <li>
+                                {{ email }}
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </td>
