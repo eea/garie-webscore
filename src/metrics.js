@@ -203,7 +203,7 @@ const metrics = [
     field: "value",
     thresholds: [20, 80],
     docs: "",
-    help: "Code age measures how old the average line of code of the url is."
+    help: "Code age measures how old the average line of code of the url is. It gets the repo information from Taskman and it uses the tool <a href='https://github.com/src-d/hercules' target='_blank'>Hercules</a>. The score is calculated based on the commit information provided by the tool."
   },
 ]
 
