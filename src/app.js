@@ -17,6 +17,7 @@ const { get } = require('./ondemand')
 const {
   urlSlug,
   thresholdColor,
+  healthColor,
   checksStyle,
   isExternal,
   urlHostname,
@@ -37,6 +38,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
+nunjucksEnv.addGlobal('healthColor', healthColor)
 nunjucksEnv.addGlobal('checksStyle', checksStyle)
 nunjucksEnv.addGlobal('urlSlug', urlSlug)
 nunjucksEnv.addGlobal('pathNameFromUrl', garie_plugin.utils.helpers.pathNameFromUrl);
@@ -48,6 +50,7 @@ nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
 })
 
 nunjucksEnv.addGlobal('formatMetric', (metric, url, value) => {
+  if (value === -1) return "-"
   if (typeof(value) === 'number') return value
   if ((metric.internal === true) && (isExternal(url))) return "N/A"
   return "-"

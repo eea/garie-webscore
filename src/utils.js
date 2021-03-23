@@ -25,6 +25,16 @@ const thresholdColor = (thresholds, value) => {
     }
 }
 
+const healthColor = (alive) => {
+  if (alive === 'UP') {
+    return "table-success";
+  } else if (alive === 'DOWN'){
+    return "table-danger";
+  } else {
+    return "table-secondary";
+  }
+}
+
 const checksStyle = (value) => {
     //TODO: instead of 13, 18... use (max_number_of_checks - something)
     if (typeof value === 'number' && !isNaN(value)) {
@@ -60,6 +70,7 @@ const isUpPath = (path) => {
 module.exports = {
     urlSlug,
     thresholdColor,
+    healthColor,
     checksStyle,
     isExternal,
     urlHostname,
