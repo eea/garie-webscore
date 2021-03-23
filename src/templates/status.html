@@ -92,7 +92,7 @@
                     {% set time = summaryStatus[metric.name].duration %}
                     {{ (time/ 3600) |int }}h {{ ((time % 3600) / 60) |round|int }}m {{ (time % 60) |round|int }}s
                 {% else %}
-                    Not finished
+                    -
                 {% endif %}
             </td>
         </tr>
