@@ -165,6 +165,7 @@ app.get('/status/:plugin_name', async(req, res)=> {
 
 app.get('/status', async (req, res) => {
   const summaryStatus = await garie_plugin.utils.getSummaryStatus(influx, metrics);
+  console.log(summaryStatus);
   return res.render('status.html', { metrics, summaryStatus });
 });
 
