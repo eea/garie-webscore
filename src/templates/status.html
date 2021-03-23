@@ -62,6 +62,7 @@
           <th scope="col" data-field="url">Status</th>
           <th scope="col" data-field="url">Success / Total</th>
           <th scope="col" > Last Run (Start time) </th>
+          <th scope="col" > Duration </th>
       </thead>
       <tbody>
         {% for metric in metrics %}
@@ -85,6 +86,14 @@
             </td>
             <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) if summaryStatus[metric.name].status == 'FINISHED' }}">
                 {{ summaryStatus[metric.database].lastRun }}
+            </td>
+            <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) if summaryStatus[metric.name].status == 'FINISHED' }}">
+                {% if summaryStatus[metric.name].duration %}
+                    {% set time = summaryStatus[metric.name].duration %}
+                    {{ (time/ 3600) |int }}h {{ ((time % 3600) / 60) |round|int }}m {{ (time % 60) |round|int }}s
+                {% else %}
+                    Not finished
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
