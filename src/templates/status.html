@@ -88,9 +88,11 @@
                 {{ summaryStatus[metric.database].lastRun }}
             </td>
             <td class="dataCell {{ thresholdColor([2, summaryStatus[metric.database].allUrls], summaryStatus[metric.database].success) if summaryStatus[metric.name].status == 'FINISHED' }}">
-                {% if summaryStatus[metric.name].duration %}
-                    {% set time = summaryStatus[metric.name].duration %}
-                    {{ (time/ 3600) |int }}h {{ ((time % 3600) / 60) |round|int }}m {{ (time % 60) |round|int }}s
+                {% if summaryStatus[metric.name].status == 'FINISHED' %}
+                    {% if summaryStatus[metric.name].duration %}
+                        {% set time = summaryStatus[metric.name].duration %}
+                        {{ (time/ 3600) |int }}h {{ ((time % 3600) / 60) |round|int }}m {{ (time % 60) |round|int }}s
+                    {% endif %}
                 {% else %}
                     -
                 {% endif %}
