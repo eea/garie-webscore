@@ -33,8 +33,8 @@ const nunjucksEnv = nunjucks.configure(`${__dirname}/templates`, {
   watch: true,
 })
 
-const USERNAME = process.env.USERNAME;
-const PASSWORD = process.env.PASSWORD;
+const PAGE_USERNAME = process.env.PAGE_USERNAME;
+const PAGE_PASSWORD = process.env.PAGE_PASSWORD;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(require('express-session')({ secret: 'secret', resave: false, saveUninitialized: false }));
@@ -79,7 +79,7 @@ passport.deserializeUser(function(user, done) {
 
 passport.use(new Strategy(
   function(username, password, done) {
-    if (username === USERNAME && password === PASSWORD) {
+    if (username === PAGE_USERNAME && password === PAGE_PASSWORD) {
       return done(null, {username: username});
     }
     done(null, false);
