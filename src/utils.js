@@ -1,3 +1,4 @@
+var dateFormat = require('dateformat');
 
 
 const urlSlug = (url) => {
@@ -66,6 +67,14 @@ const isUpPath = (path) => {
   return UP_PATH_REGEXP.test(path)
 }
 
+const newDate = (timestamp) => {
+  return new Date(timestamp);
+}
+
+const formatDate = (date) => {
+  return dateFormat(date, "yyyy-mm-dd hh:MM")
+}
+
 
 module.exports = {
     urlSlug,
@@ -75,5 +84,7 @@ module.exports = {
     isExternal,
     urlHostname,
     isUpPath,
-    urlReplaceProtocol
+    urlReplaceProtocol,
+    newDate,
+    formatDate
 }

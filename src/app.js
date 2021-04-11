@@ -21,7 +21,9 @@ const {
   checksStyle,
   isExternal,
   urlHostname,
-  isUpPath
+  isUpPath,
+  newDate,
+  formatDate
 } = require('./utils')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
@@ -44,6 +46,8 @@ nunjucksEnv.addGlobal('urlSlug', urlSlug)
 nunjucksEnv.addGlobal('pathNameFromUrl', garie_plugin.utils.helpers.pathNameFromUrl);
 nunjucksEnv.addGlobal('urlHostname', urlHostname)
 nunjucksEnv.addGlobal('isExternal', isExternal)
+nunjucksEnv.addFilter('newDate', newDate)
+nunjucksEnv.addGlobal('formatDate', formatDate)
 
 nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
@@ -165,7 +169,9 @@ app.get('/status/:plugin_name', async(req, res)=> {
 
 app.get('/status', async (req, res) => {
   const summaryStatus = await garie_plugin.utils.getSummaryStatus(influx, metrics);
-  return res.render('status.html', { metrics, summaryStatus });
+  const currentTime = Date.now();
+  const timezone = process.env.TZ;
+  return res.render('status.html', { currentTime, Date, timezone, metrics, summaryStatus });
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
