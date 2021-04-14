@@ -26,9 +26,10 @@ const TEST_SUBSCRIPTION_EVENTS = process.env.TEST_SUBSCRIPTION_EVENTS || false;
 const DATABASE_NAME = 'leaderboard';
 const CONSISTENCY_LENGTH = 3;
 
+// Every Monday at 15:00
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: '*/10 * * * *',
-    influx_syntax: '10m'
+    cronjob_syntax: '0 15 * * 1',
+    influx_syntax: '7d'
 }
 
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());

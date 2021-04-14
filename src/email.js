@@ -4,12 +4,7 @@ const nunjucks = require('nunjucks');
 
 const mail = nodemailer.createTransport({
     host: 'postfix',
-    port: 25,
-    auth: {
-        //TODO: TO COMPLETE USER AND PASS
-        user: process.env.TRANSPORT_USER_EMAIL || 'webscoreu',
-        pass: process.env.TRANSPORT_PASSWORD_EMAIL || ''
-    }
+    port: 25
 });
 
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@eea.europa.eu'
@@ -88,7 +83,6 @@ function send_email(rank, app_info, current_leaderboard, text, emails) {
     try{
         const page = nunjucks.render('emailTemplate.html', {rank, app_info, current_leaderboard, text})
         var mailOptions = {
-            // TODO: TO COMPLETE MAIL
             from: `Webscore <${EMAIL_FROM}>`,
             to: emails,
             subject: `Webscore Rank - ${app_info.url}`,
@@ -133,7 +127,6 @@ function send_email_subscription_started(url, email, last_scores_saved) {
     try{
         const page = nunjucks.render('emailSubscriptionTemplate.html', {rank, url, score, leaderboard})
         var mailOptions = {
-            // TODO: TO COMPLETE MAIL
             from: `Webscore <${EMAIL_FROM}>`,
             to: email,
             subject: `Successfully subscribed to Webscore - ${url}!`,
