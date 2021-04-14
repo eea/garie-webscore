@@ -7,8 +7,8 @@ const mail = nodemailer.createTransport({
     port: 25,
     auth: {
         //TODO: TO COMPLETE USER AND PASS
-        user: process.env.TRANSPORT_USER_EMAIL || 'dana',
-        pass: process.env.TRANSPOR_PASSWORD_EMAIL || 'dana'
+        user: process.env.TRANSPORT_USER_EMAIL || 'webscoreu',
+        pass: process.env.TRANSPORT_PASSWORD_EMAIL || ''
     }
 });
 

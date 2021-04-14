@@ -24,8 +24,6 @@ services:
     postfix:
         image: eeacms/postfix:latest
         environment:
-            MTP_USER: "dana"
-            MTP_PASS: "dana"
-            MTP_HOST: "localhost"
-            MTP_RELAY: "ironports.eea.europa.eu"
+            MTP_HOST: "eea.europa.eu"
+            MTP_RELAY: "ironports.eionet.europa.eu"
             MTP_PORT: "8587"
