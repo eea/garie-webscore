@@ -122,7 +122,11 @@
                     {{ successful_urls  }} / {{ summaryStatus[metric.database].allUrls }}
                 {% else %}
                     {% if summaryStatus[metric.name].status == 'FINISHED' %}
-                        {{ successful_urls  }} / {{ summaryStatus[metric.database].allUrls }}
+                        {% if successful_urls > summaryStatus[metric.database].allUrls %}
+                            {{ summaryStatus[metric.database].allUrls }} / {{ summaryStatus[metric.database].allUrls }}
+                        {% else %}
+                            {{ successful_urls  }} / {{ summaryStatus[metric.database].allUrls }}
+                        {% endif %}
                     {% else %}
                         - / {{ summaryStatus[metric.database].allUrls }}
                     {% endif %}
