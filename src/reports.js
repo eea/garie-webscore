@@ -31,6 +31,9 @@ const reportUrl = (metric, slug, onDemand) => {
     case "linksintegrity":
       return fileUrl("linksintegrity-results/linksintegrity.txt")
 
+    case "code-age":
+      return fileUrl("code-age-results/code-age.txt");
+
     case "securityheaders":
       if (metric.measurement === "mozilla_score") {
         return fileUrl("securityheaders-results/mozilla-observatory.txt")

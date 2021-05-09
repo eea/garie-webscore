@@ -17,10 +17,13 @@ const { get } = require('./ondemand')
 const {
   urlSlug,
   thresholdColor,
+  healthColor,
   checksStyle,
   isExternal,
   urlHostname,
-  isUpPath
+  isUpPath,
+  newDate,
+  formatDate
 } = require('./utils')
 
 const dev = (process.env.NODE_ENV || 'dev') === 'dev'
@@ -41,17 +44,21 @@ app.use(require('express-session')({ secret: 'secret', resave: false, saveUninit
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 nunjucksEnv.addGlobal('thresholdColor', thresholdColor)
+nunjucksEnv.addGlobal('healthColor', healthColor)
 nunjucksEnv.addGlobal('checksStyle', checksStyle)
 nunjucksEnv.addGlobal('urlSlug', urlSlug)
 nunjucksEnv.addGlobal('pathNameFromUrl', garie_plugin.utils.helpers.pathNameFromUrl);
 nunjucksEnv.addGlobal('urlHostname', urlHostname)
 nunjucksEnv.addGlobal('isExternal', isExternal)
+nunjucksEnv.addFilter('newDate', newDate)
+nunjucksEnv.addGlobal('formatDate', formatDate)
 
 nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
   return thresholdColor(metric.thresholds, value)
 })
 
 nunjucksEnv.addGlobal('formatMetric', (metric, url, value) => {
+  if (value === -1) return "-"
   if (typeof(value) === 'number') return value
   if ((metric.internal === true) && (isExternal(url))) return "N/A"
   return "-"
@@ -215,7 +222,9 @@ app.get('/status/:plugin_name', async(req, res)=> {
 
 app.get('/status', async (req, res) => {
   const summaryStatus = await garie_plugin.utils.getSummaryStatus(influx, metrics);
-  return res.render('status.html', { metrics, summaryStatus });
+  const currentTime = Date.now();
+  const timezone = process.env.TZ;
+  return res.render('status.html', { currentTime, Date, timezone, metrics, summaryStatus });
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`))

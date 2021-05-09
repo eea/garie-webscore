@@ -195,16 +195,6 @@ const metrics = [
     docs: "",
     help: "Browsertime provides an alternative way of evaluating website performance."
   },
-  {
-    name: "Code Age",
-    important: true,
-    database: "code-age",
-    measurement: "code-age",
-    field: "value",
-    thresholds: [20, 80],
-    docs: "",
-    help: "Code age measures how old the average line of code of the url is."
-  },
 ]
 
 const onDemandApis = [
@@ -243,10 +233,6 @@ const onDemandApis = [
   {
     database: "browsertime",
     url: "http://garie-browsertime:3000",
-  },
-  {
-    database:"code-age",
-    url: "http://garie-code-age:3000",
   },
 ]
 

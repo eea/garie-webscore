@@ -1,3 +1,4 @@
+var dateFormat = require('dateformat');
 
 
 const urlSlug = (url) => {
@@ -23,6 +24,16 @@ const thresholdColor = (thresholds, value) => {
     } else {
       return "table-secondary"
     }
+}
+
+const healthColor = (alive) => {
+  if (alive === 'UP') {
+    return "table-success";
+  } else if (alive === 'DOWN'){
+    return "table-danger";
+  } else {
+    return "table-secondary";
+  }
 }
 
 const checksStyle = (value) => {
@@ -56,13 +67,24 @@ const isUpPath = (path) => {
   return UP_PATH_REGEXP.test(path)
 }
 
+const newDate = (timestamp) => {
+  return new Date(timestamp);
+}
+
+const formatDate = (date) => {
+  return dateFormat(date, "yyyy-mm-dd hh:MM")
+}
+
 
 module.exports = {
     urlSlug,
     thresholdColor,
+    healthColor,
     checksStyle,
     isExternal,
     urlHostname,
     isUpPath,
-    urlReplaceProtocol
+    urlReplaceProtocol,
+    newDate,
+    formatDate
 }
