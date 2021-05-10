@@ -28,8 +28,8 @@ const CONSISTENCY_LENGTH = 3;
 
 // every 10 minutes;
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: '*/10 * * * *',
-    influx_syntax: '10m'
+    cronjob_syntax: '*/30 * * * *',
+    influx_syntax: '30m'
 }
 
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
