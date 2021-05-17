@@ -26,10 +26,10 @@ const TEST_SUBSCRIPTION_EVENTS = process.env.TEST_SUBSCRIPTION_EVENTS || false;
 const DATABASE_NAME = 'leaderboard';
 const CONSISTENCY_LENGTH = 3;
 
-// every 10 minutes;
+// every wednsday at 11:00;
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: '*/30 * * * *',
-    influx_syntax: '30m'
+    cronjob_syntax: '*0 11 * * 3',
+    influx_syntax: '7d'
 }
 
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
