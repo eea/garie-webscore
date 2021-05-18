@@ -28,7 +28,7 @@ const CONSISTENCY_LENGTH = 3;
 
 // every wednsday at 11:00;
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: '*0 11 * * 3',
+    cronjob_syntax: '0 11 * * 3',
     influx_syntax: '7d'
 }
 
