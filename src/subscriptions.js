@@ -28,8 +28,8 @@ const CONSISTENCY_LENGTH = 3;
 
 // every wednsday at 11:00;
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: '0 11 * * 3',
-    influx_syntax: '7d'
+    cronjob_syntax: process.env.MAIL_SUBSCRIPTION_FREQUENCY_CRONJOB || '0 11 * * 3',
+    influx_syntax: process.env.MAIL_SUBSCRIPTION_INFLUX_SYNTAX || '7d'
 }
 
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
@@ -50,8 +50,8 @@ async function update_email_for_url(url, email, active) {
         await influx.writePoints([point], {database: DATABASE_NAME});
         console.log(`Successfully saved email ${email} for the application ${url} as ${active}.`);
         if (parseInt(active) === 1) {
-            const last_scores_saved = await get_last_entries();
-            send_email_subscription_started(url, email, last_scores_saved);
+            const {urls_map} = await get_current_scores();
+            send_email_subscription_started(url, email, urls_map);
         }
     } catch (err) {
         console.log(`Failed to save email ${email} for application ${url}.`);
@@ -286,23 +286,27 @@ function get_rank(current_urls_array_sorted, url) {
     return -1;
 }
 
-async function send_notification() {
-    await init_leaderboard_influx();
-    const last_urls_map = await get_last_entries();
-
+async function get_current_scores() {
     const data = await queries.getData();
     for (const row of data) {
         row.url = urlSlug(row.url);
     }
+    const urls_map = map_data(data);
+    return {urls_map, data};
+}
+
+async function send_notification() {
+    await init_leaderboard_influx();
+    const last_urls_map = await get_last_entries();
 
     let emails = await get_all_emails();
     if (Object.keys(emails).length === 0) {
       return;
     }
 
-    const urls_map = map_data(data);
 
     //after querying influx for last week's results, update influx with current scores;
+    const {urls_map, data} = await get_current_scores();
     let current_urls_array_sorted = sort_data(urls_map, true);
     await update_influx(current_urls_array_sorted);
     current_urls_array_sorted = sort_data(urls_map, false);
