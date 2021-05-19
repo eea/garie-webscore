@@ -84,7 +84,7 @@ function send_email(rank, app_info, current_leaderboard, text, emails) {
         const page = nunjucks.render('emailTemplate.html', {rank, app_info, current_leaderboard, text})
         var mailOptions = {
             from: `Webscore <${EMAIL_FROM}>`,
-            to: emails,
+            to: email_list,
             subject: `Webscore Rank - ${app_info.url}`,
             html: page
         }
