@@ -3,8 +3,8 @@ const nunjucks = require('nunjucks');
 
 
 const mail = nodemailer.createTransport({
-    host: 'postfix',
-    port: 25
+    host: process.env.MAIL_SERVER || 'postfix',
+    port: process.env.MAIL_PORT || 25
 });
 
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@eea.europa.eu'
@@ -40,6 +40,7 @@ function sort_data(urls_map, keep_negatives=false) {
 
 
 
+// TODO change mail text;
 function send_email_first_place(rank, app_info, current_leaderboard, emails) {
     const text = `Congratulations! Your application has now the highest score and reached first place with ${app_info.score} points!`;
     send_email(rank, app_info, current_leaderboard, text, emails);
@@ -51,22 +52,22 @@ function send_email_entered_top_five(rank, app_info, current_leaderboard, emails
 }
 
 function send_email_exited_top_five(rank, app_info, current_leaderboard, emails) {
-    const text = "Watch out! Your application is no longer in top five :(";
+    const text = "Watch out! Your application is no longer in top five.";
     send_email(rank, app_info, current_leaderboard, text, emails);
 }
 
 function send_email_above_median(rank, app_info, current_leaderboard, emails) {
-    const text = `Your application's score has risen above the median of all scores of all the applications with ${app_info.score} points!`;
+    const text = `Your application's score has risen above the median of all applications' scores with ${app_info.score} points!`;
     send_email(rank, app_info, current_leaderboard, text, emails);
 }
 
 function send_email_below_median(rank, app_info, current_leaderboard, emails) {
-    const text = `Watch out! Your application's score dropped below the median of all scores of all applications :(`;
+    const text = `Watch out! Your application's score dropped below the median of all applications' scores.`;
     send_email(rank, app_info, current_leaderboard, text, emails);
 }
 
 function send_email_bottom_five(rank, app_info, current_leaderboard, emails) {
-    const text = `Ouch! Your application is now within the bottom five scores :(`;
+    const text = `Ouch! Your application is now within the bottom five scores.`;
     send_email(rank, app_info, current_leaderboard, text, emails);
 }
 

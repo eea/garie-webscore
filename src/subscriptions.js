@@ -266,6 +266,7 @@ function check_consistency_median(url, scores_sorted, scores_sorted_map) {
         }
         const median = scores_sorted[i][Math.round(scores_sorted[i].length / 2)].score;
         const below_median = (scores_sorted_map[i][url] < median);
+        console.log(`The ${i} median score is ${median}.`);
 
         if ((last_below_median !== null) && (last_below_median !== below_median)) {
             return false;
