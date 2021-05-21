@@ -223,7 +223,7 @@ app.get('/status/:plugin_name', async(req, res)=> {
 app.get('/status', async (req, res) => {
   const summaryStatus = await garie_plugin.utils.getSummaryStatus(influx, metrics);
   const currentTime = Date.now();
-  const timezone = process.env.TZ;
+  const timezone = process.env.TZ || "Europe/Copenhagen";
   return res.render('status.html', { currentTime, Date, timezone, metrics, summaryStatus });
 });
 
