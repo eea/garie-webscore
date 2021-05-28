@@ -26,7 +26,12 @@ const reportUrl = (metric, slug, onDemand) => {
 
   switch (metric.database) {
     case "lighthouse":
-      return fileUrl("lighthouse-reports/lighthouse.html")
+      if (metric.measurement === 'performance-score'){
+        return fileUrl("lighthouse-reports/lighthouse.html")
+      }
+      if (metric.measurement === 'performance-score_fast'){
+        return fileUrl("lighthouse-reports/lighthouse_fast.html")
+      }
 
     case "linksintegrity":
       return fileUrl("linksintegrity-results/linksintegrity.txt")

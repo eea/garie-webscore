@@ -10,6 +10,15 @@ const metrics = [
     help: "Performance - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools"
   },
   {
+    name: "Performance (Fast Connection)",
+    database: "lighthouse",
+    measurement: "performance-score_fast",
+    field: "value",
+    thresholds: [50, 90],
+    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Performance",
+    help: "Performance - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools"
+  },
+  {
     name: "Progressive Web App",
     database: "lighthouse",
     measurement: "pwa-score",
