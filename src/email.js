@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const nunjucks = require('nunjucks');
+const sleep = require('sleep-promise');
 
 
 const mail = nodemailer.createTransport({
@@ -39,8 +40,6 @@ function sort_data(urls_map, keep_negatives=false) {
 }
 
 
-
-// TODO change mail text;
 function send_email_first_place(rank, app_info, current_leaderboard, emails) {
     const text = `Congratulations! Your application has now the highest score and reached first place with ${app_info.score} points!`;
     send_email(rank, app_info, current_leaderboard, text, emails);
@@ -72,6 +71,23 @@ function send_email_bottom_five(rank, app_info, current_leaderboard, emails) {
 }
 
 
+function resend_email(mailOptions, count) {
+    if (count <= 0) {
+        return;
+    }
+    mail.sendMail(mailOptions, async function(error, info){
+        if (error) {
+            console.log(`Could not send email ${error}. Resending...`)
+            count--;
+            await sleep(60 * 1000);
+            return resend_email(mailOptions, count)
+        } else {
+            console.log('Email sent: ' + info.response);
+            return;
+        }
+    });
+}
+
 function send_email(rank, app_info, current_leaderboard, text, emails) {
 
     let email_list = [];
@@ -89,15 +105,8 @@ function send_email(rank, app_info, current_leaderboard, text, emails) {
             subject: `Webscore Rank - ${app_info.url}`,
             html: page
         }
-
-        mail.sendMail(mailOptions, function(error, info){
-            if (error) {
-                console.log(`Could not send email ${error}`);
-                return;
-            } else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
+        // try resending the email if it does not work from the start;
+        resend_email(mailOptions, 20);
     } catch (err) {
         console.log(`Could not send email ${err}`);
         return;
@@ -125,7 +134,7 @@ function send_email_subscription_started(url, email, last_scores_saved) {
         }
     }
 
-    try{
+    try {
         const page = nunjucks.render('emailSubscriptionTemplate.html', {rank, url, score, leaderboard})
         var mailOptions = {
             from: `Webscore <${EMAIL_FROM}>`,
@@ -133,15 +142,7 @@ function send_email_subscription_started(url, email, last_scores_saved) {
             subject: `Successfully subscribed to Webscore - ${url}!`,
             html: page
         }
-
-        mail.sendMail(mailOptions, function(error, info){
-            if (error) {
-                console.log(`Could not send email ${error}`);
-                return;
-            } else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
+        resend_email(mailOptions, 20);
     } catch (err) {
         console.log(`Could not send email ${err}`);
         return;

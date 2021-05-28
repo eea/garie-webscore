@@ -26,7 +26,8 @@
 <h2> Greetings! </h2>
 <br>
 <br>
-<h3>You have been successfully subscribed to Webscore! See below stats from the most recent leaderboard</h3>
+<h3>You have been successfully subscribed to <b><a href="https://webscore.eea.europa.eu/">Webscore</a></b>!</h3>
+<br>
 
 {% if score != -1 %}
     <table>
@@ -42,7 +43,7 @@
                 {% else %}
                     <td>-</td>
                 {% endif %}
-                <td>{{ url }}</td>
+                <td> {{ url }} </td>
                 <td>{{ score }}</td>
             </tr>
         </tbody>
@@ -54,8 +55,8 @@
 {% endif %}
 
 <br>
+<h3>Visit the <b><a href="{{ 'https://webscore.eea.europa.eu/site/' + url|urlencode }}">full report online</a></b> in order to see <b>trends, drill down</b> on each test result and get <b>practical tips</b> for improvements. </h3>
 <br>
-
 {% if leaderboard.length != 0 %}
 
     <table>
@@ -68,7 +69,7 @@
             {% for app in leaderboard %}
             <tr>
                 <td>{{ loop.index }}</td>
-                <td>{{ app.url }}</td>
+                <td> {{ app.url }} </td>
                 <td>{{ app.score }}</td>
             </tr>
             {% endfor %}
@@ -82,7 +83,13 @@
 <br>
 <br>
 
-<p> For more information you can access https://webscore.eea.europa.eu/. </p>
+<p> For more information you can access <a href="https://webscore.eea.europa.eu/">https://webscore.eea.europa.eu/</a> </p>
+<br>
+<p> If you wish to unsubscribe or have further questions please contact us at <a href="mailto:web.helpdesk@eea.europa.eu"> web.helpdesk@eea.europa.eu</a> </p>
+<br>
+<br>
+<p>Best</p>
+<p>DIS1 Dev Team</p>
 
 
 </body>
