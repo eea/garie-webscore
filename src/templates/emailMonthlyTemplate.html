@@ -19,7 +19,7 @@
         padding: 15px;
     }
     .p_big {
-        font-size: 20px;
+        font-size: 14px;
     }
 </style>
 </head>
@@ -37,15 +37,15 @@
     <thead>
         <tr>
             <th> Application </th>
-            <th> Current score (rank) </th>
-            <th> Last month's score (rank) </th>
+            <th> Score Evolution </th>
+            <th> Rank Evolution </th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td> {{ url }} </td>
-            <td> {{ current_score }}  ({{ current_rank }}) </td>
-            <td> {{ last_month_score }}  ({{ last_month_rank }}) </td>
+            <td> {{ last_month_score }} -> <b>{{ current_score }}</b> </td>
+            <td> {{ last_month_rank }} -> <b>{{ current_rank }}</b> </td>
         </tr>
     </tbody>
 </table>
