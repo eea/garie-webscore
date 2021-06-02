@@ -77,7 +77,7 @@ function resend_email(mailOptions, count) {
     }
     mail.sendMail(mailOptions, async function(error, info){
         if (error) {
-            if (error.contains("No recipients defined")) {
+            if (error.includes("No recipients defined")) {
                 return;
             }
             console.log(`Could not send email ${error}. Resending...`)
