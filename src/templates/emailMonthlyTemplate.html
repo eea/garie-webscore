@@ -18,6 +18,9 @@
     th, td {
         padding: 15px;
     }
+    .p_big {
+        font-size: 20px;
+    }
 </style>
 </head>
 <body>
@@ -29,28 +32,26 @@
 <h3>{{ email_text }}</h3>
 <br>
 
+
 <table>
     <thead>
         <tr>
-            <th colspan="3"> Your application's rank and score </th>
+            <th> Application </th>
+            <th> Current score (rank) </th>
+            <th> Last month's score (rank) </th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td> Application </td>
-            <td> Current score - rank</td>
-            <td> Last month's score - rank </td>
-        </tr>
-        <tr>
             <td> {{ url }} </td>
-            <td> {{ current_score }} - {{ current_rank }} </td>
-            <td> {{ last_month_score }} - {{ last_month_rank }} </td>
+            <td> {{ current_score }}  ({{ current_rank }}) </td>
+            <td> {{ last_month_score }}  ({{ last_month_rank }}) </td>
         </tr>
     </tbody>
 </table>
 
 <br>
-<h3>Visit the <b><a href="{{ 'https://webscore.eea.europa.eu/site/' + url|urlencode }}">full report online</a></b> in order to see <b>trends, drill down</b> on each test result and get <b>practical tips</b> for improvements. </h3>
+<p class="p_big">Visit the <b><a href="{{ 'https://webscore.eea.europa.eu/site/' + url|urlencode }}">full report online</a></b> in order to see <b>trends, drill down</b> on each test result and get <b>practical tips</b> for improvements. </p>
 <br>
 
 <table>

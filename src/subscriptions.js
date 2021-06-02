@@ -50,6 +50,7 @@ async function monthly_notification() {
         return;
     }
 
+    console.log("Start sending the monthly emails...");
     let current_and_old_scores = {};
 
     const {urls_map, data} = await get_current_scores();
