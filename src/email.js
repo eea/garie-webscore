@@ -98,7 +98,7 @@ function send_email(rank, app_info, current_leaderboard, text, emails) {
     }
 
     try{
-        const page = nunjucks.render('emailTemplate.html', {rank, app_info, current_leaderboard, text})
+        const page = nunjucks.render('emailEventTemplate.html', {rank, app_info, current_leaderboard, text})
         var mailOptions = {
             from: `Webscore <${EMAIL_FROM}>`,
             to: email_list,
@@ -149,6 +149,103 @@ function send_email_subscription_started(url, email, last_scores_saved) {
     }
 }
 
+function send_monthly_email(current_urls_sorted, current_and_old_scores, emails) {
+
+    const leaderboard = current_urls_sorted.slice(0, 5);
+
+    for (let i = 0; i < current_urls_sorted.length; i++) {
+        const url = current_urls_sorted[i].url;
+        const current_score = current_and_old_scores[url].current_score;
+        const last_month_score = current_and_old_scores[url].last_month_score;
+        const current_rank = current_and_old_scores[url].current_rank;
+        const last_month_rank = current_and_old_scores[url].last_month_rank;
+        const text = get_email_text(
+            url,
+            current_score,
+            last_month_score,
+            current_rank,
+            last_month_rank
+        );
+        let art = " a ";
+        if (text.adj === "" && text.subst === " increase from ") {
+            art = " an ";
+        } else if (text.subst === " the same as ") {
+            art = "";
+        }
+
+        const email_text = `Currently, your application has the score of ${current_score},${art}${text.adj}${text.subst} last month's score (${last_month_score}), \
+and the rank of ${current_rank},${text.rank} last month's rank (${last_month_rank}).`
+    
+        let email_list = [];
+        for (let email in emails[url]) {
+            if (emails[url][email] === 1) {
+                email_list.push(email);
+            }
+        }
+
+        try {
+            const page = nunjucks.render('emailMonthlyTemplate.html', {
+                leaderboard,
+                email_text,
+                url,
+                current_score,
+                last_month_score,
+                current_rank,
+                last_month_rank
+            })
+            var mailOptions = {
+                from: `Webscore <${EMAIL_FROM}>`,
+                to: email_list,
+                subject: `Webscore monthly update - ${url}!`,
+                html: page
+            }
+            resend_email(mailOptions, 20);
+        } catch (err) {
+            console.log(`Could not send monthly email ${err}`);
+            return;
+        }
+
+    }
+
+}
+
+function get_email_text(url, current_score, old_score, current_rank, old_rank) {
+
+    let text = {
+        adj: "",
+        subst: "",
+        rank: ""
+    }
+
+    if (current_score - old_score > 0) {
+        text.subst = " increase from ";
+        if (current_score - old_score > 100) {
+            text.adj = " significant";
+        } else if (current_score - old_score <= 50) {
+            text.adj = " slight";
+        }
+    } else if (current_score - old_score < 0) {
+        text.subst = " decrease from ";
+        if (old_score - current_score > 100) {
+            text.adj = " significant";
+        } else if (old_score - current_score <= 50) {
+            text.adj = " slight";
+        }
+    } else {
+        text.subst = " the same as ";
+    }
+
+    if (current_rank > old_rank) {
+        text.rank = " lower than";
+    } else if (current_rank < old_rank) {
+        text.rank = " higher than";
+    } else {
+        text.rank = " the same as"
+    }
+
+    return text;
+}
+
 module.exports = {
     send_email_first_place,
     send_email_entered_top_five,
@@ -156,7 +253,6 @@ module.exports = {
     send_email_above_median,
     send_email_below_median,
     send_email_bottom_five,
-    send_email_subscription_started
-
-
+    send_email_subscription_started,
+    send_monthly_email
 }

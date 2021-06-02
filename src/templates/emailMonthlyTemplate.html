@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    th {
+        background-color: rgb(187, 188, 190);
+    }
+    table, td, th {  
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 50%;
+    }
+    
+    th, td {
+        padding: 15px;
+    }
+</style>
+</head>
+<body>
+    
+
+<h2> Greetings! </h2>
+<br>
+<br>
+<h3>{{ email_text }}</h3>
+<br>
+
+<table>
+    <thead>
+        <tr>
+            <th colspan="3"> Your application's rank and score </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td> Application </td>
+            <td> Current score - rank</td>
+            <td> Last month's score - rank </td>
+        </tr>
+        <tr>
+            <td> {{ url }} </td>
+            <td> {{ current_score }} - {{ current_rank }} </td>
+            <td> {{ last_month_score }} - {{ last_month_rank }} </td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+<h3>Visit the <b><a href="{{ 'https://webscore.eea.europa.eu/site/' + url|urlencode }}">full report online</a></b> in order to see <b>trends, drill down</b> on each test result and get <b>practical tips</b> for improvements. </h3>
+<br>
+
+<table>
+    <thead>
+        <tr>
+            <th colspan="3"> Current leaderboard </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in leaderboard %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td> {{ app.url }} </td>
+            <td>{{ app.score }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<p> For more information you can access <a href="https://webscore.eea.europa.eu/">https://webscore.eea.europa.eu/</a> </p>
+<br>
+<p> If you wish to unsubscribe or have further questions please contact us at <a href="mailto:web.helpdesk@eea.europa.eu"> web.helpdesk@eea.europa.eu</a> </p>
+<br>
+<br>
+<p>Best</p>
+<p>DIS1 Dev Team</p>
+
+</body>
+</html> 

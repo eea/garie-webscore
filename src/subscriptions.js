@@ -10,7 +10,8 @@ const {
     send_email_above_median,
     send_email_below_median,
     send_email_bottom_five,
-    send_email_subscription_started
+    send_email_subscription_started,
+    send_monthly_email
 } = require('./email');
 
 const {
@@ -28,11 +29,77 @@ const CONSISTENCY_LENGTH = 3;
 
 // every wednsday at 11:00;
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: process.env.MAIL_SUBSCRIPTION_FREQUENCY_CRONJOB || '0 11 * * 3',
+    cronjob_syntax: process.env.MAIL_SUBSCRIPTION_FREQUENCY_CRONJOB || '0 11 * * 1',
     influx_syntax: process.env.MAIL_SUBSCRIPTION_INFLUX_SYNTAX || '7d'
 }
 
+const MONTHLY_SUBSCRIPTION = {
+    cronjob_syntax: process.env.MONTHLY_MAIL_SUBSCRIPTION || "0 12 1 * *",
+    influx_syntax: "30d"
+}
+
+cron.schedule(MONTHLY_SUBSCRIPTION.cronjob_syntax, async() => monthly_notification());
+
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
+
+
+async function monthly_notification() {
+    let emails = await get_all_emails();
+    if (Object.keys(emails).length === 0) {
+        console.log("No mail to send monthly emails to.");
+        return;
+    }
+
+    let current_and_old_scores = {};
+
+    const {urls_map, data} = await get_current_scores();
+    let current_urls_sorted = sort_data(urls_map, false);
+
+    for (let i = 0; i < current_urls_sorted.length; i++) {
+        current_and_old_scores[current_urls_sorted[i].url] = {
+            current_score: current_urls_sorted[i].score,
+            current_rank: i + 1,
+            last_month_score: 0,
+            last_month_rank: 0
+        }
+    }
+
+    const month_query = `select * from "webscore-leaderboard" where time >= now() - ${MONTHLY_SUBSCRIPTION.influx_syntax} order by time desc`;
+    let all_last_month = [];
+    try {
+        all_last_month = await influx.query(month_query, {database: DATABASE_NAME});
+    } catch(err) {
+        console.log('Can not get last month query', err);
+    }
+
+    let old_scores = {};
+
+    for (let elem of all_last_month) {
+        old_scores[elem.url] = elem.score;
+    }
+
+    let sorted_old_scores = []
+    for (let elem in old_scores) {
+        if (old_scores[elem] >= 0) {
+            sorted_old_scores.push([elem, old_scores[elem]])
+        }
+    }
+
+    sorted_old_scores.sort(function(a, b) {
+        return b[1] - a[1];
+    });
+
+    for (let i = 0; i < sorted_old_scores.length; i++) {
+        const url = sorted_old_scores[i][0];
+        if (current_and_old_scores[url] != undefined && old_scores[url] >= 0) {
+            current_and_old_scores[url].last_month_score = old_scores[url];
+            current_and_old_scores[url].last_month_rank = i + 1;
+        }
+    }
+
+    send_monthly_email(current_urls_sorted, current_and_old_scores, emails);
+
+}
 
 async function update_email_for_url(url, email, active) {
 
@@ -453,5 +520,6 @@ async function send_notification() {
 
 module.exports = {
     update_email_for_url,
-    get_all_emails
+    get_all_emails,
+    monthly_notification
 }
