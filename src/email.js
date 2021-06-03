@@ -170,14 +170,18 @@ function send_monthly_email(current_urls_sorted, current_and_old_scores, emails)
             last_month_rank
         );
         let art = " a ";
-        if (text.adj === "" && text.subst === " increase from ") {
+        if (text.adj === "" && text.subst === " increase") {
             art = " an ";
-        } else if (text.subst === " the same as ") {
+        } else if (text.subst === " no change") {
             art = "";
         }
 
-        const email_text = `Currently, your application has the score of ${current_score},${art}${text.adj}${text.subst} last month's score (${last_month_score}), \
-and the rank of ${current_rank},${text.rank} last month's rank (${last_month_rank}).`
+        const current = new Date();
+        current.setMonth(current.getMonth()-1);
+        const previousMonth = current.toLocaleString('default', { month: 'long' });
+
+        const email_text_score = `There has been ${art}${text.adj}${text.subst} in the score since the start of the month (${previousMonth}), from ${last_month_score} to ${current_score}.`
+        const email_text_rank = `The current rank, ${current_rank}, is ${text.rank} the rank from the start of the month, ${last_month_rank}.`
     
         let email_list = [];
         for (let email in emails[url]) {
@@ -189,7 +193,8 @@ and the rank of ${current_rank},${text.rank} last month's rank (${last_month_ran
         try {
             const page = nunjucks.render('emailMonthlyTemplate.html', {
                 leaderboard,
-                email_text,
+                email_text_score,
+                email_text_rank,
                 url,
                 current_score,
                 last_month_score,
@@ -199,7 +204,7 @@ and the rank of ${current_rank},${text.rank} last month's rank (${last_month_ran
             var mailOptions = {
                 from: `Webscore <${EMAIL_FROM}>`,
                 to: email_list,
-                subject: `Webscore monthly update - ${url}!`,
+                subject: `Webscore monthly update (${previousMonth}) - ${url}!`,
                 html: page
             }
             resend_email(mailOptions, 20);
@@ -221,21 +226,21 @@ function get_email_text(url, current_score, old_score, current_rank, old_rank) {
     }
 
     if (current_score - old_score > 0) {
-        text.subst = " increase from ";
+        text.subst = " increase";
         if (current_score - old_score > 100) {
             text.adj = " significant";
         } else if (current_score - old_score <= 50) {
             text.adj = " slight";
         }
     } else if (current_score - old_score < 0) {
-        text.subst = " decrease from ";
+        text.subst = " decrease";
         if (old_score - current_score > 100) {
             text.adj = " significant";
         } else if (old_score - current_score <= 50) {
             text.adj = " slight";
         }
     } else {
-        text.subst = " the same as ";
+        text.subst = " no change";
     }
 
     if (current_rank > old_rank) {

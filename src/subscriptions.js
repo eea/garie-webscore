@@ -33,10 +33,7 @@ const CRONJOB_INTERVAL = {
     influx_syntax: process.env.MAIL_SUBSCRIPTION_INFLUX_SYNTAX || '7d'
 }
 
-const MONTHLY_SUBSCRIPTION = {
-    cronjob_syntax: process.env.MONTHLY_MAIL_SUBSCRIPTION || "0 12 1 * *",
-    influx_syntax: "30d"
-}
+const MONTHLY_SUBSCRIPTION = process.env.MONTHLY_SUBSCRIPTION || "0 12 1 * *";
 
 cron.schedule(MONTHLY_SUBSCRIPTION.cronjob_syntax, async() => monthly_notification());
 
@@ -65,13 +62,16 @@ async function monthly_notification() {
         }
     }
 
-    const month_query = `select * from "webscore-leaderboard" where time >= now() - ${MONTHLY_SUBSCRIPTION.influx_syntax} order by time desc`;
+    const month_query = `select * from "monthly-leaderboard" where time >= now() - 32d order by time desc`;
     let all_last_month = [];
     try {
         all_last_month = await influx.query(month_query, {database: DATABASE_NAME});
     } catch(err) {
-        console.log('Can not get last month query', err);
+        console.log('Can not get last month score results', err);
     }
+
+    // update monthly leaderboard with current scores;
+    await update_influx(current_urls_sorted, "monthly-leaderboard");
 
     let old_scores = {};
 
@@ -230,12 +230,12 @@ function sort_data(urls_map, keep_negatives=false) {
 }
 
 
-async function update_influx(urls_array_sorted) {
+async function update_influx(urls_array_sorted, measurement) {
     let points = [];
     try {
         for (let i = 0; i < urls_array_sorted.length; i++) {
             points.push( {
-                measurement: "webscore-leaderboard",
+                measurement: measurement,
                 tags: {
                     url: urls_array_sorted[i].url,
                     score: urls_array_sorted[i].score
@@ -245,10 +245,10 @@ async function update_influx(urls_array_sorted) {
         }
 
         const result = await influx.writePoints(points, {database: DATABASE_NAME});
-        console.log(`Successfully saved ${points.length} applications into database leaderboard`);
+        console.log(`Successfully saved ${points.length} applications into ${measurement}`);
         return result;
     } catch (err) {
-        console.log(`Failed to add applications to leaderboard database. ${points.length} apps. ${err}`);
+        console.log(`Failed to add applications to ${measurement}. ${points.length} apps. ${err}`);
         return Promise.reject(`Failed to add applications to leaderboard database. ${points.length} apps. ${err}`);
     }
 }
@@ -377,7 +377,7 @@ async function send_notification() {
     //after querying influx for last week's results, update influx with current scores;
     const {urls_map, data} = await get_current_scores();
     let current_urls_array_sorted = sort_data(urls_map, true);
-    await update_influx(current_urls_array_sorted);
+    await update_influx(current_urls_array_sorted, "webscore-leaderboard");
     current_urls_array_sorted = sort_data(urls_map, false);
 
 
@@ -521,6 +521,5 @@ async function send_notification() {
 
 module.exports = {
     update_email_for_url,
-    get_all_emails,
-    monthly_notification
+    get_all_emails
 }
