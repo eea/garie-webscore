@@ -35,7 +35,7 @@ const CRONJOB_INTERVAL = {
 
 const MONTHLY_SUBSCRIPTION = process.env.MONTHLY_SUBSCRIPTION || "0 12 1 * *";
 
-cron.schedule(MONTHLY_SUBSCRIPTION.cronjob_syntax, async() => monthly_notification());
+cron.schedule(MONTHLY_SUBSCRIPTION, async() => monthly_notification());
 
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
 
