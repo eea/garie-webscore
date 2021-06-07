@@ -180,6 +180,7 @@ async function send_monthly_email(current_urls_sorted, current_and_old_scores, e
         }
 
         const current = new Date();
+        const currentMonth = current.getMonth();
         current.setMonth(current.getMonth()-1);
         const previousMonth = current.toLocaleString('default', { month: 'long' });
         const year = current.getFullYear();
@@ -207,7 +208,9 @@ async function send_monthly_email(current_urls_sorted, current_and_old_scores, e
                     current_score,
                     last_month_score,
                     current_rank,
-                    last_month_rank
+                    last_month_rank,
+                    previousMonth,
+                    currentMonth
                 })
                 var mailOptions = {
                     from: `Webscore <${EMAIL_FROM}>`,
