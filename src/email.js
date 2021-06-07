@@ -183,7 +183,7 @@ async function send_monthly_email(current_urls_sorted, current_and_old_scores, e
         current.setMonth(current.getMonth()-1);
         const previousMonth = current.toLocaleString('default', { month: 'long' });
         const year = current.getFullYear();
-        const email_text_score = `There has been ${art}${text.adj}${text.subst} in the score since the start of the month, ${previousMonth} ${year}, from ${last_month_score} to ${current_score}.`
+        const email_text_score = `There has been ${art}${text.adj}${text.subst} in the score since the start of ${previousMonth} ${year}, from ${last_month_score} to ${current_score}.`
         const email_text_rank = `The current rank, ${current_rank}, is ${text.rank} the rank from the start of the month, which was ${last_month_rank}.`
 
         let email_list = [];
