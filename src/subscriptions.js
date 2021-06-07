@@ -56,7 +56,7 @@ async function check_monthly_mails() {
         console.log("Start resending emails..");
         event.setDate(1);
         event.setHours(0);
-        const query = `select * from "sent_mails" WHERE time >= ${event.toISOString().split('.')[0]}`;
+        const query = `select * from "sent_mails" WHERE time >= '${event.toISOString().split('.')[0]}Z'`;
 
         let res = [];
         try {
