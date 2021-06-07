@@ -180,7 +180,8 @@ async function send_monthly_email(current_urls_sorted, current_and_old_scores, e
         }
 
         const current = new Date();
-        const currentMonth = current.getMonth();
+        current.setMonth(current.getMonth())
+        const currentMonth = current.toLocaleString('default', { month: 'long' });
         current.setMonth(current.getMonth()-1);
         const previousMonth = current.toLocaleString('default', { month: 'long' });
         const year = current.getFullYear();
