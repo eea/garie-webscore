@@ -152,18 +152,21 @@ function send_email_subscription_started(url, email, last_scores_saved) {
     }
 }
 
-function send_monthly_email(current_urls_sorted, current_and_old_scores, emails) {
-
+async function send_monthly_email(current_urls_sorted, current_and_old_scores, emails, influx, DATABASE_NAME, already_sent) {
     const leaderboard = current_urls_sorted.slice(0, 5);
-
     for (let i = 0; i < current_urls_sorted.length; i++) {
         const url = current_urls_sorted[i].url;
         const current_score = current_and_old_scores[url].current_score;
         const last_month_score = current_and_old_scores[url].last_month_score;
         const current_rank = current_and_old_scores[url].current_rank;
         const last_month_rank = current_and_old_scores[url].last_month_rank;
+
+        // in case the url is new, continue
+        if (current_score === 0 || last_month_score === 0) {
+            continue;
+        }
+
         const text = get_email_text(
-            url,
             current_score,
             last_month_score,
             current_rank,
@@ -179,10 +182,10 @@ function send_monthly_email(current_urls_sorted, current_and_old_scores, emails)
         const current = new Date();
         current.setMonth(current.getMonth()-1);
         const previousMonth = current.toLocaleString('default', { month: 'long' });
+        const year = current.getFullYear();
+        const email_text_score = `There has been ${art}${text.adj}${text.subst} in the score since the start of the month, ${previousMonth} ${year}, from ${last_month_score} to ${current_score}.`
+        const email_text_rank = `The current rank, ${current_rank}, is ${text.rank} the rank from the start of the month, which was ${last_month_rank}.`
 
-        const email_text_score = `There has been ${art}${text.adj}${text.subst} in the score since the start of the month (${previousMonth}), from ${last_month_score} to ${current_score}.`
-        const email_text_rank = `The current rank, ${current_rank}, is ${text.rank} the rank from the start of the month, ${last_month_rank}.`
-    
         let email_list = [];
         for (let email in emails[url]) {
             if (emails[url][email] === 1) {
@@ -190,34 +193,58 @@ function send_monthly_email(current_urls_sorted, current_and_old_scores, emails)
             }
         }
 
-        try {
-            const page = nunjucks.render('emailMonthlyTemplate.html', {
-                leaderboard,
-                email_text_score,
-                email_text_rank,
-                url,
-                current_score,
-                last_month_score,
-                current_rank,
-                last_month_rank
-            })
-            var mailOptions = {
-                from: `Webscore <${EMAIL_FROM}>`,
-                to: email_list,
-                subject: `Webscore monthly update (${previousMonth}) - ${url}!`,
-                html: page
+        for (let email of email_list) {
+            if (already_sent && already_sent[url] !== undefined && already_sent[url].includes(email)) {
+                console.log(`The monthly email for ${url} to ${email} was already sent!`);
+                continue;
             }
-            resend_email(mailOptions, 20);
-        } catch (err) {
-            console.log(`Could not send monthly email ${err}`);
-            return;
+            try {
+                const page = nunjucks.render('emailMonthlyTemplate.html', {
+                    leaderboard,
+                    email_text_score,
+                    email_text_rank,
+                    url,
+                    current_score,
+                    last_month_score,
+                    current_rank,
+                    last_month_rank
+                })
+                var mailOptions = {
+                    from: `Webscore <${EMAIL_FROM}>`,
+                    to: email,
+                    subject: `Webscore monthly update - ${url} - ${previousMonth} ${year}`,
+                    html: page
+                }
+                await mark_monthly_email_sent(url, email, influx, DATABASE_NAME);
+                resend_email(mailOptions, 20);
+            } catch (err) {
+                console.log(`Could not send monthly email ${err}`);
+                return;
+            }
         }
-
     }
-
 }
 
-function get_email_text(url, current_score, old_score, current_rank, old_rank) {
+async function mark_monthly_email_sent(url, email, influx, DATABASE_NAME) {
+    try {
+        const point = {
+            measurement: "sent_mails",
+            tags: {
+                url: url,
+                email: email
+            },
+            fields: {date: Date.now()}
+        }
+
+        await influx.writePoints([point], {database: DATABASE_NAME});
+        console.log(`Sent monthly mail to ${email} for ${url}.`);
+    } catch (err) {
+        console.log(`Failed to save and send monthly email to ${email} for ${url}`, err);
+        return Promise.reject(`Failed to save and send monthly email to ${email} for ${url}`);
+    }
+}
+
+function get_email_text(current_score, old_score, current_rank, old_rank) {
 
     let text = {
         adj: "",
