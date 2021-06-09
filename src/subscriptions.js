@@ -10,7 +10,8 @@ const {
     send_email_above_median,
     send_email_below_median,
     send_email_bottom_five,
-    send_email_subscription_started
+    send_email_subscription_started,
+    send_monthly_email
 } = require('./email');
 
 const {
@@ -28,11 +29,112 @@ const CONSISTENCY_LENGTH = 3;
 
 // every wednsday at 11:00;
 const CRONJOB_INTERVAL = {
-    cronjob_syntax: process.env.MAIL_SUBSCRIPTION_FREQUENCY_CRONJOB || '0 11 * * 3',
+    cronjob_syntax: process.env.MAIL_SUBSCRIPTION_FREQUENCY_CRONJOB || '0 11 * * 1',
     influx_syntax: process.env.MAIL_SUBSCRIPTION_INFLUX_SYNTAX || '7d'
 }
 
+const MONTHLY_SUBSCRIPTION = process.env.MONTHLY_SUBSCRIPTION || "0 12 1 * *";
+
+cron.schedule(MONTHLY_SUBSCRIPTION, async() => monthly_notification());
+
 cron.schedule(CRONJOB_INTERVAL.cronjob_syntax, async()=> send_notification());
+
+
+check_monthly_mails();
+async function check_monthly_mails() {
+    // wait for container to start and init
+    await sleep(180 * 1000);
+
+    // if date is past 5th we don't want to send mails unless forced to
+    const event = new Date();
+    if (event.getDate() > 5) {
+        if (!process.env.FORCED_MAIL_RESEND) {
+            return;
+        }
+    }
+    while (true) {
+        console.log("Start resending emails..");
+        event.setDate(1);
+        event.setHours(0);
+        const query = `select * from "sent_mails" WHERE time >= '${event.toISOString().split('.')[0]}Z'`;
+
+        let res = [];
+        try {
+            res = await influx.query(query, {database: DATABASE_NAME});
+        } catch (err) {
+            console.log('Can not query sent mails', err);
+        }
+
+        let already_sent = {}
+        for (let elem of res) {
+            if (!already_sent[elem.url]) {
+                already_sent[elem.url] = [];
+            }
+            already_sent[elem.url].push(elem.email);
+        }
+
+        try {
+            await monthly_notification(already_sent);
+            break;
+        } catch(err) {
+            console.log("Error at retry sending mails", err);
+        }
+
+    }
+}
+
+async function monthly_notification(already_sent) {
+    let emails = await get_all_emails();
+    if (Object.keys(emails).length === 0) {
+        console.log("No mail to send monthly emails to.");
+        return;
+    }
+
+    console.log("Start sending the monthly emails...");
+    let current_and_old_scores = {};
+
+    // current scores;
+    const {urls_map} = await get_scores();
+    let current_urls_sorted = sort_data(urls_map, false);
+
+    for (let i = 0; i < current_urls_sorted.length; i++) {
+        current_and_old_scores[current_urls_sorted[i].url] = {
+            current_score: current_urls_sorted[i].score,
+            current_rank: i + 1,
+            last_month_score: 0,
+            last_month_rank: 0
+        }
+    }
+
+    // scores from one month ago
+    const start_event = new Date();
+    start_event.setMonth(start_event.getMonth() - 1);
+    start_event.setDate(1);
+    start_event.setHours(0);
+    start_event.setMinutes(0);
+    // 1st of last month 00:00
+
+    const end_event = new Date();
+    end_event.setMonth(end_event.getMonth() - 1);
+    end_event.setDate(1);
+    end_event.setHours(23);
+    // 1st of last month 23:00
+
+    const result = await get_scores(start_event, end_event, true);
+    const urls_map_old = result.urls_map;
+    let old_urls_sorted = sort_data(urls_map_old, false);
+
+    for (let i = 0; i < old_urls_sorted.length; i++) {
+        const url = old_urls_sorted[i].url;
+        if (current_and_old_scores[url] !== undefined) {
+            current_and_old_scores[url].last_month_score = old_urls_sorted[i].score;
+            current_and_old_scores[url].last_month_rank = i + 1;
+        }
+    }
+
+    await send_monthly_email(current_urls_sorted, current_and_old_scores, emails, influx, DATABASE_NAME, already_sent);
+
+}
 
 async function update_email_for_url(url, email, active) {
 
@@ -50,7 +152,7 @@ async function update_email_for_url(url, email, active) {
         await influx.writePoints([point], {database: DATABASE_NAME});
         console.log(`Successfully saved email ${email} for the application ${url} as ${active}.`);
         if (parseInt(active) === 1) {
-            const {urls_map} = await get_current_scores();
+            const {urls_map} = await get_scores();
             send_email_subscription_started(url, email, urls_map);
         }
     } catch (err) {
@@ -162,12 +264,12 @@ function sort_data(urls_map, keep_negatives=false) {
 }
 
 
-async function update_influx(urls_array_sorted) {
+async function update_influx(urls_array_sorted, measurement) {
     let points = [];
     try {
         for (let i = 0; i < urls_array_sorted.length; i++) {
             points.push( {
-                measurement: "webscore-leaderboard",
+                measurement: measurement,
                 tags: {
                     url: urls_array_sorted[i].url,
                     score: urls_array_sorted[i].score
@@ -177,10 +279,10 @@ async function update_influx(urls_array_sorted) {
         }
 
         const result = await influx.writePoints(points, {database: DATABASE_NAME});
-        console.log(`Successfully saved ${points.length} applications into database leaderboard`);
+        console.log(`Successfully saved ${points.length} applications into ${measurement}`);
         return result;
     } catch (err) {
-        console.log(`Failed to add applications to leaderboard database. ${points.length} apps. ${err}`);
+        console.log(`Failed to add applications to ${measurement}. ${points.length} apps. ${err}`);
         return Promise.reject(`Failed to add applications to leaderboard database. ${points.length} apps. ${err}`);
     }
 }
@@ -287,8 +389,8 @@ function get_rank(current_urls_array_sorted, url) {
     return -1;
 }
 
-async function get_current_scores() {
-    const data = await queries.getData();
+async function get_scores(start_date, end_date, no_cache) {
+    const data = await queries.getData(start_date, end_date, no_cache);
     for (const row of data) {
         row.url = urlSlug(row.url);
     }
@@ -307,9 +409,9 @@ async function send_notification() {
 
 
     //after querying influx for last week's results, update influx with current scores;
-    const {urls_map, data} = await get_current_scores();
+    const {urls_map, data} = await get_scores();
     let current_urls_array_sorted = sort_data(urls_map, true);
-    await update_influx(current_urls_array_sorted);
+    await update_influx(current_urls_array_sorted, "webscore-leaderboard");
     current_urls_array_sorted = sort_data(urls_map, false);
 
 

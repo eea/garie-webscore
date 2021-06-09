@@ -54,11 +54,22 @@ const merge_results = (seriesRows, days) => {
   return seriesValues;
 }
 
-const query = async (metricSpec) => {
+const query = async (metricSpec, start_date, end_date, no_cache) => {
   const { name, measurement, field, database } = metricSpec
   let metricsRows, lastMetricsRows, maxRows, monthSeriesRows, yearSeriesRows;
-  let cacheResult = cache.get(name);
-  const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" WHERE time >= now() - 1d GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
+  let cacheResult = null;
+  if (!no_cache) {
+    cacheResult = cache.get(name);
+  }
+
+  let time_condition = 'time >= now() - 1d';
+
+  if (end_date) {    
+    time_condition = `time >= '${start_date.toISOString().split('.')[0]}Z' `;
+    time_condition += `and time <= '${end_date.toISOString().split('.')[0]}Z'`;
+  }
+
+  const metricsQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" WHERE ${time_condition} GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const lastMetricQuery = `SELECT "url", "time", "${field}" AS "value" FROM "${measurement}" GROUP BY "url" ORDER BY "time" DESC LIMIT 1`
   const maxQuery = `SELECT max("${field}") AS "value" FROM "${measurement}" WHERE time <= now() - ${MAX_GRACE_PERIOD} GROUP BY "url" fill(none) ORDER BY time DESC LIMIT 1`
     // last 30 days - should we add `LIMIT 30` ?
@@ -85,20 +96,21 @@ const query = async (metricSpec) => {
       return [[], [], [], [], []];
     })
 
-
-    cache.put(name, {
-      metricsRows,
-      lastMetricsRows,
-      maxRows,
-      monthSeriesRows,
-      yearSeriesRows
-    }, 60000);
+    if (!no_cache) {
+      cache.put(name, {
+        metricsRows,
+        lastMetricsRows,
+        maxRows,
+        monthSeriesRows,
+        yearSeriesRows
+      }, 60000);
+    }
   }
 
   // order asc metricRows to get the last value every time;
   metricsRows.sort(function(a, b) {
     return a.time - b.time;
-});
+  });
 
   const metricsValues = {}
   for (const row of metricsRows) {
@@ -171,8 +183,8 @@ const fillCheckList = (series, checkList) => {
   return checkList;
 }
 
-const getData = async () => {
-  const results = await Promise.all(metrics.map((metric) => query(metric)))
+const getData = async (start_date, end_date, no_cache) => {
+  const results = await Promise.all(metrics.map((metric) => query(metric, start_date, end_date, no_cache)))
   const metricResults = {}
   metrics.forEach((metric, i) => metricResults[metric.name] = results[i])
 

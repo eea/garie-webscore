@@ -18,34 +18,41 @@
     th, td {
         padding: 15px;
     }
+    .p_big {
+        font-size: 14px;
+    }
 </style>
 </head>
 <body>
     
 
-<h2> Greetings! </h2>
+<h2> Monthly overview of {{ url }} (1 {{ previousMonth }} - 1 {{ currentMonth }}) </h2>
 <br>
 <br>
-<h3>{{ text }}</h3>
+<h3>{{ email_text_score }}<h3>
+<h3>{{ email_text_rank }}</h3>
 <br>
+
 
 <table>
     <thead>
         <tr>
-            <th colspan="3"> Your application's rank and score </th>
+            <th> Application </th>
+            <th> Score Evolution </th>
+            <th> Rank Evolution </th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>{{ rank }}</td>
-            <td> {{ app_info.url }} </td>
-            <td>{{ app_info.score }}</td>
+            <td> {{ url }} </td>
+            <td> {{ last_month_score }} -> <b>{{ current_score }}</b> </td>
+            <td> {{ last_month_rank }} -> <b>{{ current_rank }}</b> </td>
         </tr>
     </tbody>
 </table>
 
 <br>
-<h3>Visit the <b><a href="{{ 'https://webscore.eea.europa.eu/site/' + app_info.url|urlencode }}">full report online</a></b> in order to see <b>trends, drill down</b> on each test result and get <b>practical tips</b> for improvements. </h3>
+<p class="p_big">Visit the <b><a href="{{ 'https://webscore.eea.europa.eu/site/' + url|urlencode }}">full report online</a></b> in order to see <b>trends, drill down</b> on each test result and get <b>practical tips</b> for improvements. </p>
 <br>
 
 <table>
@@ -55,7 +62,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for app in current_leaderboard %}
+        {% for app in leaderboard %}
         <tr>
             <td>{{ loop.index }}</td>
             <td> {{ app.url }} </td>
