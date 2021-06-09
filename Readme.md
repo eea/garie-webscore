@@ -61,6 +61,8 @@ If you want to change one of the two last variables mentioned, you will have to 
 
 If you want to test the system, you can make the environment variable TEST_SUBSCRIPTION_EVENTS 'true' (it defaults to 'false'). There are several tests (you can find them in test.js) that run, with the frequency set by the cronjob, that manually change a website's score and notifies the list of subscribers.
 
+There is also a feature for monthly emails. Every start of the month (1st) an email will be sent with a short overview of the past month evolution. If the container dies and some emails are not sent, between 1st-5th of the month (if the container wakes up) there will be a retry. After that, there is an environment variable we can set (FORCED_MAIL_RESEND) which if 'true' it will force resend the unsent emails past the 5th.
+
 ## License
 Icons from https://icons.getbootstrap.com/, MIT license
 
