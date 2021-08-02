@@ -275,9 +275,9 @@ function get_email_text(current_score, old_score, current_rank, old_rank) {
     }
 
     if (current_rank > old_rank) {
-        text.rank = " lower than";
+        text.rank = " worse";
     } else if (current_rank < old_rank) {
-        text.rank = " higher than";
+        text.rank = " better";
     } else {
         text.rank = " the same as"
     }
