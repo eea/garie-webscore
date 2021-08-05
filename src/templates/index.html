@@ -60,7 +60,12 @@ function sortScores(a, b) {
     data-show-button-text="true">
     <thead class="thead-dark">
       <tr>
-        <th scope="col" data-field="rank">Rank</th>
+        <th scope="col" class="text-center"
+        data-field="rank"
+        data-sortable="true"
+        data-sort-name="_rank_data"
+        data-sorter="sortScores"
+        data-searchable="false">Rank</th>
         <th scope="col" data-field="url" data-searchable="true">Website</th>
         <th scope="col" class="text-center"
           data-field="total-score"
@@ -97,7 +102,7 @@ function sortScores(a, b) {
     <tbody>
     {% for row in data %}
       <tr>
-        <th scope="row">
+        <th scope="row" class="text-center" data-score="{{ loop.index }}">
           {{ loop.index }}
         </th>
         <td scope="row">
