@@ -32,6 +32,13 @@ function sortScores(a, b) {
 function sortStringScores(a, b) {
   return a.score.localeCompare(b.score);
 }
+
+function customSearch(data, text) {
+  return data.filter(function (row) {
+    return  row._url_data.score.indexOf(text.toLowerCase()) > -1
+  })
+}
+
 </script>
 <div class="container-fluid">
 
@@ -61,6 +68,8 @@ function sortStringScores(a, b) {
     data-search-align="left"
     data-show-search-clear-button="true"
     data-show-button-icons="false"
+    data-filter-control="true"
+    data-custom-search="customSearch"
     data-show-button-text="true">
     <thead class="thead-dark">
       <tr>
