@@ -28,6 +28,17 @@ function sortScores(a, b) {
   if ((a.score > b.score) || (typeof(b.score) === "string")) return 1;
   return 0;
 }
+
+function sortStringScores(a, b) {
+  return a.score.localeCompare(b.score);
+}
+
+function customSearch(data, text) {
+  return data.filter(function (row) {
+    return  row._url_data.score.indexOf(text.toLowerCase()) > -1
+  })
+}
+
 </script>
 <div class="container-fluid">
 
@@ -57,11 +68,22 @@ function sortScores(a, b) {
     data-search-align="left"
     data-show-search-clear-button="true"
     data-show-button-icons="false"
+    data-filter-control="true"
+    data-custom-search="customSearch"
     data-show-button-text="true">
     <thead class="thead-dark">
       <tr>
-        <th scope="col" data-field="rank">Rank</th>
-        <th scope="col" data-field="url" data-searchable="true">Website</th>
+        <th scope="col" class="text-center"
+        data-field="rank"
+        data-sortable="true"
+        data-sort-name="_rank_data"
+        data-sorter="sortScores"
+        data-searchable="false">Rank</th>
+        <th scope="col" data-field="url"
+        data-sortable="true"
+        data-sort-name="_url_data"
+        data-sorter="sortStringScores"
+        data-searchable="true">Website</th>
         <th scope="col" class="text-center"
           data-field="total-score"
           data-sortable="true"
@@ -97,10 +119,10 @@ function sortScores(a, b) {
     <tbody>
     {% for row in data %}
       <tr>
-        <th scope="row">
+        <th scope="row" class="text-center" data-score="{{ loop.index }}">
           {{ loop.index }}
         </th>
-        <td scope="row">
+        <td scope="row"  data-score="{{ urlSlug(row.url) }}">
           {% set url_host = row.url %}
           {% if isExternal(url_host) %}
             <span data-toggle="tooltip" title="Non-EEA site, included for reference">🌎</span>
