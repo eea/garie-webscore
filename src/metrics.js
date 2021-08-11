@@ -195,6 +195,16 @@ const metrics = [
     docs: "",
     help: "Browsertime provides an alternative way of evaluating website performance."
   },
+  {
+    name: "Checkmk",
+    important: true,
+    database: "checkmk",
+    measurement: "cmk1DayScore",
+    field: "value",
+    thresholds: [50, 90],
+    docs: "",
+    help: "Checkmk provides a score based on the data from checkmk server regarding downtimes."
+  }
 ]
 
 const onDemandApis = [
