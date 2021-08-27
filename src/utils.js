@@ -13,7 +13,7 @@ const urlReplaceProtocol = (url) => {
 }
 
 const thresholdColor = (thresholds, value) => {
-    if (typeof value === 'number' && !isNaN(value)) {
+    if (typeof value === 'number' && value >= 0 && !isNaN(value)) {
       const [red, yellow] = thresholds
       if (value < red)
         return "table-danger"
