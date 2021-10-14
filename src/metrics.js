@@ -199,7 +199,7 @@ const metrics = [
     name: "Checkmk",
     important: true,
     database: "checkmk",
-    measurement: "cmk1DayScore",
+    measurement: "cmk30DaysScore",
     field: "value",
     thresholds: [50, 90],
     docs: "",

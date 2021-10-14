@@ -197,7 +197,7 @@ const getData = async (start_date, end_date, no_cache) => {
       urlMap[url] = row
       const result = results[url]
       row.metrics[metric.name] = {
-        value: Math.round(result.value),
+        value: result.value,
         last: Math.round(result.last),
         lastTime: result.lastTime,
         lastTimeMs: result.lastTimeMs,
