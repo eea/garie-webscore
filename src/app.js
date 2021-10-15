@@ -60,7 +60,6 @@ nunjucksEnv.addGlobal('metricStyle', (metric, value) => {
 nunjucksEnv.addGlobal('formatMetric', (metric, url, value) => {
   if (value === -1) return "-"
   if (typeof(value) === 'number') {
-    if (metric.name === "Checkmk") return value.toFixed(1);
     return Math.round(value);
   }
   if ((metric.internal === true) && (isExternal(url))) return "N/A"
