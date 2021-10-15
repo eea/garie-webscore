@@ -167,7 +167,7 @@ const median = (values) => {
   values.sort((a, b) => a - b)
   if (!values.length > 0) return null
   const half = Math.floor(values.length / 2)
-  if (values.length % 2) return values[half]
+  if (values.length % 2) return Math.round(values[half])
   return Math.round((values[half - 1] + values[half]) / 2)
 }
 
