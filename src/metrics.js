@@ -196,7 +196,7 @@ const metrics = [
     help: "Browsertime provides an alternative way of evaluating website performance."
   },
   {
-    name: "Checkmk",
+    name: "Checkmk(30days)",
     important: true,
     database: "checkmk",
     measurement: "cmk30DaysScore",
