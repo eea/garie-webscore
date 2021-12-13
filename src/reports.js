@@ -59,6 +59,9 @@ const reportUrl = (metric, slug, onDemand) => {
 
     case "browsertime":
       return fileUrl("browsertime-results/browsertime.html")
+
+    case "sentry-metrics":
+      return fileUrl("sentry-metrics-results/sentry-metrics.json")
     
     case "checkmk":
       return fileUrl("checkmk-results/checkmk.txt")

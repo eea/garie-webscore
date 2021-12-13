@@ -104,7 +104,7 @@ const metrics = [
     help: "Uptime (30 days) - this metrics gives 100 if the site is never found down/unresponsive within the checks performed under the last 30 days period. Uptime data gathered using <a href='https://uptimerobot.com/'>https://uptimerobot.com/</a>"
   },
   {
-    name: "Server errors(30)",
+    name: "Server errors(30days)",
     important: true,
     internal: true,
     database: "sentry-metrics",
@@ -112,10 +112,10 @@ const metrics = [
     field: "value_30days",
     thresholds: [95, 99],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Server-errorsvisit-by-Sentry",
-    help: "Server Errors per visit - aggregation of the number of server-side errors/exception received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a> from the website, divided by the total number of website visits as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
+    help: "Server Errors (30 days) per visit - aggregation of the number of server-side errors/exception received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a> from the website, divided by the total number of website visits as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
   },
   {
-    name: "JS errors(30)",
+    name: "JS errors(30days)",
     internal: true,
     database: "sentry-metrics",
     measurement: "JsEvents/TotalVisits",
