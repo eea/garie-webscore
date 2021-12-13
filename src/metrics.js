@@ -122,7 +122,7 @@ const metrics = [
     field: "value_30days",
     thresholds: [95, 99],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#JS-errorsvisit-by-Sentry",
-    help: "JS Errors per visit - aggregation of the number of JS errors/exceptions received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a>, divided by the number of website visits  as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
+    help: "JS Errors (30 days) per visit - aggregation of the number of JS errors/exceptions received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a>, divided by the number of website visits  as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
   },
   {
     name: "Test coverage",
