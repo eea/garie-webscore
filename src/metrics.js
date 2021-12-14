@@ -104,25 +104,25 @@ const metrics = [
     help: "Uptime (30 days) - this metrics gives 100 if the site is never found down/unresponsive within the checks performed under the last 30 days period. Uptime data gathered using <a href='https://uptimerobot.com/'>https://uptimerobot.com/</a>"
   },
   {
-    name: "Server errors(30days)",
+    name: "Server errors(7days)",
     important: true,
     internal: true,
     database: "sentry-metrics",
     measurement: "ServerErrors/TotalVisits",
-    field: "value_30days",
+    field: "value_7days",
     thresholds: [95, 99],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Server-errorsvisit-by-Sentry",
-    help: "Server Errors (30 days) per visit - aggregation of the number of server-side errors/exception received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a> from the website, divided by the total number of website visits as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
+    help: "Server Errors (7 days) per visit - aggregation of the number of server-side errors/exception received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a> from the website, divided by the total number of website visits as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
   },
   {
-    name: "JS errors(30days)",
+    name: "JS errors(7days)",
     internal: true,
     database: "sentry-metrics",
     measurement: "JsEvents/TotalVisits",
-    field: "value_30days",
+    field: "value_7days",
     thresholds: [95, 99],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#JS-errorsvisit-by-Sentry",
-    help: "JS Errors (30 days) per visit - aggregation of the number of JS errors/exceptions received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a>, divided by the number of website visits  as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
+    help: "JS Errors (7 days) per visit - aggregation of the number of JS errors/exceptions received in <a href='https://sentry.eea.europa.eu/' target='_blank'>Sentry</a>, divided by the number of website visits  as logged by <a href='https://matomo.org/' target='_blank'>Matomo</a>."
   },
   {
     name: "Test coverage",
@@ -133,7 +133,7 @@ const metrics = [
     field: "value",
     thresholds: [30, 80],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Test-coverage-JenkinsSonarqube",
-    help: "Test coverage - code quality metric that is computed based on the unit test coverage in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a>."
+    help: "Test coverage - code quality metric that is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube scanner. Coverage is computed from all the <a href='https://sonarqube.eea.europa.eu/projects?sort=-analysis_date' target='_blank'> SonarQube Projects</a> that have the url as a tag and are ending with '-master'. The score is the division between the sum of all covered lines and the sum of total lines."
   },
   {
     name: "Bugs",
@@ -143,7 +143,7 @@ const metrics = [
     field: "value",
     thresholds: [25, 75],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Bugs-JenkinsSonarqube",
-    help: "Bugs - code quality metric that is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
+    help: "Bugs - code quality metric that is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube scanner. Bugs are counted from all the <a href='https://sonarqube.eea.europa.eu/projects?sort=-analysis_date' target='_blank'> SonarQube Projects</a> that have the url as a tag and are ending with '-master'. The score is 0 if at least one bug has grade E (Blocker), 25 if at least one bug has grade D (Critical), 50 for C (Major), and 75 for B (Minor)."
   },
   {
     name: "Vulnerabilities",
@@ -153,7 +153,7 @@ const metrics = [
     field: "value",
     thresholds: [25, 75],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Vulnerabilities-JenkinsSonarqube",
-    help: "Vulnerabilities - code quality metric that is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
+    help: "Vulnerabilities - code quality metric that is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube scanner. Vulnerability score is computed from all the <a href='https://sonarqube.eea.europa.eu/projects?sort=-analysis_date' target='_blank'> SonarQube Projects</a> that have the url as a tag and are ending with '-master'. The score is 0 if at least one grade is E (Blocker), 25 if at least one grade is D (Critical), 50 for C (Major), and 75 for B (Minor)."
   },
   {
     name: "Code smells",
@@ -163,7 +163,7 @@ const metrics = [
     field: "value",
     thresholds: [25, 75],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Code-smells-JenkinsSonarqube",
-    help: "Code smells - code quality metric is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
+    help: "Code smells - code quality metric is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube scanner. Code smells score is computed from all the <a href='https://sonarqube.eea.europa.eu/projects?sort=-analysis_date' target='_blank'> SonarQube Projects</a> that have the url as a tag and are ending with '-master'. The score is 0 if at least one grade is E (Blocker), 25 if at least one grade is D (Critical), 50 for C (Major), and 75 for B (Minor)."
   },
   {
     name: "Duplication score",
@@ -173,7 +173,7 @@ const metrics = [
     field: "value",
     thresholds: [80, 95],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Duplication-score-JenkinsSonarqube",
-    help: "Duplication score - code quality metric is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube plugin."
+    help: "Duplication score - code quality metric that is computed based on the results of tests ran in <a href='https://ci.eionet.europa.eu' target='_blank'>Jenkins</a> using the SonarQube scanner. Duplication is computed from all the <a href='https://sonarqube.eea.europa.eu/projects?sort=-analysis_date' target='_blank'> SonarQube Projects</a> that have the url as a tag and are ending with '-master'. The score is the substraction from 100 of the division between the sum of all duplicated lines and the sum of total lines."
   },
   {
     name: "Webbkoll",
