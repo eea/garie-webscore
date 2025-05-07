@@ -1,29 +1,29 @@
-version: '3.4'
+version: "3.4"
 services:
-    garie-webscore:
-        build: .
-        privileged: true
-        ports:
-            - 3000:3000
-        environment:
-            - PAGE_USERNAME=admin
-            - PAGE_PASSWORD=admin
-            - TEST_SUBSCRIPTION_EVENTS=false
-        depends_on:
-            - postfix
-            - influxdb
-    influxdb:
-        image: 'influxdb:latest'
-        volumes:
-            - /var/lib/influxdb:/var/lib/influxdb
-        ports:
-            - 8086:8086
-        environment:
-            - INFLUXDB_ADMIN_USER=admin
-            - INFLUXDB_ADMIN_PASSWORD=admin
-    postfix:
-        image: eeacms/postfix:latest
-        environment:
-            MTP_HOST: "eea.europa.eu"
-            MTP_RELAY: "ironports.eionet.europa.eu"
-            MTP_PORT: "8587"
+  garie-webscore:
+    build: .
+    privileged: true
+    ports:
+      - 3000:3000
+    environment:
+      - PAGE_USERNAME=admin
+      - PAGE_PASSWORD=admin
+      - TEST_SUBSCRIPTION_EVENTS=false
+    depends_on:
+      - postfix
+      - influxdb
+  influxdb:
+    image: "influxdb:1.8.10"
+    volumes:
+      - /var/lib/influxdb:/var/lib/influxdb
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+  postfix:
+    image: eeacms/postfix:latest
+    environment:
+      MTP_HOST: "eea.europa.eu"
+      MTP_RELAY: "ironports.eionet.europa.eu"
+      MTP_PORT: "8587"
