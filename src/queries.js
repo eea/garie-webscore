@@ -6,7 +6,6 @@ const { urlReplaceProtocol } = require('./utils')
 
 // how much time to skip when looking for the historic max value of a metric
 const MAX_GRACE_PERIOD = "7d"
-let nrUrls = 0;
 
 const influx = new Influx.InfluxDB({
   host: process.env.INFLUX_HOST || 'influxdb',
@@ -128,7 +127,7 @@ const query = async (metricSpec, start_date, end_date, no_cache) => {
   for (const row of lastMetricsRows) {
     lastValues[urlReplaceProtocol(row.url)] = {
       last: row.value,
-      lastTime: (row.time.toISOString() || "").substr(0, 16).replace("T", " "),
+      lastTime: row.time.toLocaleString('en-GB', { timeZone: `${process.env.TZ}` }),
       lastTimeMs: row.time.getTime(),
     }
   }
@@ -224,8 +223,6 @@ const getData = async (start_date, end_date, no_cache) => {
       delete urlMap[url]
     }
   }
-
-  nrUrls = Object.keys(urlMap).length;
 
   for (let url in urlMap) {
     urlMap[url].checkListMonth = urlMap[url].checkListMonth.map(x=>x*5);
