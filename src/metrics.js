@@ -19,15 +19,6 @@ const metrics = [
     help: "Performance - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='_blank'>Lighthouse</a> in Chrome Developer Tools"
   },
   {
-    name: "Progressive Web App",
-    database: "lighthouse",
-    measurement: "pwa-score",
-    field: "value",
-    thresholds: [50, 90],
-    docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Progressive-Web-App",
-    help: "Progressive Web App - evaluated using <a href='https://developers.google.com/web/tools/lighthouse' target='blank'>Lighthouse</a> in Chrome Developer Tools"
-  },
-  {
     name: "Accessibility",
     database: "lighthouse",
     measurement: "accessibility-score",
