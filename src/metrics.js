@@ -62,7 +62,7 @@ const metrics = [
     field: "value",
     thresholds: [1, 90],
     docs: "https://taskman.eionet.europa.eu/projects/netpub/wiki/Quality_metrics#Encryption-TLS",
-    help: "Encryption (TLS) - certificates validity and configuration are evaluated using the SSL test tool at <a href='https://www.ssllabs.com/ssltest/' target='_blank'>https://www.ssllabs.com/ssltest/</a>"
+    help: "Encryption (TLS) - certificates validity and TLS configuration are evaluated using <a href='https://testssl.sh/' target='_blank'>testssl.sh</a> (<a href='https://github.com/testssl/testssl.sh' target='_blank'>GitHub</a>)"
   },
   {
     name: "Securityheaders.com",
