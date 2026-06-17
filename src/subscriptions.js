@@ -1,4 +1,5 @@
 const sleep = require('sleep-promise');
+const http = require('http');
 const { influx } = require('./queries');
 const queries = require('./queries');
 const cron = require('node-cron');
@@ -186,7 +187,13 @@ async function create_db() {
         const names = await influx.getDatabaseNames();
         if (names.indexOf(DATABASE_NAME) === -1) {
             console.log("Influx: leaderboard database does not exist. Creating Database.");
-            await influx.createDatabase(DATABASE_NAME);
+            // Try v2 API first (InfluxDB 2.x), fall back to v1 (InfluxDB 1.x)
+            try {
+                await _createBucketV2(DATABASE_NAME);
+            } catch (v2Err) {
+                console.log(`Influx: v2 bucket creation failed (${v2Err.message}), trying v1 CREATE DATABASE`);
+                await influx.createDatabase(DATABASE_NAME);
+            }
         }
         return Promise.resolve();
     } catch (err) {
@@ -194,6 +201,61 @@ async function create_db() {
         return Promise.reject('Failed to create database leaderboard');
     }
 }
+
+// Create a bucket via InfluxDB v2 API. Required for InfluxDB 2.x.
+const _createBucketV2 = (dbName) => {
+    const org = process.env.INFLUX_ORG || 'garie';
+    const token = process.env.INFLUX_TOKEN || process.env.INFLUX_PASSWORD || '';
+    const host = process.env.INFLUX_HOST || 'localhost';
+    const port = process.env.INFLUX_PORT || '8086';
+
+    return new Promise((resolve, reject) => {
+        http.get(`http://${host}:${port}/api/v2/orgs?org=${encodeURIComponent(org)}`, {
+            headers: { 'Authorization': `Token ${token}` }
+        }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                try {
+                    const parsed = JSON.parse(data);
+                    if (!parsed.orgs || parsed.orgs.length === 0) {
+                        return reject(new Error(`Org '${org}' not found`));
+                    }
+                    const orgID = parsed.orgs[0].id;
+
+                    const body = JSON.stringify({
+                        name: dbName,
+                        orgID: orgID,
+                        retentionRules: []
+                    });
+                    const bucketReq = http.request({
+                        hostname: host,
+                        port: port,
+                        path: '/api/v2/buckets',
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Token ${token}`,
+                            'Content-Type': 'application/json',
+                            'Content-Length': Buffer.byteLength(body)
+                        }
+                    }, (res) => {
+                        if (res.statusCode === 201 || res.statusCode === 200) {
+                            console.log(`Influx: bucket '${dbName}' created via v2 API`);
+                            resolve();
+                        } else {
+                            reject(new Error(`Bucket creation failed: HTTP ${res.statusCode}`));
+                        }
+                    });
+                    bucketReq.on('error', reject);
+                    bucketReq.write(body);
+                    bucketReq.end();
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        }).on('error', reject);
+    });
+};
 
 
 async function init_leaderboard_influx() {
