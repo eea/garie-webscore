@@ -207,8 +207,8 @@ async function create_db() {
 const _createBucketV2 = (dbName) => {
     const org = process.env.INFLUX_ORG || 'garie';
     const token = process.env.INFLUX_TOKEN || process.env.INFLUX_PASSWORD || '';
-    const host = process.env.INFLUX_HOST || 'localhost';
-    const port = process.env.INFLUX_PORT || '8086';
+    const host = process.env.HOST || process.env.INFLUX_HOST || 'influxdb';
+    const port = process.env.INFLUX_PORT || 8086;
 
     return new Promise((resolve, reject) => {
         http.get(`http://${host}:${port}/api/v2/orgs?org=${encodeURIComponent(org)}`, {
