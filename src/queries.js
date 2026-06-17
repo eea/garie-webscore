@@ -17,7 +17,7 @@ const influxUsername = token ? 'token' : (process.env.INFLUX_USERNAME || '');
 const influxPassword = token || process.env.INFLUX_PASSWORD || '';
 
 const influx = new Influx.InfluxDB({
-  host: process.env.INFLUX_HOST || 'localhost',
+  host: process.env.INFLUX_HOST || 'influxdb',
   port: process.env.INFLUX_PORT || '8086',
   username: influxUsername,
   password: influxPassword,
