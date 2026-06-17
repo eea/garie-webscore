@@ -45,6 +45,7 @@ check_monthly_mails();
 async function check_monthly_mails() {
     // wait for container to start and init
     await sleep(180 * 1000);
+    await init_leaderboard_influx();
 
     // if date is past 5th we don't want to send mails unless forced to
     const event = new Date();
