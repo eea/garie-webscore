@@ -8,9 +8,19 @@ const { urlReplaceProtocol } = require('./utils')
 const MAX_GRACE_PERIOD = "7d"
 let nrUrls = 0;
 
+// InfluxDB 2.x v1 compatibility API accepts token as the password.
+// If INFLUX_TOKEN is set, use it as password. Username must be non-empty
+// for the v1 compat API (value is ignored, but empty string causes 401).
+// Falls back to INFLUX_USERNAME/INFLUX_PASSWORD for backward compat with 1.x.
+const token = process.env.INFLUX_TOKEN;
+const influxUsername = token ? 'token' : (process.env.INFLUX_USERNAME || '');
+const influxPassword = token || process.env.INFLUX_PASSWORD || '';
+
 const influx = new Influx.InfluxDB({
-  host: process.env.INFLUX_HOST || 'influxdb',
-  port: process.env.INFLUX_PORT || '8086'
+  host: process.env.HOST || process.env.INFLUX_HOST || 'influxdb',
+  port: process.env.INFLUX_PORT || 8086,
+  username: influxUsername,
+  password: influxPassword,
 })
 
 // merge the MEAN values from month and year queries to accept http and https link as the same key;
@@ -184,6 +194,7 @@ const fillCheckList = (series, checkList) => {
 }
 
 const getData = async (start_date, end_date, no_cache) => {
+  const safeRound = (value) => Number.isFinite(value) ? Math.round(value) : -1
   const results = await Promise.all(metrics.map((metric) => query(metric, start_date, end_date, no_cache)))
   const metricResults = {}
   metrics.forEach((metric, i) => metricResults[metric.name] = results[i])
@@ -196,12 +207,14 @@ const getData = async (start_date, end_date, no_cache) => {
       const row = urlMap[url] || { url, metrics: {}, score: 0, checks: 0, currentChecks: 0, checkListMonth: [], checkListYear: [] }
       urlMap[url] = row
       const result = results[url]
+      const hasCurrentValue = Number.isFinite(result.value) && result.value >= 0
+
       row.metrics[metric.name] = {
-        value: Math.round(result.value),
-        last: Math.round(result.last),
+        value: safeRound(result.value),
+        last: safeRound(result.last),
         lastTime: result.lastTime,
         lastTimeMs: result.lastTimeMs,
-        max: Math.round(result.max),
+        max: safeRound(result.max),
         maxTime: result.maxTime,
         monthSeries: result.monthSeries,
         yearSeries: result.yearSeries
@@ -210,10 +223,10 @@ const getData = async (start_date, end_date, no_cache) => {
       row.checkListMonth = fillCheckList(result.monthSeries, row.checkListMonth)
       row.checkListYear = fillCheckList(result.yearSeries, row.checkListYear)
 
-      if (result.value) {
+      if (hasCurrentValue) {
         row.currentChecks += 1
       }
-      row.score += (result.value) ? result.value : 0
+      row.score += hasCurrentValue ? result.value : 0
       row.checks += 1
     }
   }

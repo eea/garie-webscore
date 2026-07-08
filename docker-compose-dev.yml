@@ -6,6 +6,8 @@ services:
     ports:
       - 3000:3000
     environment:
+      - INFLUX_TOKEN=dev-token
+      - INFLUX_ORG=garie
       - PAGE_USERNAME=admin
       - PAGE_PASSWORD=admin
       - TEST_SUBSCRIPTION_EVENTS=false
@@ -13,14 +15,18 @@ services:
       - postfix
       - influxdb
   influxdb:
-    image: "influxdb:1.8.10"
+    image: "influxdb:2.7"
     volumes:
       - /var/lib/influxdb:/var/lib/influxdb
     ports:
       - 8086:8086
     environment:
-      - INFLUXDB_ADMIN_USER=admin
-      - INFLUXDB_ADMIN_PASSWORD=admin
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=adminadmin
+      - DOCKER_INFLUXDB_INIT_ORG=garie
+      - DOCKER_INFLUXDB_INIT_BUCKET=default
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=dev-token
   postfix:
     image: eeacms/postfix:latest
     environment:
